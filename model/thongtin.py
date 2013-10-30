@@ -81,8 +81,7 @@ class yhoc_thongtin(osv.osv):
                 'attachment': fields.one2many('yhoc.attachment', 'baiviet_id', 'Đính kèm'),
                 'keyword_ids': fields.many2many('yhoc_keyword', 'thongtin_keyword_rel', 'thongtin_id', 'keyword_id', 'Keyword'),
                 'link_url':fields.char('Link url',size=1000),
-#                'public': fields.boolean('Public', help='Có cho phép cập nhật thông tin này lên web không?'),
-#                'album_ids': fields.many2many('x_album', 'thongtin_album_rel', 'thongtin_id', 'album_id', 'Albums'),
+                'url_thongtin':fields.char('URL',size=1000),                
                 }
     _defaults = {
                  'is_write': _default_quyensuabaiviet,
@@ -127,9 +126,22 @@ class yhoc_thongtin(osv.osv):
     def act_huy_thongtin(self, cr, uid, ids, context = None):
         return super(yhoc_thongtin,self).write(cr, uid, ids, {'state':'huy'}, context=context)
    
+    def create(self, cr, uid, vals, context=None):
+        if 'url_thongtin' not in vals:
+            name_url = self.pool.get('yhoc_trangchu').parser_url(str(thongtin.name))
+            vals.update({'url_thongtin':name_url})
+        return super(yhoc_thongtin,self).create(cr,uid,vals,context=context)
+    
     def write(self,cr, uid, ids, vals, context=None):
-        print vals
+#        print vals
         for r in self.browse(cr, uid, ids, context=context):
+            if 'name' in vals:
+                name_url = self.pool.get('yhoc_trangchu').parser_url(str(vals['name']))
+                vals.update({'url_thongtin':name_url})
+            elif 'url_thongtin' not in vals and not r.url_thongtin:
+                name_url = self.pool.get('yhoc_trangchu').parser_url(str(r.name))
+                vals.update({'url_thongtin':name_url})
+                
             if uid != 1:
                 if r.is_write == False:
                     raise osv.except_osv(('Message'), ('Bạn không có quyền sửa bài viết của người khác!'))
@@ -179,7 +191,7 @@ class yhoc_thongtin(osv.osv):
         for bv in thongtin:
             tongxem_baiviet.append(bv.id)
             baiviet_tab = baiviet_tab_.replace('__COL1__', bv.name or '')
-            baiviet_tab = baiviet_tab.replace('__LINK1__', '../../../../../../chude/%s.%s'%(bv.link_url, kieufile))
+            baiviet_tab = baiviet_tab.replace('__LINK1__', '../../../../../../%s.%s'%(bv.link_url, kieufile))
             baiviet_tab = baiviet_tab.replace('__COL2__', (bv.duan and bv.duan.name) or '')
             baiviet_tab = baiviet_tab.replace('__LINK2__', (bv.duan and bv.duan.link) or '#')
             #baiviet_tab = baiviet_tab.replace('__COL3__', str('--'))
@@ -248,15 +260,18 @@ class yhoc_thongtin(osv.osv):
         kieufile = self.pool.get('hlv.property')._get_value_project_property_by_name(cr, uid, 'Kiểu lưu file') or 'html'
         thongtin = self.browse(cr,uid,ids[0],context)
         
-        name_url = self.pool.get('yhoc_trangchu').parser_url(str(thongtin.name))
-        link_url = thongtin.duan.link_url + '/%s-%s'%(name_url,str(thongtin.id))
+        if thongtin.url_thongtin:
+            name_url = thongtin.url_thongtin
+        else:
+            name_url = self.pool.get('yhoc_trangchu').parser_url(str(thongtin.name))
+        link_url = thongtin.duan.link_url + '/%s'%(name_url)
         
         fr= open(duongdan+'/template/thongtin/thongtin.html', 'r')
         template = fr.read()
         fr.close()
         
 #Tao folder cho thongtin
-        folder_thongtin = duongdan + '/chude/' + thongtin.duan.link_url
+        folder_thongtin = duongdan + '/' + thongtin.duan.link_url
         if not os.path.exists(folder_thongtin):
             os.makedirs(folder_thongtin)
             
@@ -348,7 +363,10 @@ class yhoc_thongtin(osv.osv):
 #                template = template.replace('__CHUYENNGANH__',tv.chuyennganh or '')
         template = template.replace('__DANHXUNGNT__',tv.danhxung or '')
         template = template.replace('__NGUOIDICH__',tv.name)
-        template = template.replace('__LINKNGUOIDICH__',tv.link or '#')
+        if tv.google_plus_acc:
+            template = template.replace('__LINKNGUOIDICH__',tv.google_plus_acc)
+        else:
+            template = template.replace('__LINKNGUOIDICH__',tv.link or '#')
         
         self.pool.get('hr.employee').capnhat_profiletrongtrangbaiviet(cr, uid, [tv.id], context)             
         template = template.replace('__THONGTINNGUOIVIET__',duongdan + '/profile/%s/profiletrongtrangbaiviet.html' %str(tv.id))            
@@ -393,7 +411,7 @@ class yhoc_thongtin(osv.osv):
         template = template.replace('__HINHBAIVIET__', photo)
         template = template.replace('__MOTA__', thongtin.motangan or thongtin.name)
         
-        link_xemnhanh = domain + '/chude/' + link_url + '.%s'%(kieufile)
+        link_xemnhanh = domain + '/' + link_url + '.%s'%(kieufile)
         super(yhoc_thongtin,self).write(cr,uid,ids,{'link':link_xemnhanh,
                                                     'date':date,
                                                     'link_url':link_url}, context=context)
@@ -409,13 +427,18 @@ class yhoc_thongtin(osv.osv):
 #                all_cungchude += cungchude_tab
 #
         self.pool.get('yhoc_duan').capnhat_baivietcungduantrongbaiviet(cr, uid, [thongtin.duan.id], context)
-        template = template.replace('__BAIVIET_CUNGCHUDE__', duongdan + '/chude/%s/baivietcungduantrongbaiviet.php' %str(thongtin.duan.link_url))
+        template = template.replace('__BAIVIET_CUNGCHUDE__', duongdan + '/%s/baivietcungduantrongbaiviet.php' %str(thongtin.duan.link_url))
+        
+        cungchude = self.search(cr, uid, [('duan.id', '=',thongtin.duan.id),('state','=','done')], order='sequence', context=context)
+        cungchude = self.browse(cr, uid, cungchude, context)
+        path = duongdan + '/' + thongtin.duan.link_url +'/baivietcungduantrongbaiviet_end.html'
+        self.pool.get('yhoc_trangchu').capnhat_baivietmoi(cr, uid, cungchude, path, context)
         
 #Cap nhat tag        
         self.pool.get('yhoc_keyword').capnhat_tag(cr, uid, thongtin.keyword_ids, thongtin.id, context=context)
         tags = thongtin.keyword_ids
         list_tag = ''
-        temp_ = '''<a href="__LINKTAG__"><span style="font-size:14px;">__NAMETAG__</span></a>&nbsp;&nbsp;'''
+        temp_ = '''<a href="__LINKTAG__"><span style="font-size:14px;">__NAMETAG__</span></a>,&nbsp;'''
         for t in tags:
             temp = ''
             name = self.pool.get('yhoc_trangchu').parser_url(t.name)
@@ -424,15 +447,19 @@ class yhoc_thongtin(osv.osv):
             list_tag += temp
         template = template.replace('__LIST_TAGS__', list_tag)
         template = template.replace('__DUONGDAN__', duongdan)
+        template = template.replace('__ID__', str(thongtin.id))
             
         
         import codecs  
-        fw= codecs.open(folder_thongtin+'/%s-%s.%s'%(name_url, str(thongtin.id), kieufile),'w','utf-8')
+        fw= codecs.open(folder_thongtin+'/%s.%s'%(name_url, kieufile),'w','utf-8')
         fw.write(template)
         fw.close()
-        
+
+#Cap nhat bai viet moi
         trangchu_ids = self.pool.get('yhoc_trangchu').search(cr, uid, [], context=context)
-        self.pool.get('yhoc_trangchu').capnhat_baivietmoi(cr, uid, trangchu_ids, context)
+        trangchu_rc = self.pool.get('yhoc_trangchu').browse(cr, uid, trangchu_ids[0], context=context)
+        path = duongdan + '/trangchu/vi/baivietmoi.html'
+        self.pool.get('yhoc_trangchu').capnhat_baivietmoi(cr, uid, trangchu_rc.baivietmoi,path, context)
             
         self.pool.get('yhoc_duan').capnhat_thongtin(cr,uid,[thongtin.duan.id],context)
         self.capnhat_baiviettrongprofile(cr, uid, [thongtin.nguoidich.id], context)
@@ -520,7 +547,6 @@ class yhoc_thongtin(osv.osv):
         noidung = noidung.lower()
         tags = self.pool.get('yhoc_keyword').search(cr, uid, [], order='priority desc', context=context)
         kq = []
-        bs_tag = self.pool.get('yhoc_keyword').search(cr, uid, [('name','=',thongtin.nguoidich.name)],context=context)
         list = {}
         for t in tags:
             t = self.pool.get('yhoc_keyword').browse(cr, uid, t, context=context)
@@ -535,32 +561,45 @@ class yhoc_thongtin(osv.osv):
         else:
             kq = list_tags
         
-        if bs_tag:
+        bs_tag = self.pool.get('yhoc_keyword').search(cr, uid, [('name','=',thongtin.nguoidich.name)],context=context)
+        if bs_tag and bs_tag[0] not in kq:
             kq.append(bs_tag[0])
-        else:
+        elif not bs_tag:
             bs_tag = self.pool.get('yhoc_keyword').create(cr, uid, {'name':thongtin.nguoidich.name}, context=context)
-            kq.append(bs_tag)
+            if bs_tag not in kq:
+                kq.append(bs_tag)
+        
+        hd_tag = self.pool.get('yhoc_keyword').search(cr, uid, [('name','=',thongtin.nguoihieudinh.name)],context=context)
+        if hd_tag and hd_tag[0] not in kq:
+            kq.append(hd_tag[0])
+        elif not hd_tag:
+            hd_tag = self.pool.get('yhoc_keyword').create(cr, uid, {'name':thongtin.nguoidich.name}, context=context)
+            if hd_tag not in kq:
+                kq.append(hd_tag)
         
         duan_tag = self.pool.get('yhoc_keyword').search(cr, uid, [('name','=',thongtin.duan.name)],context=context)
-        if duan_tag:
+        if duan_tag and duan_tag[0] not in kq:
             kq.append(duan_tag[0])
-        else:
+        elif not duan_tag:
             duan_tag = self.pool.get('yhoc_keyword').create(cr, uid, {'name':thongtin.duan.name}, context=context)
-            kq.append(duan_tag)
+            if duan_tag not in kq:
+                kq.append(duan_tag)
         
         list_chude = self.pool.get('yhoc_chude').get_tree_obj(cr, uid, thongtin.duan.chude_id)
         for cd in list_chude:
             cd_tag = self.pool.get('yhoc_keyword').search(cr, uid, [('name','=',cd.name)],context=context)
-            if cd_tag:
+            if cd_tag and cd_tag[0] not in kq:
                 kq.append(cd_tag[0])
-            else:
+            elif not cd_tag:
                 cd_tag = self.pool.get('yhoc_keyword').create(cr, uid, {'name':cd.name}, context=context)
-                kq.append(cd_tag)
+                if cd_tag not in kq:
+                    kq.append(cd_tag)
         ok = False
         if kq:
 #             ok = super(yhoc_thongtin,self).write(cr, uid, ids, {'keyword_ids': [[6, False, kq]]}, context=context)
              ok = super(yhoc_thongtin,self).write(cr, uid, ids, {'keyword_ids': [[6, False, kq]]}, context=context)
         return ok
+     #{'keyword_ids': [[6, False, [243, 382, 785, 799, 846, 878, 922, 924, 923]]]}
 yhoc_thongtin()
 
 

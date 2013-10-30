@@ -70,7 +70,7 @@ class yhoc_dkthanhvien(osv.osv):
     def act_daduyet(self, cr, uid, ids, context = None):
         dangky = self.browse(cr, uid, ids[0],context=context)
         if not dangky.loaithanhvien:
-            raise osv.except_osv(('Message'), ('Khôth. xóàkho.n .ãuy.t!'))
+            raise osv.except_osv(('Message'), ('Xin hãy chọn loại thành viên!'))
         vals_n = {
                   'sel_groups_1_2': False, 
                   'sel_groups_22_23_24': False, 

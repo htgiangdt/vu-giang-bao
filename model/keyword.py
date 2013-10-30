@@ -57,7 +57,7 @@ class yhoc_keyword(osv.osv):
 #                        photo = '../../thongtin/%s/images/anhbaiviet.jpg' %(bv.id,)
                     sidebar_menu_tab = sidebar_menu_tab_.replace('__IMAGE__',photo)
                     sidebar_menu_tab = sidebar_menu_tab.replace('__NAME__',bv.name)
-                    sidebar_menu_tab = sidebar_menu_tab.replace('__LINK__','../../../../../../chude/%s.%s'%(bv.link_url, kieufile))
+                    sidebar_menu_tab = sidebar_menu_tab.replace('__LINK__','../../../../../../%s.%s'%(bv.link_url, kieufile))
                     all_sidebar_menu_tab += sidebar_menu_tab 
             
             import codecs
@@ -113,7 +113,7 @@ class yhoc_keyword(osv.osv):
                 item = item.replace('__NAME__',thongtin.name or '')
                 item = item.replace('__NGAYTAO__',thongtin.date)
                 item = item.replace('__MOTANGAN__',thongtin.motangan or '(Chưa cập nhật)')
-                item = item.replace('__LINK__','../../../../../../chude/%s.%s'%(thongtin.link_url,kieufile))
+                item = item.replace('__LINK__','../../../../../../%s.%s'%(thongtin.link_url,kieufile))
                 name_url = self.pool.get('yhoc_trangchu').parser_url(str(thongtin.name))
                 item = item.replace('__IMAGE__','../../../../../../images/thongtin/%s-thongtin-%s.jpg'%(str(thongtin.id),name_url))                
                 tag_item_ = tag_item_.replace('<!--NEWITEM-->',item)

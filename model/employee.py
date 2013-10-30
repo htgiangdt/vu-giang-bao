@@ -117,6 +117,8 @@ class yhoc_employee(osv.osv):
                 'yhoc_thongtin': (_get_employee_id,['nguoidich'], 5),
                 }),
         'link_url':fields.char('Link url',size=1000),
+        'google_plus_acc':fields.char('Google+',size=500),
+        'facebook_acc':fields.char('Facebook',size=500),
             }
     
     _defaults={
@@ -234,6 +236,7 @@ class yhoc_employee(osv.osv):
             fr.close()
             noidung_tittle = noidung_tittle.replace('__TITLE__','Nhóm cộng tác viên')
             congtac_template = congtac_template.replace('__TITLE__',noidung_tittle)
+            congtac_template = congtac_template.replace('__DUONGDAN__',duongdan)
             
         import codecs
         fw = codecs.open(folder_trangchu + '/nhomcongtac.' + kieufile,'w','utf-8')

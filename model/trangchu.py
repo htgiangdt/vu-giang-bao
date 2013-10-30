@@ -140,7 +140,7 @@ class yhoc_trangchu(osv.osv):
                     item = item.replace('__NAME__',thongtin.name or '')
                     item = item.replace('__NGAYTAO__',thongtin.date)
                     item = item.replace('__MOTANGAN__',thongtin.motangan or '(Chưa cập nhật)')
-                    item = item.replace('__LINK__','../../../../../../chude/%s.%s'%(thongtin.link_url,kieufile))
+                    item = item.replace('__LINK__','../../../../../../%s.%s'%(thongtin.link_url,kieufile))
                     name_url = self.pool.get('yhoc_trangchu').parser_url(str(thongtin.name))
                     item = item.replace('__IMAGE__','../../../../../../images/thongtin/%s-thongtin-%s.jpg'%(str(thongtin.id),name_url))
                     
@@ -241,7 +241,7 @@ class yhoc_trangchu(osv.osv):
                 chude = self.pool.get('yhoc_chude').browse(cr, uid, chude, context=context)
                 if chude.link:
                     root_menu_tab = '''<li><a href="__LINK__" rel="__REL__" __TRIGGER__>__TENMENU__</a></li>'''
-                    root_menu_tab = root_menu_tab.replace('__LINK__', '../../../../../../chude/%s/index.%s'%(chude.link_url, kieufile))
+                    root_menu_tab = root_menu_tab.replace('__LINK__', '../../../../../../%s/index.%s'%(chude.link_url, kieufile))
                     root_menu_tab = root_menu_tab.replace('__REL__', 'item'+str(chude.id))
                     root_menu_tab = root_menu_tab.replace('__TENMENU__', chude.name)
                     
@@ -261,7 +261,7 @@ class yhoc_trangchu(osv.osv):
                             cd = self.pool.get('yhoc_chude').browse(cr, uid, cd, context=context)
                             if cd.link:
                                 item_sub_menu_tab = '''<li><a href="__LINK__" >__NAME__</a></li>'''
-                                item_sub_menu_tab = item_sub_menu_tab.replace('__LINK__', '../../../../../../chude/%s/index.%s'%(cd.link_url, kieufile))
+                                item_sub_menu_tab = item_sub_menu_tab.replace('__LINK__', '../../../../../../%s/index.%s'%(cd.link_url, kieufile))
                                 item_sub_menu_tab = item_sub_menu_tab.replace('__NAME__', cd.name)
                                 all_item_sub_menu += item_sub_menu_tab
                             
@@ -269,7 +269,7 @@ class yhoc_trangchu(osv.osv):
                             cd = self.pool.get('yhoc_duan').browse(cr, uid, cd, context=context)
                             if cd.link:
                                 item_sub_menu_tab = '''<li><a href="__LINK__" >__NAME__</a></li>'''
-                                item_sub_menu_tab = item_sub_menu_tab.replace('__LINK__', '../../../../../../chude/%s/index.%s'%(cd.link_url, kieufile))
+                                item_sub_menu_tab = item_sub_menu_tab.replace('__LINK__', '../../../../../../%s/index.%s'%(cd.link_url, kieufile))
                                 item_sub_menu_tab = item_sub_menu_tab.replace('__NAME__', cd.name)
                                 all_item_sub_menu += item_sub_menu_tab
                             
@@ -322,7 +322,7 @@ class yhoc_trangchu(osv.osv):
              
             chude = self.pool.get('yhoc_chude').browse(cr, uid, chude, context=context)
             if chude.link:
-                chunkyfootercolumn = chunkyfootercolumn_.replace('__LINK_CHUDECHA__', '../../../../../../chude/%s/index.%s'%(chude.link_url, kieufile))
+                chunkyfootercolumn = chunkyfootercolumn_.replace('__LINK_CHUDECHA__', '../../../../../../%s/index.%s'%(chude.link_url, kieufile))
                 chunkyfootercolumn = chunkyfootercolumn.replace('__NAME_CHUDECHA__', chude.name)
                 
                 chudecon_da = self.pool.get('yhoc_duan').search(cr, uid, [('chude_id','=',chude.id)])
@@ -335,14 +335,14 @@ class yhoc_trangchu(osv.osv):
                     for cd in chudecon_cd:
                         cd = self.pool.get('yhoc_chude').browse(cr, uid, cd, context=context)
                         if cd.link:
-                            li_tab = li_tab_.replace('__LINK__', '../../../../../../chude/%s/index.%s'%(cd.link_url, kieufile))
+                            li_tab = li_tab_.replace('__LINK__', '../../../../../../%s/index.%s'%(cd.link_url, kieufile))
                             li_tab = li_tab.replace('__NAME__', cd.name)
                             all_item_sub_menu += li_tab
                         
                     for cd in chudecon_da:
                         cd = self.pool.get('yhoc_duan').browse(cr, uid, cd, context=context)
                         if cd.link:
-                            li_tab = li_tab_.replace('__LINK__', '../../../../../../chude/%s/index.%s'%(cd.link_url, kieufile))
+                            li_tab = li_tab_.replace('__LINK__', '../../../../../../%s/index.%s'%(cd.link_url, kieufile))
                             li_tab = li_tab.replace('__NAME__', cd.name)
                             all_item_sub_menu += li_tab
                         
@@ -640,22 +640,18 @@ class yhoc_trangchu(osv.osv):
         fw.write(thanhvien_template)
         fw.close()
     
-    def capnhat_baivietmoi(self, cr, uid, ids, context=None):
+    def capnhat_baivietmoi(self, cr, uid, list_baiviet_rc, path_luu_xuong, context=None):
 #        Cap nhat bai viet moi
         duongdan = self.pool.get('hlv.property')._get_value_project_property_by_name(cr, uid, 'path of template')
         kieufile = self.pool.get('hlv.property')._get_value_project_property_by_name(cr, uid, 'Kiểu lưu file') or 'html'
-        trangchu = self.browse(cr, uid, ids[0], context=context)
-        baivietmoi = trangchu.baivietmoi
-        
+
         fr = open(duongdan+'/template/trangchu/baivietmoi_tab.html', 'r')
         baivietmoi_tab_ = fr.read()
         fr.close()
-        folder_trangchu = duongdan + '/trangchu/vi'
-        
             
         all_baivietmoi = ''
         
-        for bv in baivietmoi:
+        for bv in list_baiviet_rc:
             baivietmoi_tab = ''
             photo = ''
             if bv.hinhdaidien or thongtin.duan.photo:
@@ -674,31 +670,13 @@ class yhoc_trangchu(osv.osv):
                             self.pool.get('yhoc_thongtin').ghihinhxuong(folder_hinh_thongtin, filename, bv.duan.photo, 95, 125, context=context)
                 photo = '../../../../../../images/thongtin/%s-thongtin-%s.jpg'%(str(bv.id),name_url)
                     
-#            if bv.hinhdaidien:
-#                if not os.path.exists(folder_trangchu + '/images/trangchu'):
-#                    os.makedirs(folder_trangchu + '/images/trangchu')
-#                path_hinh_ghixuong = folder_trangchu + '/images/trangchu' + '/anhbaivietmoi_%s.jpg' %(bv.id,)
-#                fw = open(path_hinh_ghixuong,'wb')
-#                fw.write(base64.decodestring(bv.hinhdaidien))
-#                fw.close()
-#                photo = 'images/trangchu/anhbaivietmoi_%s.jpg' %(bv.id,)
-#            else:
-#                if bv.duan.photo:
-#                    if not os.path.exists(folder_trangchu + '/images/trangchu'):
-#                        os.makedirs(folder_trangchu + '/images/trangchu')
-#                    path_hinh_ghixuong = folder_trangchu + '/images/trangchu' + '/anhbaivietmoi_%s.jpg' %(bv.id,)
-#                    fw = open(path_hinh_ghixuong,'wb')
-#                    fw.write(base64.decodestring(bv.duan.photo))
-#                    fw.close()
-#                    photo = 'images/trangchu/anhbaivietmoi_%s.jpg' %(bv.id,)
-                
-            baivietmoi_tab = baivietmoi_tab_.replace('__LINK__', '../../../../../../chude/%s.%s'%(bv.link_url, kieufile))
+            baivietmoi_tab = baivietmoi_tab_.replace('__LINK__', '../../../../../../%s.%s'%(bv.link_url, kieufile))
             baivietmoi_tab = baivietmoi_tab.replace('__NAME__', bv.name)
             baivietmoi_tab = baivietmoi_tab.replace('__IMAGE__', photo)
             all_baivietmoi += baivietmoi_tab
             
         import codecs
-        fw = codecs.open(folder_trangchu +'/baivietmoi.html','w','utf-8')
+        fw = codecs.open(path_luu_xuong,'w','utf-8')
         fw.write(str(all_baivietmoi))
         fw.close()
 
@@ -734,7 +712,7 @@ class yhoc_trangchu(osv.osv):
 #                        photo = '../../thongtin/%s/images/anhbaiviet.jpg' %(bv.id,)
                     sidebar_menu_tab = sidebar_menu_tab_.replace('__IMAGE__',photo)
                     sidebar_menu_tab = sidebar_menu_tab.replace('__NAME__',bv.name)
-                    sidebar_menu_tab = sidebar_menu_tab.replace('__LINK__','../../../../../../chude/%s.%s'%(bv.link_url, kieufile))
+                    sidebar_menu_tab = sidebar_menu_tab.replace('__LINK__','../../../../../../%s.%s'%(bv.link_url, kieufile))
                     all_sidebar_menu_tab += sidebar_menu_tab 
             
             import codecs
@@ -885,7 +863,7 @@ class yhoc_trangchu(osv.osv):
         duanhoanthanh = random.sample(duanhoanthanh, 8)
         for nb in duanhoanthanh:
             chudenoibac_tab = '''<li><a href="__LINK__"><strong>__NAME__</strong></a></li>''' 
-            chudenoibac_tab = chudenoibac_tab.replace('__LINK__', '../../../../../../chude/%s/index.%s'%(nb.link_url, kieufile))
+            chudenoibac_tab = chudenoibac_tab.replace('__LINK__', '../../../../../../%s/index.%s'%(nb.link_url, kieufile))
             chudenoibac_tab = chudenoibac_tab.replace('__NAME__', nb.name)
             all_chudenoibac += chudenoibac_tab
         

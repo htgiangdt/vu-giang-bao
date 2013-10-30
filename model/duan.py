@@ -91,7 +91,7 @@ class yhoc_duan(osv.osv):
             duan_tab =''
             for m in da.thanhvienthamgia:
                 if m.nhanvien.id == nhanvien.id:
-                    duan_tab = duan_tab_.replace('__LINK__', '../../../../../../chude/%s/index.%s'%(da.link_url, kieufile))
+                    duan_tab = duan_tab_.replace('__LINK__', '../../../../../../%s/index.%s'%(da.link_url, kieufile))
                     duan_tab = duan_tab.replace('__COL1__', da.name)
                     duan_tab = duan_tab.replace('__COL2__', m.name)
             noidung_duan += duan_tab
@@ -107,7 +107,7 @@ class yhoc_duan(osv.osv):
         duongdan = self.pool.get('hlv.property')._get_value_project_property_by_name(cr, uid, 'path of template')
         kieufile = self.pool.get('hlv.property')._get_value_project_property_by_name(cr, uid, 'Kiểu lưu file') or 'html'
         duan = self.browse(cr, uid, ids[0], context=context)
-        folder_duan = duongdan + '/chude/%s' %str(duan.link_url)
+        folder_duan = duongdan + '/%s' %str(duan.link_url)
         if not os.path.exists(folder_duan):
             os.makedirs(folder_duan)
         cungchude = self.pool.get('yhoc_thongtin').search(cr, uid, [('duan.id', '=',duan.id)], order='sequence', context=context)
@@ -116,7 +116,7 @@ class yhoc_duan(osv.osv):
         for ccd in cungchude:
             ccdr = self.pool.get('yhoc_thongtin').browse(cr, uid, ccd, context=context)
             if ccdr.state == 'done':
-                cungchude_tab = cungchude_tab_.replace('__LINKBAIVIET__', '../../../../../../chude/%s.%s'%(ccdr.link_url, kieufile))
+                cungchude_tab = cungchude_tab_.replace('__LINKBAIVIET__', '../../../../../../%s.%s'%(ccdr.link_url, kieufile))
             else:
                 cungchude_tab = cungchude_tab_.replace('__LINKBAIVIET__', '#')
             cungchude_tab = cungchude_tab.replace('__TENBAIVIET__', ccdr.name)
@@ -208,7 +208,7 @@ class yhoc_duan(osv.osv):
                 cungduan_tab = cungduan_tab_.replace('__LINKBAIVIETDUAN__', '#')
                 cungduan_tab = cungduan_tab.replace('__TENBAIVIETDUAN__', str(cdar.sequence) + '. ' +cdar.name + ' (Chưa dịch)')
             else:
-                cungduan_tab = cungduan_tab_.replace('__LINKBAIVIETDUAN__', '../../../../../../chude/%s.%s'%(cdar.link_url, kieufile))
+                cungduan_tab = cungduan_tab_.replace('__LINKBAIVIETDUAN__', '../../../../../../%s.%s'%(cdar.link_url, kieufile))
                 cungduan_tab = cungduan_tab.replace('__TENBAIVIETDUAN__', str(cdar.sequence) + '. ' +cdar.name)
             all_cungduan += cungduan_tab
         
@@ -236,7 +236,7 @@ class yhoc_duan(osv.osv):
         else:
             template = ''
         
-        folder_duan = duongdan + '/chude/'+link_url
+        folder_duan = duongdan + '/'+link_url
         if not os.path.exists(folder_duan):
             os.makedirs(folder_duan)
 
@@ -253,10 +253,11 @@ class yhoc_duan(osv.osv):
         noidung_tittle = noidung_tittle.replace('__TITLE__','Dự án ' + duan.name)
         template = template.replace('__TITLE__',noidung_tittle)
         template = template.replace('__DUONGDAN__',duongdan)
+        template = template.replace('__ID__', str(duan.id))
         
 #Lấy du an cùng chủ đề:
         self.pool.get('yhoc_chude').capnhat_chudetrongtrangduan(cr, uid, duan.chude_id, context)
-        template = template.replace('__CHUDETRONGTRANGDUAN__',duongdan+'/chude/%s/data/chudetrongtrangduan.html'%str(duan.chude_id.link_url))
+        template = template.replace('__CHUDETRONGTRANGDUAN__',duongdan+'/%s/data/chudetrongtrangduan.html'%str(duan.chude_id.link_url))
         
 #Cập nhật bài viết cùng dự án
         self.capnhat_baivietcungduan(cr, uid, duan, folder_duan, context)
@@ -278,7 +279,7 @@ class yhoc_duan(osv.osv):
         template = template.replace('__TITLE__',noidung_tittle)
         
 ##set profile_link
-        super(yhoc_duan,self).write(cr,uid,[duan.id],{'link':domain + '/chude/' +link_url + '/index.%s'%(kieufile),
+        super(yhoc_duan,self).write(cr,uid,[duan.id],{'link':domain + '/' +link_url + '/index.%s'%(kieufile),
                                                       'link_url': link_url}, context=context)
         temp_ = '''<a href="__LINK__">__NAME__</a>'''
         
@@ -287,7 +288,7 @@ class yhoc_duan(osv.osv):
         treechude = self.pool.get('yhoc_chude').dequy(treechude, duan.chude_id)
         treechude.insert(0,duan.chude_id)
         for i in range(len(treechude)):
-            temp = temp_.replace('__LINK__', '../../../../../../chude/%s/index.%s'%(treechude[len(treechude)-i-1].link_url, kieufile))
+            temp = temp_.replace('__LINK__', '../../../../../../%s/index.%s'%(treechude[len(treechude)-i-1].link_url, kieufile))
             temp = temp.replace('__NAME__', treechude[len(treechude)-i-1].name)
             linktree.append(temp)
         linktree.insert(0,'''<a href="../../../../../../trangchu/vi/index.php">Trang chủ</a>''')
@@ -299,7 +300,6 @@ class yhoc_duan(osv.osv):
         res = ''
         res = " > ".join(linktree)
         super(yhoc_duan,self).write(cr,uid,[duan.id],{'link_tree':res}, context=context)
-        
         template = template.replace('__LINKTREE__', res)
         
         import codecs  
