@@ -1,0 +1,111 @@
+
+
+	<link rel="stylesheet" type="text/css" href="../../../../../../../../css/main_css.css" />
+	<link rel="stylesheet" type="text/css" href="../../../../../../../../css/main_ddmegamenu.css" />
+	<link rel="stylesheet" type="text/css" href="../../../../../../../../css/main_style.css">
+	<link rel="stylesheet" type="text/css" href="../../../../../../../../css/main_chitietbaiviet.css">
+	<link rel="stylesheet" type="text/css" href="../../../../../../../../css/main_profile.css">
+	<link rel="stylesheet" type="text/css" href="../../../../../../../../css/main_danhmuc.css">
+	<link rel="stylesheet" type="text/css" href="../../../../../../../../css/footer_menu.css">
+
+	<script language="javascript" type="text/javascript" src="../../../../../../../../js/jquery.min.js"></script>
+	<script language="javascript" type="text/javascript" src="../../../../../../../../js/ddmegamenu.js"></script>
+	<script language="javascript" type="text/javascript" src="../../../../../../../../js/jquery.js"></script>
+	<script language="javascript" type="text/javascript" src="../../../../../../../../js/jquery.easing.js"></script>
+	<script language="javascript" type="text/javascript" src="../../../../../../../../js/script.js"></script>
+	<script language="javascript" type="text/javascript" src="../../../../../../../../js/yhoc_js1.js"></script>
+	<script language="javascript" type="text/javascript" src="../../../../../../../../js/yhoc_js.js"></script>
+	<script language="javascript" type="text/javascript" src="../../../../../../../../js/ga.js"></script>	
+	<script type="text/javascript">
+	  $(document).ready(function() {
+		$(".tabLink").each(function(){
+		  $(this).click(function(){
+			tabeId = $(this).attr('id');
+			$(".tabLink").removeClass("activeLink");
+			$(this).addClass("activeLink");
+			$(".tabcontent").addClass("hide");
+			$("#"+tabeId+"-1").removeClass("hide")   
+			return false;	  
+		  });
+		});  
+	  });
+	</script>
+</head>
+
+<body>
+<div id="wallpaper">
+	<div>
+		<div id="logo"><a href="http://www.yhoccongdong.com/trangchu/vi/index.php"><img src="../../../../../../../../images/logo.jpg" width="419" height="70" /></a></div>
+		<div style="text-align: right;font-size: 13px;">
+			<a href="../../../../../../../../dangky" target="_blank"><u>Register</u></a>&nbsp;&nbsp;
+			<a href="http://yhoccongdong.com:2069/" target="_blank"><u>Login</u></a>
+		</div>
+		<div>
+			<label for="textfield"></label>
+			<input name="textfield" type="text" class="search" id="textfield" value="Nhập thông tin cần tìm" />
+		</div>
+		<br clear="all" />
+	</div>
+
+<!-- MENU START-->
+	<div>
+		<ul id="solidmenu" class="solidblockmenu"  style="background:url(../../../../../../../../images/bgmenu.jpg)">
+			<li><a href="../../../../../../../../trangchu/vi/index.__KIEUFILE__">Trang chủ</a></li>
+			
+			<!-- <li><a href="#" rel="thuongthuc" class="trigger">bệnh và triệu chứng</a></li>
+			<li><a href="#">sống khỏe</a></li>
+			<li><a href="#">mẹ và bé</a></li>
+			<li><a href="#" >trẻ em</a></li>
+			<li><a href="#" rel="treem" class="trigger">thanh niên</a></li>
+			<li><a href="#" rel="chuyende" class="trigger">Người lớn tuổi</a></li>  -->
+			<li><a href="#" rel="about" class="trigger">Giới thiệu</a>			
+			__ROOTMENU__
+			<li><br clear="all" /></li>
+		</ul>
+		
+		
+		<div id="about" class="mega solidblocktheme" style="width:200px">
+			<ul class="ulmenu">
+				<li ><a href="../../../../../../../../trangchu/vi/muctieuytuong.__KIEUFILE__" >Ý tưởng và mục tiêu</a></li>
+				<li ><a href="../../../../../../../../trangchu/vi/thungo.__KIEUFILE__" >Thư ngỏ</a></li>
+				<li><a href="__LINKCONGDONGBS__" >Cộng đồng bác sĩ</a></li>
+				<li><a href="../../../../../../../../trangchu/vi/nhomcongtac.__KIEUFILE__" >Nhóm cộng tác viên</a></li>
+				<li ><a href="../../../../../../../../trangchu/vi/nhomphattrien.__KIEUFILE__" >Điều hành và phát triển</a></li>
+				<li ><a href="../../../../../../../../trangchu/vi/nhataitro.__KIEUFILE__" >Nhà tài trợ</a></li>
+			</ul>
+		</div>
+		__SUBMENU__
+		<!-- 
+		<div id="thuongthuc" class="mega solidblocktheme" style="width:200px">
+			<ul class="ulmenu">
+				<li ><a href="#" >Kiến thức căn bản</a></li>
+				<li><a href="#" >Bách khoa toàn thư</a></li>
+				<li><a href="#" >Khảo cứu tình dục học</a></li>
+				<li><a href="#" >Giới tính tuổi hoa</a></li> 
+				<li><a href="#" >Sinh con theo ý muốn</a></li> 
+				<li><a href="#" >Bác sĩ giải đáp "chuyện ấy"	</a></li>
+				<li><a href="#" >Các vấn đề khác</a></li>
+			</ul>
+		</div>
+		
+		<div id="treem" class="mega solidblocktheme" style="width:200px">
+			<ul class="ulmenu">
+				<li ><a href="#" >Đầu Mặt Cổ</a></li>
+				<li><a href="#" >Ngực Bụng</a></li> 
+				<li><a href="#" >Da Cơ Xương</a></li>
+				<li><a href="#" >Sinh dục - Bài tiết</a></li>
+				<li><a href="#" >300 câu hỏi cho bố mẹ trẻ</a></li>
+			</ul>
+		</div>
+        
+        <div id="chuyende" class="mega solidblocktheme" style="width:200px">
+			<ul class="ulmenu">
+				<li ><a href="#" >Tăng huyết áp</a></li>
+				<li><a href="#" >Bệnh Quai bị</a></li> 
+				<li><a href="#" >Đái tháo đường</a></li>
+				<li><a href="#" >U xơ tử cung</a></li>
+				<li><a href="#" >Công dụng của Mật ong</a></li>
+			</ul>
+		</div> -->
+	</div>
+<!-- MENU END-->
