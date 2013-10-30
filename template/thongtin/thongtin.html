@@ -116,9 +116,9 @@
 		<tr>
 			<td width="70%" style="text-align: left; font-style: italic;color: rgb(109, 105, 105);font-size: 11px;">
 				<div>
-					Biên soạn: <a href="__LINKNGUOIDICH__" itemprop="author">__DANHXUNGNT____NGUOIDICH__</a></br>
+					Biên soạn: <a itemprop="author" href="__LINKNGUOIDICH__" >__DANHXUNGNT____NGUOIDICH__</a></br>
 					Hiệu đính: <a itemprop="editor" href="__LINKNGUOIHIEUDINH__">__DANHXUNGHD____NGUOIHIEUDINH__</a></br>
-					Ngày đăng: <span itemprop="datePublished">__NGAYTAO__</span> bởi <a href="https://plus.google.com/112246279151111679681?rel=author">Giang Huỳnh Trường</a>
+					Ngày đăng: <span itemprop="datePublished">__NGAYTAO__</span>
 				</div>
 			</td>
 					
@@ -142,14 +142,14 @@
 						<td>
 							<div style="font-style: italic;color: rgb(109, 105, 105);  font-size: 11px;">								
 								Số lượt xem: <span itemprop="interactionCount"><?php 
-												$string = curPageURL();
-												$res = explode('/', $string);
+												#$string = curPageURL();
+												#$res = explode('/', $string);
 												#echo '<pre>'; print_r($res); echo '<pre/>';
-												$string_page = explode('-', $res[count($res)-1]);
-												$kq = explode('.',$string_page[count($string_page)-1]);
-												$baiviet_id = $kq[0];
+												#$string_page = explode('-', $res[count($res)-1]);
+												#$kq = explode('.',$string_page[count($string_page)-1]);
+												#$baiviet_id = $kq[0];
 												include("__DUONGDAN__/count.php");
-												echo update_viewer($baiviet_id);
+												echo update_viewer(__ID__);
 											 ?> </span>
 							</div>
 						</td>
@@ -174,110 +174,26 @@ __NOIDUNG_THONGTIN__
 	<a href="https://twitter.com/share" class="twitter-share-button" data-via="yhoccongdong" data-related="yhoccongdong" data-hashtags="Yhọccộngđồng" data-dnt="true">Tweet</a>
 	<!--#Giang_end#--> 
 <!--===================================================-->
-<!--#Giang#
-<?php
-	
-	if ($_POST['btnsend']) {     
-		$dbh = pg_connect("host=localhost port=5432 dbname=hlv_yhoc_70 user=openpg password=openpgpwd"); 	 
-		if (!$dbh) {
-			die("Error in connection: " . pg_last_error());
-		}
-    
-     
-		$name = pg_escape_string($_POST['txtfullname']);
-		$email = pg_escape_string($_POST['txtemail']);	
-		$content = pg_escape_string($_POST['txtcontent']);
-		$string = curPageURL();
-		$res = explode('/', $string);
-		$baiviet_id = $res[4];
-		$comment_date = date('Y-m-d h:i:s', time());
-		
-		 
-		$sql = "INSERT INTO yhoc_comment (comment_date,name,email,comment,baiviet_id,state,create_uid) VALUES('$comment_date','$name','$email','$content','$baiviet_id','choduyet','1')";
-		
-		$result = pg_query($dbh, $sql);
-		if (!$result) {
-			die("Error in SQL query: " . pg_last_error());
-		}
-			 
-		echo '<script>window.location.href="'.$string.'"</script>';
-		exit();
-		
-		// free memory
-		pg_free_result($result);
-		
-		// close connection
-		pg_close($dbh);
-	}
- ?>   -->
 	<div id="comment">
 		<div class="cm-bar">TAGS</div>
 			__LIST_TAGS__
 		
 		</br></br>
+		<div class="cm-bar">Các bài viết liên quan</div>
+			<div>
+				<ul style="margin: 0px; padding: 0px; position: relative; list-style-type: none; z-index: 1;">
+					<?php include("baivietcungduantrongbaiviet_end.html"); ?>			
+				</ul>
+				<br clear="all" />
+			</div>
+			
+		
+		</br></br>
 		<div class="cm-bar">Trao đổi và bình luận</div>
-		<!--table width="100%" cellspacing="0" cellpadding="4" border="0" align="center" style="border: 1px solid silver;">
-		<form action="<?php echo $_SERVER['PHP_SELF']; ?>" method="post" name="MyForm" target="_self" id="MyForm" onSubmit='return clearForm(MyForm)'>
-            <tbody>
-				<tr>
-					<td>Họ &amp; Tên:</td>
-					<td>
-						<input type="text" style="width:180px;" name="txtfullname" >                    
-					</td>
-				</tr>
-				<tr class="altRow">
-					<td>
-						Địa chỉ Email:
-					</td>
-					<td>
-						<input type="text" style="width:180px;" name="txtemail">
-						<input type="checkbox" name="chkshowemail"><label>Hiển thị Email cho mọi người biết</label>
-					</td>
-				</tr>
-				<tr>
-					<td>Nội dung:</td>
-					<td>
-						<table width="100%" cellspacing="0" cellpadding="0" border="0">
-							<tbody>
-								<tr>
-									<td>
-										<span style="font-size: 11px; color: Gray">Vui lòng gõ bằng tiếng Việt có dấu (Tối đa 4000 ký tự)</span>
-									</td>									
-								</tr>
-							</tbody>
-						</table>
-						<textarea style="width:450px;" onkeyup="checkWordCount()" name="txtcontent" cols="20" rows="3" required="required"></textarea>
-						<br>
-						<span style="font-size: 11px; color: Gray">Tất cả lời cảm ơn của bạn đọc sẽ được Ban
-							biên tập kiểm duyệt trước khi đăng.<br>
-							Xin bạn đọc vui lòng thông cảm.</span>
-					</td>
-				</tr>            
-				<tr>
-					<td></td>
-					<td>
-						<input type="submit" name="btnsend" onclick="" value="Gửi lời cảm ơn">						
-					</td>
-				</tr>
-			</tbody>
-		</form>
-		</table-->
+		
 		<div id="con_comment">
 			<div class="fb-comments" data-href="<?php echo curPageURL(); ?>" data-width="650" data-num-posts="20"></div>
-			<!--div class="comment-list">
-				<div class="bar" style="line-height: 18px;">
-					<span class="total_comment">__SOBINHLUAN__ lời cảm ơn</span><br/>
-					<span class="total_comment">__SOBINHLUANCHUADUYET__ lời cảm ơn đang chờ duyệt</span>
-				</div>
-				<a style="display:none;" href="" target="_parent" id="abc">&nbsp;</a>
-					
-				<div class="mingid-commentData">
-					<ul alt="0" id="comment_post_0" class="cm-list">
-						__BINHLUAN__	
-																		
-					</ul>
-				</div>
-			</div-->
+			
 		</div>
 		
 		
