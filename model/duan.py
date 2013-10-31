@@ -301,6 +301,9 @@ class yhoc_duan(osv.osv):
         res = " > ".join(linktree)
         super(yhoc_duan,self).write(cr,uid,[duan.id],{'link_tree':res}, context=context)
         template = template.replace('__LINKTREE__', res)
+        template = template.replace('__TUADEDUAN__', duan.name)
+        template = template.replace('__MOTA__', duan.description or '')
+        template = template.replace('__HINHDUAN__', domain + '/images/%s-duan-%s.jpg' %(str(duan.id),ten_url))
         
         import codecs  
         fw= codecs.open(folder_duan+'/index.' + kieufile,'w','utf-8')

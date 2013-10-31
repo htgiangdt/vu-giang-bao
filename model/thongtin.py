@@ -364,7 +364,7 @@ class yhoc_thongtin(osv.osv):
         template = template.replace('__DANHXUNGNT__',tv.danhxung or '')
         template = template.replace('__NGUOIDICH__',tv.name)
         if tv.google_plus_acc:
-            template = template.replace('__LINKNGUOIDICH__',tv.google_plus_acc)
+            template = template.replace('__LINKNGUOIDICH__',tv.google_plus_acc +'?rel=author')
         else:
             template = template.replace('__LINKNGUOIDICH__',tv.link or '#')
         
