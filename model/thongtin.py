@@ -464,6 +464,8 @@ class yhoc_thongtin(osv.osv):
         self.pool.get('yhoc_duan').capnhat_thongtin(cr,uid,[thongtin.duan.id],context)
         self.capnhat_baiviettrongprofile(cr, uid, [thongtin.nguoidich.id], context)
         
+#Tao trang Blog
+        self.taotrangblog(cr, uid, context)
 #cap nhat tong hieu dinh va tong dong gop
 #        self.capnhat_tonghieudinh_donggop(cr, uid, [tv.id], context)
         
@@ -600,6 +602,68 @@ class yhoc_thongtin(osv.osv):
              ok = super(yhoc_thongtin,self).write(cr, uid, ids, {'keyword_ids': [[6, False, kq]]}, context=context)
         return ok
      #{'keyword_ids': [[6, False, [243, 382, 785, 799, 846, 878, 922, 924, 923]]]}
+     
+    def taotrangblog(self,cr,uid,context=None):
+        dsbaivietmoi = self.pool.get('yhoc_thongtin').search(cr, uid, [('state','=','done')], limit=15, order='date desc', context=context)
+        duongdan = self.pool.get('hlv.property')._get_value_project_property_by_name(cr, uid, 'path of template')
+        domain = self.pool.get('hlv.property')._get_value_project_property_by_name(cr, uid, 'Domain') or '../..'
+        kieufile = self.pool.get('hlv.property')._get_value_project_property_by_name(cr, uid, 'Kiểu lưu file') or 'html'
+        
+        folder_tags = duongdan + '/blog'
+        if not os.path.exists(folder_tags):
+            os.makedirs(folder_tags)
+                
+        if os.path.exists(duongdan+'/template/blog/index.html'):
+            fr = open(duongdan+'/template/blog/index.html', 'r')
+            template_ = fr.read()
+            fr.close()
+        else:
+            template_ = ''
+            
+        if os.path.exists(duongdan+'/template/blog/blog_item.html'):
+            fr = open(duongdan+'/template/blog/blog_item.html', 'r')
+            item_ = fr.read()
+            fr.close()
+        else:
+            item_ = ''
+            
+        tag_item_ = ''    
+        for t in dsbaivietmoi:  
+            thongtin = self.pool.get('yhoc_thongtin').browse(cr, uid, t, context=context)
+            
+            item = item_.replace('__NGUOIHIEUDINH__', thongtin.nguoihieudinh.name or '')
+            item = item.replace('__LINKNGUOIHIEUDINH__', thongtin.nguoihieudinh.link or '#')
+            item = item.replace('__DANHXUNGHD__', thongtin.nguoihieudinh.danhxung or '')
+            
+            item = item.replace('__DANHXUNGNT__',thongtin.nguoidich.danhxung or '')
+            item = item.replace('__NGUOIDICH__',thongtin.nguoidich.name)
+            item = item.replace('__LINKNGUOIDICH__',thongtin.nguoidich.link or '#')
+            
+            item = item.replace('__NAME__',thongtin.name or '')
+            item = item.replace('__NGAYTAO__',thongtin.date)
+            item = item.replace('__MOTANGAN__',thongtin.motangan or '(Chưa cập nhật)')
+            item = item.replace('__LINK__','../../../../../../%s.%s'%(thongtin.link_url,kieufile))
+            if thongtin.url_thongtin:
+                name_url = thongtin.url_thongtin
+            else:
+                name_url = self.pool.get('yhoc_trangchu').parser_url(str(thongtin.name))
+            item = item.replace('__IMAGE__','../../../../../../images/thongtin/%s-thongtin-%s.jpg'%(str(thongtin.id),name_url))                
+            tag_item_ += item
+
+            
+            
+        template = template_.replace('__TAGNAME__', 'Các bài viết mới')
+        template = template.replace('__SIDEBARMENU__', '''<?php include("../trangchu/vi/baivietnoibac.html")?>''')
+        template = template.replace('__CHUDENOIBAC__', '''<?php include("../trangchu/vi/duanhoanthanh.html")?>''')
+        import codecs  
+        fw = codecs.open(folder_tags +'/tag_item.html','w','utf-8')
+        fw.write(tag_item_)
+        fw.close()
+        
+        fw = codecs.open(folder_tags +'/index.%s'%kieufile,'w','utf-8')
+        fw.write(template)
+        fw.close()
+        return True
 yhoc_thongtin()
 
 
