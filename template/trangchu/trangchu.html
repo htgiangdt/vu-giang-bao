@@ -19,22 +19,36 @@
 	<div>
 		<div id="content">
 			<div id="banner">
-      <!------------------------------------- IMAGE START ------------------------------------------------->
-				<div id="lofslidecontent45" class="lof-slidecontent" style="width:651px; height:392px;">
-					<div class="preload" style="z-index: 99997; display: none; ">
-						<div></div>
+				 <div id="slider_container_3">
+					<div id="SliderName_3" class="SliderName_3"> <!-- đối tượng truyền vào phải là div -->
+						__ANHTRANGCHU__
 					</div>
-					<div class="lof-main-outer" style="width:651px; height:392px;">
-						<div onclick="return false" href="" class="lof-previous">Previous</div>
-						<ul class="lof-main-wapper lof-opacity">
-							__ANHTRANGCHU__
-						</ul>
-						<div onclick="return false" href="" class="lof-next">Next</div>
-					</div>
+					<div class="c"></div>
+					
+					<!-- Importance Script -->
+					<script type="text/javascript">
+						// khai báo các một tập hợp effect bao gồm name: 'myeffect', hiệu ứng bắt đầu từ(left, top, right , bottom)-> chỉ khai báo một cái thôi ^_^!, có di chuyển hay không, khoảng thời gian cho effect.
+						demo3Effect1 = {name: 'myEffect31', top: true, move: true, duration: 400};
+						demo3Effect2 = {name: 'myEffect32', right: true, move: true, duration: 400};
+						demo3Effect3 = {name: 'myEffect33', bottom: true, move: true, duration: 400};
+						demo3Effect4 = {name: 'myEffect34', left: true, move: true, duration: 400};
+						demo3Effect5 = {name: 'myEffect35', rows: 3, cols: 9, delay: 50, duration: 100, order: 'random', fade: true};
+						demo3Effect6 = {name: 'myEffect36', rows: 2, cols: 4, delay: 100, duration: 400, order: 'random', fade: true, chess: true};
+						
+						effectsDemo3 = [demo3Effect1,demo3Effect2,demo3Effect3,demo3Effect4,demo3Effect5,demo3Effect6,'blinds'];
+
+						var demoSlider_3 = MySlider.slider({container: 'SliderName_3', width: 650, height: 390, effects: effectsDemo3, 
+						display: { 
+							autoplay: 3000,
+							always_show_loading: 200, // testing loading mode
+							description: {background: '#ffffff', opacity: 0.5, height: 80, position: 'bottom'}, // image description box settings
+							buttons: {opacity: 1, prev: {className: 'SliderNamePrev_3', label: ''}, next: {className: 'SliderNameNext_3', label: ''}}, // Next/Prev buttons settings
+							}
+						});
+					</script>
+
+					<div class="c"></div>
 				</div>
-<!------------------------------------- IMAGE END ------------------------------------------------->
-     
-      
       
 			</div>
 <!------------------------------------- BÀI MỚI START ------------------------------------------------->
