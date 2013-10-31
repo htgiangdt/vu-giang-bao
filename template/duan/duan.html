@@ -5,15 +5,12 @@
 <head prefix="og: http://ogp.me/ns# fb: http://ogp.me/ns/fb# website: http://ogp.me/ns/website#">
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 	<link rel="shortcut icon" href="../../../../../../../../images/Yhoccongdong.ico" type="image/x-icon">
-<!--#Giang# Meta Tag google-->
 	<meta name="description" content="__MOTA__" />	
 	<title>__TUADEDUAN__</title>	
 	<meta name="robots" content="index,follow,noodp" />
 	<link rel="canonical" href="<?php echo curPageURL(); ?>">
-	<!--	<meta name="google-site-verification" content="..." /> -->
 	<meta name="copyright" content="Copyright © 2012 by YHocCongDong.com" />
 	<meta name="distribution" content="Global" />	
-	<!--<meta name="keywords" itemprop="keywords" content="__LIST_TAGS__">-->
 	<meta property="fb:admins" content="100005119690063" />
 	<meta property="og:title" itemprop="headline" content="__TUADEDUAN__"/>
 	<meta property="og:url" itemprop="url"  content="<?php echo curPageURL(); ?>"/>
@@ -32,6 +29,21 @@
 	<h3>
 	__CHUDE__
 	</h3>
+	<?php
+	function curPageURL() {
+	 $pageURL = 'http';
+	 #Giang#if ($_SERVER["HTTPS"] == "on") {$pageURL .= "s";}
+	 if (!empty($_SERVER['HTTPS'])) {$pageURL .= "s";}  
+	 $pageURL .= "://";
+	 if ($_SERVER["SERVER_PORT"] != "80") {
+	  $pageURL .= $_SERVER["SERVER_NAME"].":".$_SERVER["SERVER_PORT"].$_SERVER["REQUEST_URI"];
+	 } else {
+	  $pageURL .= $_SERVER["SERVER_NAME"].$_SERVER["REQUEST_URI"];
+	 }
+	 return $pageURL;
+	}
+	?>
+	
 	<?php 		
 		include("__DUONGDAN__/count.php");
 		echo update_viewer_duan(__ID__);
