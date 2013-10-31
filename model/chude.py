@@ -297,7 +297,7 @@ class yhoc_chude(osv.osv):
                                                             'link_url':link_url}, context=context)
             template = template.replace('__LINKTREE__', res)
             template = template.replace('__TUADECHUDE__', chude.name)
-            template = template.replace('__MOTA__', chude.description)
+            template = template.replace('__MOTA__', str(chude.description) or '')
             template = template.replace('__HINHCHUDE__', domain + '/images/%s-chude-%s.jpg' %(str(chude.id),name_url))
             
             if not os.path.exists(folder_chude):
