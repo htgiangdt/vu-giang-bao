@@ -56,6 +56,8 @@ class yhoc_chude(osv.osv):
                 'complete_name': fields.function(_name_get_fnc, type="char", string='Name'),
                 'link_url':fields.char('Link url',size=1000),
                 'soluongxem': fields.integer("Số lượng người xem"),
+                'keyword_ids': fields.many2many('yhoc_keyword', 'chude_keyword_rel', 'chude_id', 'keyword_id', 'Keyword'),
+                'main_key':fields.many2one('yhoc_keyword', 'Từ khóa chính'),
                 }
     _defaults={
                }
@@ -124,15 +126,16 @@ class yhoc_chude(osv.osv):
         chude = self.browse(cr, uid, ids[0], context=context)
         
         tree_obj = self.get_tree_obj(cr, uid, chude, context=context)
-        link_url = self.get_url(tree_obj)        
+#        link_url = self.get_url(tree_obj)
         name_url = self.pool.get('yhoc_trangchu').parser_url(str(chude.name))
+        link_url = 'chude/%s'%(name_url)
         
-        folder = duongdan
-        for i in range(len(tree_obj)):
-            folder += '/%s' %(self.pool.get('yhoc_trangchu').parser_url(str(tree_obj[len(tree_obj)-i-1].name)))
-            if not os.path.exists(folder):
-                os.makedirs(folder)
-        folder_chude = folder
+#        folder = duongdan
+#        for i in range(len(tree_obj)):
+#            folder += '/%s' %(self.pool.get('yhoc_trangchu').parser_url(str(tree_obj[len(tree_obj)-i-1].name)))
+#            if not os.path.exists(folder):
+#                os.makedirs(folder)
+        folder_chude = duongdan + '/chude/%s'%(name_url)
 #        folder_chude = duongdan + '/%s-%s' %(str(chude.id),name_url)
         duan_thuoc_cd = self.pool.get('yhoc_duan').search(cr, uid, [('chude_id','=',chude.id),('link','!=',False)])
         
@@ -197,9 +200,9 @@ class yhoc_chude(osv.osv):
                     fw = open(path_hinh_ghixuong,'wb')
                     fw.write(base64.decodestring(cdcr.photo))
                     fw.close()
-                    photo = '../../../../../../' + 'images/%s-chude-%s.jpg' %(str(cdcr.id),name_url_cdc)
+                    photo = domain + '/images/chude/%s-chude-%s.jpg' %(str(cdcr.id),name_url_cdc)
                 if cdcr.link_url:
-                    chude_tab = chude_tab_.replace('__LINKCHUDE__', '../../../../../../%s/index.%s'%(cdcr.link_url, kieufile))
+                    chude_tab = chude_tab_.replace('__LINKCHUDE__', '../../../../../../%s/'%(cdcr.link_url))
                 else:
                     chude_tab = chude_tab_.replace('__LINKCHUDE__', '#')
                 chude_tab = chude_tab.replace('__ANHCHUDE__', photo)
@@ -217,9 +220,9 @@ class yhoc_chude(osv.osv):
                     fw = open(path_hinh_ghixuong,'wb')
                     fw.write(base64.decodestring(cdcr.photo))
                     fw.close()
-                    photo = '../../../../../../' + 'images/duan/%s-duan-%s.jpg' %(str(cdcr.id),name_url_cdc)
+                    photo = domain + '/images/duan/%s-duan-%s.jpg' %(str(cdcr.id),name_url_cdc)
                 if cdcr.link_url: 
-                    chude_tab = chude_tab_.replace('__LINKCHUDE__', '../../../../../../../%s/index.%s'%(cdcr.link_url, kieufile))
+                    chude_tab = chude_tab_.replace('__LINKCHUDE__', '../../../../../../../%s/'%(cdcr.link_url))
                 else:
                     chude_tab = chude_tab_.replace('__LINKCHUDE__', '#')
                 chude_tab = chude_tab.replace('__ANHCHUDE__', photo)
@@ -241,12 +244,12 @@ class yhoc_chude(osv.osv):
                 if chudecon_cuacha:
                     for cd in chudecon_cuacha_cd:
                         cdr = self.browse(cr, uid, cd, context=context)
-                        cungchude_tab = cungchude_tab_.replace('__LINKBAIVIET__', '../../../../../../%s/index.%s'%(cdr.link_url, kieufile))
+                        cungchude_tab = cungchude_tab_.replace('__LINKBAIVIET__', '../../../../../../%s/'%(cdr.link_url))
                         cungchude_tab = cungchude_tab.replace('__TENBAIVIET__', cdr.name)
                         all_cungchude += cungchude_tab
                     for cd in chudecon_cuacha_da:
                         cdr = self.pool.get('yhoc_duan').browse(cr, uid, cd, context=context)
-                        cungchude_tab = cungchude_tab_.replace('__LINKBAIVIET__', '../../../../../../%s/index.%s'%(cdr.link_url, kieufile))
+                        cungchude_tab = cungchude_tab_.replace('__LINKBAIVIET__', '../../../../../../%s/'%(cdr.link_url))
                         cungchude_tab = cungchude_tab.replace('__TENBAIVIET__', cdr.name)
                         all_cungchude += cungchude_tab
                         
@@ -281,7 +284,7 @@ class yhoc_chude(osv.osv):
             treechude.insert(0,chude)
             
             for i in range(len(treechude)):
-                temp = temp_.replace('__LINK__', '../../../../../../%s/index.%s'%(treechude[len(treechude)-i-1].link_url, kieufile))
+                temp = temp_.replace('__LINK__', '../../../../../../%s/'%(treechude[len(treechude)-i-1].link_url))
                 temp = temp.replace('__NAME__', treechude[len(treechude)-i-1].name)
                 linktree.append(temp)
 #            if chude.parent_id:
@@ -290,10 +293,10 @@ class yhoc_chude(osv.osv):
 #                linktree.insert(0,temp)
                 
                 
-            linktree.insert(0,'''<a href="../../../../../../trangchu/vi/index.''' + kieufile + '''">Trang chủ</a>''')
+            linktree.insert(0,'''<a href="../../../../../../trangchu/vi/'''  + '''">Trang chủ</a>''')
             res = " > ".join(linktree)
             super(yhoc_chude,self).write(cr,uid,[chude.id],{'link_tree':res,
-                                                            'link': domain + '/%s/index.%s'%(link_url,kieufile),
+                                                            'link': domain + '/%s/'%(link_url),
                                                             'link_url':link_url}, context=context)
             template = template.replace('__LINKTREE__', res)
             template = template.replace('__TUADECHUDE__', chude.name)

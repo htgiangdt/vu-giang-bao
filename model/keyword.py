@@ -20,6 +20,9 @@ class yhoc_keyword(osv.osv):
         'name': fields.char('Keyword', size=500, required=1),
         'priority': fields.integer('Priority'),
         'thongtin_ids': fields.many2many('yhoc_thongtin', 'thongtin_keyword_rel', 'keyword_id', 'thongtin_id', 'Keyword'),
+        'soluongxem': fields.integer("Số lượng người xem"),
+        'description':fields.text('Giới thiệu'),
+        'kwlienquan_ids': fields.many2many('yhoc_keyword', 'keyword_kwlienquan_rel', 'keyword_id', 'kwlienquan_id', 'Từ khóa liên quan'),
     }
 
     _defaults = {
@@ -48,7 +51,7 @@ class yhoc_keyword(osv.osv):
                         if not os.path.exists(duongdan+'/images/thongtin/%s-thongtin-%s.jpg'%(str(bv.id),name_url)):
                             folder_hinh_baiviet = duongdan + '/images/thongtin'
                             self.pool.get('yhoc_thongtin').ghihinhxuong(folder_hinh_baiviet, filename, bv.hinhdaidien, 95,125, context=context)
-                        photo = '../../../../../../images/thongtin/%s.jpg' %(filename)
+                        photo = domain + '/images/thongtin/%s.jpg' %(filename)
 #                        path_hinh_ghixuong = duongdan + '/thongtin/%s/images/anhbaiviet.jpg'%(bv.id)
 #                        if not os.path.exists(path_hinh_ghixuong):
 #                            fw = open(path_hinh_ghixuong,'wb')
@@ -57,7 +60,7 @@ class yhoc_keyword(osv.osv):
 #                        photo = '../../thongtin/%s/images/anhbaiviet.jpg' %(bv.id,)
                     sidebar_menu_tab = sidebar_menu_tab_.replace('__IMAGE__',photo)
                     sidebar_menu_tab = sidebar_menu_tab.replace('__NAME__',bv.name)
-                    sidebar_menu_tab = sidebar_menu_tab.replace('__LINK__','../../../../../../%s.%s'%(bv.link_url, kieufile))
+                    sidebar_menu_tab = sidebar_menu_tab.replace('__LINK__','../../../../../../%s'%(bv.link_url))
                     all_sidebar_menu_tab += sidebar_menu_tab 
             
             import codecs
@@ -99,8 +102,7 @@ class yhoc_keyword(osv.osv):
             fr.close()
             
             thongtin = self.pool.get('yhoc_thongtin').browse(cr, uid, tt_id, context=context)
-            
-            find = tag_item_.lower().count((thongtin.name).lower()) 
+            find = tag_item_.count(thongtin.name) 
             if find == 0:
                 item = item_.replace('__NGUOIHIEUDINH__', thongtin.nguoihieudinh.name or '')
                 item = item.replace('__LINKNGUOIHIEUDINH__', thongtin.nguoihieudinh.link or '#')
@@ -113,9 +115,9 @@ class yhoc_keyword(osv.osv):
                 item = item.replace('__NAME__',thongtin.name or '')
                 item = item.replace('__NGAYTAO__',thongtin.date)
                 item = item.replace('__MOTANGAN__',thongtin.motangan or '(Chưa cập nhật)')
-                item = item.replace('__LINK__','../../../../../../%s.%s'%(thongtin.link_url,kieufile))
+                item = item.replace('__LINK__','../../../../../../%s'%(thongtin.link_url))
                 name_url = self.pool.get('yhoc_trangchu').parser_url(str(thongtin.name))
-                item = item.replace('__IMAGE__','../../../../../../images/thongtin/%s-thongtin-%s.jpg'%(str(thongtin.id),name_url))                
+                item = item.replace('__IMAGE__',domain + '/images/thongtin/%s-thongtin-%s.jpg'%(str(thongtin.id),name_url))                
                 tag_item_ = tag_item_.replace('<!--NEWITEM-->',item)
 
             
@@ -134,6 +136,9 @@ class yhoc_keyword(osv.osv):
             
             
         return True
+    def tukhoalienquan(self,cr,uid,context=None):
+        
+        return 0
 yhoc_keyword()
     
     

@@ -79,7 +79,7 @@ class yhoc_nganh(osv.osv):
                         if not os.path.exists(duongdan+'/images/profile/%s-profile-%s.jpg'%(str(tv.id),tv.link_url)):
                             folder_hinh_profile = duongdan + '/images/profile'
                             self.pool.get('yhoc_thongtin').ghihinhxuong(folder_hinh_profile, filename, tv.image, 150, 150, context=context)
-                        photo = '../../../../../../images/profile/%s.jpg' %(filename)
+                        photo = domain + '/images/profile/%s.jpg' %(filename)
         ##############################                             
                     thanhvien_tab = ''
                     thanhvien_tab = thanhvien_tab_

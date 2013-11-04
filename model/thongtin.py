@@ -81,7 +81,8 @@ class yhoc_thongtin(osv.osv):
                 'attachment': fields.one2many('yhoc.attachment', 'baiviet_id', 'Đính kèm'),
                 'keyword_ids': fields.many2many('yhoc_keyword', 'thongtin_keyword_rel', 'thongtin_id', 'keyword_id', 'Keyword'),
                 'link_url':fields.char('Link url',size=1000),
-                'url_thongtin':fields.char('URL',size=1000),                
+                'url_thongtin':fields.char('URL',size=1000),
+                'main_key':fields.many2one('yhoc_keyword', 'Từ khóa chính'),               
                 }
     _defaults = {
                  'is_write': _default_quyensuabaiviet,
@@ -191,7 +192,7 @@ class yhoc_thongtin(osv.osv):
         for bv in thongtin:
             tongxem_baiviet.append(bv.id)
             baiviet_tab = baiviet_tab_.replace('__COL1__', bv.name or '')
-            baiviet_tab = baiviet_tab.replace('__LINK1__', '../../../../../../%s.%s'%(bv.link_url, kieufile))
+            baiviet_tab = baiviet_tab.replace('__LINK1__', '../../../../../../%s'%(bv.link_url))
             baiviet_tab = baiviet_tab.replace('__COL2__', (bv.duan and bv.duan.name) or '')
             baiviet_tab = baiviet_tab.replace('__LINK2__', (bv.duan and bv.duan.link) or '#')
             #baiviet_tab = baiviet_tab.replace('__COL3__', str('--'))
@@ -264,14 +265,15 @@ class yhoc_thongtin(osv.osv):
             name_url = thongtin.url_thongtin
         else:
             name_url = self.pool.get('yhoc_trangchu').parser_url(str(thongtin.name))
-        link_url = thongtin.duan.link_url + '/%s'%(name_url)
+#        link_url = thongtin.duan.link_url + '/%s'%(name_url)
+        link_url = 'thongtin/%s'%(name_url)
         
         fr= open(duongdan+'/template/thongtin/thongtin.html', 'r')
         template = fr.read()
         fr.close()
         
 #Tao folder cho thongtin
-        folder_thongtin = duongdan + '/' + thongtin.duan.link_url
+        folder_thongtin = duongdan + '/thongtin/%s'%(name_url)
         if not os.path.exists(folder_thongtin):
             os.makedirs(folder_thongtin)
             
@@ -316,7 +318,7 @@ class yhoc_thongtin(osv.osv):
             folder_hinh_thongtin = duongdan+'/images/thongtin'
             filename = str(thongtin.id) + '-thongtin-' + name_url
             self.ghihinhxuong(folder_hinh_thongtin, filename, thongtin.hinhdaidien, 95, 125, context=context)
-            photo = '../../../../../../images/thongtin/%s-thongtin-%s.jpg'%(str(thongtin.id),name_url)
+            photo = domain + '/images/thongtin/%s-thongtin-%s.jpg'%(str(thongtin.id),name_url)
             
         else:
             if thongtin.duan.photo:
@@ -332,7 +334,7 @@ class yhoc_thongtin(osv.osv):
                 folder_hinh_thongtin = duongdan+'/images/thongtin'
                 filename = str(thongtin.id) + '-thongtin-' + name_url
                 self.ghihinhxuong(folder_hinh_thongtin, filename, thongtin.duan.photo, 95, 125, context=context)
-                photo = '../../../../../../images/thongtin/%s-thongtin-%s.jpg'%(str(thongtin.id),name_url)
+                photo = domain + '/images/thongtin/%s-thongtin-%s.jpg'%(str(thongtin.id),name_url)
                 
     #Cap nhat thong tin nguoi viet
 #            photo = ''
@@ -394,7 +396,7 @@ class yhoc_thongtin(osv.osv):
             temp = temp_.replace('__LINK__', treechude[len(treechude)-i-1].link or '#')
             temp = temp.replace('__NAME__', treechude[len(treechude)-i-1].name)
             linktree.append(temp)
-        linktree.insert(0,'''<a href="../../../../../../trangchu/vi/index.php">Trang chủ</a>''')
+        linktree.insert(0,'''<a href="../../../../../../trangchu/vi/">Trang chủ</a>''')
         temp = temp_.replace('__LINK__', thongtin.duan.link or '#')
         temp = temp.replace('__NAME__', thongtin.duan.name)
         linktree.append(temp)
@@ -411,7 +413,7 @@ class yhoc_thongtin(osv.osv):
         template = template.replace('__HINHBAIVIET__', photo)
         template = template.replace('__MOTA__', thongtin.motangan or thongtin.name)
         
-        link_xemnhanh = domain + '/' + link_url + '.%s'%(kieufile)
+        link_xemnhanh = domain + '/' + link_url
         super(yhoc_thongtin,self).write(cr,uid,ids,{'link':link_xemnhanh,
                                                     'date':date,
                                                     'link_url':link_url}, context=context)
@@ -431,7 +433,7 @@ class yhoc_thongtin(osv.osv):
         
         cungchude = self.search(cr, uid, [('duan.id', '=',thongtin.duan.id),('state','=','done')], order='sequence', context=context)
         cungchude = self.browse(cr, uid, cungchude, context)
-        path = duongdan + '/' + thongtin.duan.link_url +'/baivietcungduantrongbaiviet_end.html'
+        path = duongdan + '/' + link_url +'/baivietcungduantrongbaiviet_end.html'
         self.pool.get('yhoc_trangchu').capnhat_baivietmoi(cr, uid, cungchude, path, context)
         
 #Cap nhat tag        
@@ -451,7 +453,7 @@ class yhoc_thongtin(osv.osv):
             
         
         import codecs  
-        fw= codecs.open(folder_thongtin+'/%s.%s'%(name_url, kieufile),'w','utf-8')
+        fw= codecs.open(folder_thongtin+'/index.%s'%(kieufile),'w','utf-8')
         fw.write(template)
         fw.close()
 
@@ -644,11 +646,12 @@ class yhoc_thongtin(osv.osv):
             item = item.replace('__MOTANGAN__',thongtin.motangan or '(Chưa cập nhật)')
             #Giang#item = item.replace('__LINK__','../../../../../../%s.%s'%(thongtin.link_url,kieufile))
             item = item.replace('__LINK__','http://yhoccongdong.com/thongtin/%s.%s'%(thongtin.link_url,kieufile))
+
             if thongtin.url_thongtin:
                 name_url = thongtin.url_thongtin
             else:
                 name_url = self.pool.get('yhoc_trangchu').parser_url(str(thongtin.name))
-            item = item.replace('__IMAGE__','../../../../../../images/thongtin/%s-thongtin-%s.jpg'%(str(thongtin.id),name_url))                
+            item = item.replace('__IMAGE__',domain + 'images/thongtin/%s-thongtin-%s.jpg'%(str(thongtin.id),name_url))                
             tag_item_ += item
 
             
