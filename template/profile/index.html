@@ -2,20 +2,20 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-	<title>__TENPROFILE__</title>
-	<meta name="description" content="__GIOITHIEU__" />
+	<title>__TENPROFILE__ - Bác sĩ __CHUYENNGANH__</title>
+	<meta name="description" content="__DANHXUNG__ __TENPROFILE__ - chuyên ngành __CHUYENNGANH__, làm việc tại __NOILAMVIEC__." />
 	<meta name="robots" content="index,follow,noodp" />
 	<meta name="copyright" content="Copyright © 2012 by YHocCongDong.com" />
 	<meta name="distribution" content="Global" />
 	<meta name="author" itemprop="author" content="YHocCongDong.com" />	
-	<meta name="keywords" itemprop="keywords" content="__TENPROFILE__">
-	<meta property="og:title" itemprop="headline" content="__TENPROFILE__"/>
+	<meta name="keywords" itemprop="keywords" content="Bác sĩ,__TENPROFILE__,__CHUYENNGANH__">
+	<meta property="og:title" itemprop="headline" content="__TENPROFILE__ - Bác sĩ __CHUYENNGANH__"/>
 	<meta property="og:url" itemprop="url"  content="<?php echo curPageURL(); ?>"/>
-	<meta property="og:description" itemprop="description" content="__GIOITHIEU__"/>
+	<meta property="og:description" itemprop="description" content="__DANHXUNG__ __TENPROFILE__ - chuyên ngành __CHUYENNGANH__, làm việc tại __NOILAMVIEC__."/>
     <meta property="og:locale" itemprop="inLanguage" content="vi_VN" />
-	<meta property="og:site_name" content="Profile Y Học Cộng Đồng"/>
+	<meta property="og:site_name" content="Profile Bác sĩ Y Học Cộng Đồng"/>
 	<meta property="og:image" itemprop="thumbnailUrl" content="__ANHPROFILE__"/>
-	<link rel="shortcut icon" href="../../../../../../../../images/Yhoccongdong.ico" type="image/x-icon">
+	<link rel="shortcut icon" href="http://yhoccongdong.com/images/Yhoccongdong.ico" type="image/x-icon">
 	<link rel="canonical" href="<?php echo curPageURL(); ?>">	
 
 <?php include("__DUONGDAN__/trangchu/vi/header.html")?>
@@ -30,6 +30,18 @@
 
   ga('create', 'UA-45326191-1', 'yhoccongdong.com');
   ga('send', 'pageview');
+
+</script>
+<script type="text/javascript">
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-45321692-1']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
 
 </script>
 <script type="text/javascript">
@@ -79,13 +91,13 @@
 					<a href="javascript:;" class="tabLink " id="cont-4">Liên kết</a>
                 </div>
                 <div id="logo">
-                	<a href="http://www.yhoccongdong.com"><img src="../../images/logoxanh.png" border="none" /></a>
+                	<a href="http://yhoccongdong.com"><img src="http://yhoccongdong.com/images/logoxanh.png" border="none" /></a>
                 </div>
             </div>
             
-            <div id="content_left">
-                <h2>__DANHXUNG__&nbsp__TENPROFILE__</h2>
+				<div id="content_left">
                 <img width="210px" src="__ANHPROFILE__" />
+                <h1>__DANHXUNG__&nbsp__TENPROFILE__</h1>
               <h3>__TRIETLY__</h3>
               <div id="line_dashed"></div>
               <div id="profile_info">
@@ -93,16 +105,20 @@
                 <p>__NGANH__</p>
                 <p>__CHUYENNGANH__</p>
                 <p><a href="mailto:__EMAIL__">__EMAIL__</a></p>
-                <p><a href="__LINKNOILAMVIEC__">__NOILAMVIEC__</a></p>
+                <!--#GIANG#<p><a href="__LINKNOILAMVIEC__">__NOILAMVIEC__</a></p>-->
+				<p>__NOILAMVIEC__</p>
               </div>
             </div>
             
 			<div class="tabcontent" id="cont-1-1"> 
 				<div id="content_mid">
-					<h1>Giới thiệu bản thân</h1>
+					</br>
+					<h2>Giới thiệu Bác sĩ __TENPROFILE__</h2>
 					<!--p>Chức vụ hiện tại: Trưởng Đơn vị Hỗ trợ sinh sản IVF Mekong, Bệnh viện Phụ Sản Quốc tế Phương Châu, Cần Thơ.</p-->
 					<p>__GIOITHIEU__</p>
-					<h1>Quá trình đào tạo</h1>
+					<div id="line_mid"></div>
+					</br></br>
+					<h2>Quá trình đào tạo</h2>
 					
 					<table id="table-thongtin">
 						<thead>
@@ -118,8 +134,8 @@
 						</tbody>
 					</table>
 					<div id="line_mid"></div>
-					
-					<h1>Các dự án tham gia</h1>
+					</br></br>
+					<h2>Các dự án tham gia</h2>
 					<table id="table-thongtin">
 						<thead>
 							<tr>
@@ -139,7 +155,7 @@
 			
 			<div class="tabcontent hide" id="cont-3-1"> 
 				<div id="content_mid">               
-					<h1>Các bài viết</h1>
+					<h2>Các bài viết</h2>
 					
 					<table id="table-thongtin">
 						<thead>
@@ -159,13 +175,12 @@
 			
 			<div class="tabcontent hide" id="cont-4-1"> 
 				<div id="content_mid">               
-					<h1>Liên kết</h1>					
+					<h2>Liên kết</h2>					
 					<p>__LIENKET__</p>
 					<div id="line_mid"></div>
 
 				</div>
 			</div>
-            
             <div id="content_right">
             	<div id=""></div>
             	<p><?php 

@@ -5,17 +5,17 @@
 <head>
 
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-	<link rel="shortcut icon" href="../../../../../../../../images/Yhoccongdong.ico" type="image/x-icon">
-	<meta name="description" content="Tổng hợp thông tin từ khóa __TAGNAME__" />	
-	<title>TỪ KHÓA: __TAGNAME__</title>	
+	<link rel="shortcut icon" href="http://yhoccongdong.com/images/Yhoccongdong.ico" type="image/x-icon">
+	<meta name="description" content="Tổng hợp thông tin và lời khuyên của bác sĩ về __TAGNAME__" />	
+	<title>__TAGNAME__ - Lời khuyên bác sĩ</title>	
 	<meta name="robots" content="index,follow,noodp" />
 	<link rel="canonical" href="<?php echo curPageURL(); ?>">
 	<meta name="copyright" content="Copyright © 2012 by YHocCongDong.com" />
 	<meta name="distribution" content="Global" />	
 	<meta property="fb:admins" content="100005119690063" />
-	<meta property="og:title" itemprop="headline" content="TỪ KHÓA: __TAGNAME__"/>
+	<meta property="og:title" itemprop="headline" content="__TAGNAME__ - Lời khuyên bác sĩ"/>
 	<meta property="og:url" itemprop="url"  content="<?php echo curPageURL(); ?>"/>
-	<meta property="og:description" itemprop="description" content="Tổng hợp thông tin từ khóa __TAGNAME__"/>
+	<meta property="og:description" itemprop="description" content="Tổng hợp thông tin và lời khuyên của bác sĩ về __TAGNAME__"/>
     <meta property="og:locale" itemprop="inLanguage" content="vi_VN" />
 	<meta property="og:site_name" content="YHocCongDong.com"/>
 
@@ -24,8 +24,7 @@
 	<?php
 	function curPageURL() {
 	 $pageURL = 'http';
-	 #Giang#if ($_SERVER["HTTPS"] == "on") {$pageURL .= "s";}
-	 if (!empty($_SERVER['HTTPS'])) {$pageURL .= "s";}  
+	 if ($_SERVER["HTTPS"] == "on") {$pageURL .= "s";}
 	 $pageURL .= "://";
 	 if ($_SERVER["SERVER_PORT"] != "80") {
 	  $pageURL .= $_SERVER["SERVER_NAME"].":".$_SERVER["SERVER_PORT"].$_SERVER["REQUEST_URI"];
@@ -67,7 +66,7 @@
 		<div id="sidebar">
 		<!------------------------------------- 6 MENU START------------------------------------------------->		
 			<div class="rowsidebar">
-				<strong><a href="#">Các bài viết nổi bậc</a></strong>
+				<strong><a href="#">Các bài viết nổi bật</a></strong>
 				<div class="content_side">
 					__SIDEBARMENU__	
 					<br clear="all" />					
