@@ -642,7 +642,8 @@ class yhoc_thongtin(osv.osv):
             item = item.replace('__NAME__',thongtin.name or '')
             item = item.replace('__NGAYTAO__',thongtin.date)
             item = item.replace('__MOTANGAN__',thongtin.motangan or '(Chưa cập nhật)')
-            item = item.replace('__LINK__','../../../../../../%s.%s'%(thongtin.link_url,kieufile))
+            #Giang#item = item.replace('__LINK__','../../../../../../%s.%s'%(thongtin.link_url,kieufile))
+            item = item.replace('__LINK__','http://yhoccongdong.com/thongtin/%s.%s'%(thongtin.link_url,kieufile))
             if thongtin.url_thongtin:
                 name_url = thongtin.url_thongtin
             else:
