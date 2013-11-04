@@ -123,7 +123,7 @@ class yhoc_employee(osv.osv):
     
     _defaults={
                'danhxung':'BS.',
-               'trietlysong':'/',
+               'trietlysong':'Vì Sức Khỏe Cộng Đồng',
                'loaithanhvien':'bacsi',
                }
     
