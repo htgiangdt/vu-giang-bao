@@ -578,7 +578,8 @@ class yhoc_thongtin(osv.osv):
         if hd_tag and hd_tag[0] not in kq:
             kq.append(hd_tag[0])
         elif not hd_tag:
-            hd_tag = self.pool.get('yhoc_keyword').create(cr, uid, {'name':thongtin.nguoidich.name}, context=context)
+            #Giang_0511#nguoidich->nguoihieudinh
+            hd_tag = self.pool.get('yhoc_keyword').create(cr, uid, {'name':thongtin.nguoihieudinh.name}, context=context)
             if hd_tag not in kq:
                 kq.append(hd_tag)
         
@@ -650,7 +651,8 @@ class yhoc_thongtin(osv.osv):
                 name_url = thongtin.url_thongtin
             else:
                 name_url = self.pool.get('yhoc_trangchu').parser_url(str(thongtin.name))
-            item = item.replace('__IMAGE__',domain + 'images/thongtin/%s-thongtin-%s.jpg'%(str(thongtin.id),name_url))                
+            #Giang_0511#
+            item = item.replace('__IMAGE__',domain + '/images/thongtin/%s-thongtin-%s.jpg'%(str(thongtin.id),name_url))                
             tag_item_ += item
 
             
