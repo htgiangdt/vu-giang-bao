@@ -513,7 +513,8 @@ class yhoc_trangchu(osv.osv):
             thanhvien_tab = thanhvien_tab.replace('__DANHXUNG__', tv.danhxung or '')
             thanhvien_tab = thanhvien_tab.replace('__TENTHANHVIEN__', tv.name)
             thanhvien_tab = thanhvien_tab.replace('__HINHTHANHVIEN__', photo)
-            thanhvien_tab = thanhvien_tab.replace('__LINKTHANHVIEN__', '../../profile/%s/'%(tv.id))
+            #Giang_0511#thanhvien_tab = thanhvien_tab.replace('__LINKTHANHVIEN__', '../../profile/%s/'%(tv.id))
+            thanhvien_tab = thanhvien_tab.replace('__LINKTHANHVIEN__', '../../profile/%s/'%(tv.link_url))
             thanhvien_tab = thanhvien_tab.replace('__EMAIL__', vaitro or '')
             thanhvien_tab = thanhvien_tab.replace('__CHUCVU__', '')
             noidung_thanhvien += thanhvien_tab
@@ -763,7 +764,8 @@ class yhoc_trangchu(osv.osv):
         noidung_sanglap += '''Nhóm sáng lập:</br>'''
         temp_ = '''<a href="__LINK__">__NAME__</a><br/>'''
         for m in npt.member:
-            temp = temp_.replace('__LINK__','../../profile/%s/'%(m.nhanvien.id))
+            #Giang_0511#temp = temp_.replace('__LINK__','../../profile/%s/'%(m.nhanvien.id))
+            temp = temp_.replace('__LINK__','../../profile/%s/'%(m.nhanvien.link_url))
             temp = temp.replace('__NAME__',m.nhanvien.name)
             noidung_sanglap += temp
 

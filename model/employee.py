@@ -250,7 +250,8 @@ class yhoc_employee(osv.osv):
         kieufile = self.pool.get('hlv.property')._get_value_project_property_by_name(cr, uid, 'Kiểu lưu file') or 'html'
         nhanvien = self.browse(cr,uid,ids[0])
         name_url = self.pool.get('yhoc_trangchu').parser_url(str(nhanvien.name))
-        link_url = str(nhanvien.id) +'-' +name_url
+        #Giang_0511#link_url = str(nhanvien.id) +'-' +name_url
+        link_url = name_url
         if not context:
             context = {}
         
@@ -408,7 +409,8 @@ class yhoc_employee(osv.osv):
 #        template = template.replace('__TONGDONGGOP_HIEUDINH__',tonghieudinh_donggop)
         ##################################################
         
-        link_xemnhanh = '''%s/profile/%s/index.%s'''%(domain,link_url,kieufile)
+        #Giang_0511#link_xemnhanh = '''%s/profile/%s/index.%s'''%(domain,link_url,kieufile)
+        link_xemnhanh = '''%s/profile/%s/'''%(domain,link_url)
         super(yhoc_employee,self).write(cr,uid,ids,{'link':link_xemnhanh,
                                                     'link_url': link_url}, context=context) 
         
