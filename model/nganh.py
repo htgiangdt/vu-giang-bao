@@ -23,6 +23,10 @@ class yhoc_nganh(osv.osv):
     
     def capnhat_thongtin(self,cr,uid,ids,context=None):
         nganh = self.browse(cr, uid, ids[0], context=context)
+		#Giang_0811_start#Them ten_url + url_nganh
+        ten_url = self.pool.get('yhoc_trangchu').parser_url(nganh.name)
+        url_nganh = '/nganh/%s/'%(ten_url)
+		#Giang_0811_end#
         duongdan = self.pool.get('hlv.property')._get_value_project_property_by_name(cr, uid, 'path of template')
         domain = self.pool.get('hlv.property')._get_value_project_property_by_name(cr, uid, 'Domain') or '../..'
         kieufile = self.pool.get('hlv.property')._get_value_project_property_by_name(cr, uid, 'Kiểu lưu file') or 'html'
@@ -35,7 +39,8 @@ class yhoc_nganh(osv.osv):
             else:
                 template = ''
             
-            folder_nganh = duongdan + '/nganh/%s' %str(nganh.id)
+            #Giang_0811#folder_nganh = duongdan + '/nganh/%s' %str(nganh.id)
+            folder_nganh = duongdan + url_nganh
             if not os.path.exists(folder_nganh):
                 os.makedirs(folder_nganh)
     
@@ -99,7 +104,8 @@ class yhoc_nganh(osv.osv):
             
             template = template.replace('__THANHVIENNGANH__', noidung_thanhvien)
             
-            super(yhoc_nganh,self).write(cr,uid,[nganh.id],{'link':domain + '/nganh/%s/index.%s'%(nganh.id,kieufile)}, context=context)
+            #Giang_0811#super(yhoc_nganh,self).write(cr,uid,[nganh.id],{'link':domain + '/nganh/%s/index.%s'%(nganh.id,kieufile)}, context=context)
+            super(yhoc_nganh,self).write(cr,uid,[nganh.id],{'link': domain + url_nganh}, context=context)
             import codecs  
             fw = codecs.open(folder_nganh +'/index.' + kieufile,'w','utf-8')
             fw.write(template)
