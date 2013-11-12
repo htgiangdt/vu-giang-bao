@@ -1,0 +1,7 @@
+		<item>
+			<title>__TITLEITEM__</title>
+			<description><![CDATA[<a href="__LINKITEM__"><img width=130 height=100 src="__IMAGEITEM__"></a></br>__MOTAITEM__]]></description>
+			<link>__LINKITEM__</link>
+			<guid isPermaLink="false">__LINKITEM__</guid>
+			<pubDate>__DATEITEM__</pubDate>
+		</item>

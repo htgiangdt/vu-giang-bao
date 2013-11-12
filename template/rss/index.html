@@ -1,0 +1,65 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<link rel="shortcut icon" href="http://yhoccongdong.com/images/Yhoccongdong.ico" type="image/x-icon">
+	<meta name="description" content="Kênh tin RSS Yhoccongdong.com cập nhật những thông tin sức khỏe mới nhất"/>	
+	<title>Kênh tin RSS Y Học Cộng Đồng</title>	
+	<meta name="robots" content="index,follow,noodp" />
+	<link rel="canonical" href="<?php echo curPageURL(); ?>">
+	<meta name="copyright" content="Copyright © 2012 by YHocCongDong.com" />
+	<meta name="distribution" content="Global" />	
+	<meta property="fb:admins" content="100005119690063" />
+	<meta property="og:title" itemprop="headline" content="Kênh tin RSS Y Học Cộng Đồng"/>
+	<meta property="og:url" itemprop="url"  content="<?php echo curPageURL(); ?>"/>
+	<meta property="og:description" itemprop="description" content="Kênh tin RSS Yhoccongdong.com cập nhật những thông tin sức khỏe mới nhất"/>
+    <meta property="og:locale" itemprop="inLanguage" content="vi_VN" />
+	<meta property="og:site_name" content="YHocCongDong.com/rss/"/>
+	
+	
+<?php include("../trangchu/vi/header.html")?>
+<!-- MENU END-->
+	<?php
+	function curPageURL() {
+	 $pageURL = 'http';
+	 #Giang#if ($_SERVER["HTTPS"] == "on") {$pageURL .= "s";}
+	 if (!empty($_SERVER['HTTPS'])) {$pageURL .= "s";}  
+	 $pageURL .= "://";
+	 if ($_SERVER["SERVER_PORT"] != "80") {
+	  $pageURL .= $_SERVER["SERVER_NAME"].":".$_SERVER["SERVER_PORT"].$_SERVER["REQUEST_URI"];
+	 } else {
+	  $pageURL .= $_SERVER["SERVER_NAME"].$_SERVER["REQUEST_URI"];
+	 }
+	 return $pageURL;
+	}
+	?>
+	
+	<div>
+		<div style="margin:0 auto; background:#FFF" >
+<!------------------------------------- BÀI MỚI START ------------------------------------------------->
+			<div style="padding: 10px 20px 10px 20px;">   
+				<h1 align="left" style="text-align: center"><font size="4" face="Arial">Kênh tin RSS của Y Học Cộng Đồng</font></h1>
+				</br>
+				<h2 align="left"><font size="2.5" face="Arial">RSS là gì ?</font></h2>
+				<p>
+            	RSS (viết tắt từ Really Simple Syndication) là một tiêu chuẩn định dạng tài liệu dựa trên XML nhằm giúp người sử dụng dễ dàng cập nhật và tra cứu thông tin một cách nhanh chóng và thuận tiện nhất bằng cách tóm lược thông tin vào trong một đoạn dữ liệu ngắn gọn, hợp chuẩn. Dữ liệu này được các chương trình đọc tin chuyên biệt (gọi là News reader) phân tích và hiển thị trên máy tính của người sử dụng. Trên trình đọc tin này, người sử dụng có thể thấy những tin chính mới nhất, tiêu đề, tóm tắt và cả đường link để xem tòan bộ tin.
+				</p>
+				<h2 align="left"><font size="2.5" face="Arial">Các kênh tin RSS do YHocCongDong.com cung cấp</font></h2>
+				<div>
+					<table border="0" style="margin: 0px; padding: 0px;">
+                    <tbody>
+						<?php include("rss_item.html")?>					
+					</tbody>
+					</table>
+					<br clear="all" />
+				</div>
+			</div>
+<!------------------------------------- BÀI MỚI END ------------------------------------------------->
+		</div>
+		<br clear="all" />
+	</div>
+</div>
+
+<?php include("../trangchu/vi/footer.html")?>

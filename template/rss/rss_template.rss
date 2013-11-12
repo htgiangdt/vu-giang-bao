@@ -1,0 +1,16 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+	<channel>
+		<atom:link href="__LINKRSS__" rel="self" type="application/rss+xml" />
+		<title>__TITLECHANNEL__</title>
+		<description>__MOTACHANNEL__</description>
+		<link>__LINKCHANNEL__</link>
+		<image>
+			<url>__HINHCHANNEL__</url>
+			<title>__TITLECHANNEL__</title>
+			<link>__LINKCHANNEL__</link>			
+		</image>
+		<language>vi-vn</language>
+		<copyright>yhoccongdong.com</copyright>
+__RSSITEM__	</channel>
+</rss>

@@ -4,11 +4,11 @@
 
 <head prefix="og: http://ogp.me/ns# fb: http://ogp.me/ns/fb# website: http://ogp.me/ns/website#">
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-	<link rel="shortcut icon" href="http://yhoccongdong.com/images/Yhoccongdong.ico" type="image/x-icon">
+	<link rel="shortcut icon" href="http://yhoccongdong.com/images/Yhoccongdong.ico" type="image/x-icon"/>
 	<meta name="description" content="__MOTA__" />	
 	<title>__TUADETHONGTIN__</title>	
 	<meta name="robots" content="index,follow,noodp" />
-	<link rel="canonical" href="<?php echo curPageURL(); ?>">
+	<link rel="canonical" href="<?php echo curPageURL(); ?>"/>
 	<meta name="copyright" content="Copyright © 2012 by YHocCongDong.com" />
 	<meta name="distribution" content="Global" />	
 	<meta property="fb:admins" content="100005119690063" />
@@ -66,7 +66,8 @@
 <?php
 	function curPageURL() {
 	 $pageURL = 'http';
-	 if ($_SERVER["HTTPS"] == "on") {$pageURL .= "s";}
+	 #Giang_1112#if ($_SERVER["HTTPS"] == "on") {$pageURL .= "s";}
+	 if (!empty($_SERVER['HTTPS'])) {$pageURL .= "s";}  
 	 $pageURL .= "://";
 	 if ($_SERVER["SERVER_PORT"] != "80") {
 	  $pageURL .= $_SERVER["SERVER_NAME"].":".$_SERVER["SERVER_PORT"].$_SERVER["REQUEST_URI"];
