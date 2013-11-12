@@ -3,6 +3,7 @@ from osv import fields,osv
 from tools.translate import _
 import time
 from datetime import datetime, date
+from email.Utils import formatdate
 import os
 import base64,os,re
 import sys
@@ -319,5 +320,104 @@ class yhoc_chude(osv.osv):
             return template, duongdan, domain
         else:
             return template, duongdan, domain
+             
+#Giang#0911-Cap Nhat RSS ChuDe
+    def capnhat_rsschude(self, cr, uid, cd_id, context=None):
+        duongdan = self.pool.get('hlv.property')._get_value_project_property_by_name(cr, uid, 'path of template')
+        domain = self.pool.get('hlv.property')._get_value_project_property_by_name(cr, uid, 'Domain') or '../..'
+        if os.path.exists(duongdan+'/template/rss/rss_template.rss'):
+            fr = open(duongdan+'/template/rss/rss_template.rss', 'r')
+            template_ = fr.read()
+            fr.close()
+        else:
+            template_ = ''
+            
+        if os.path.exists(duongdan+'/template/rss/rss_item.rss'):
+            fr = open(duongdan+'/template/rss/rss_item.rss', 'r')
+            rss_item_ = fr.read()
+            fr.close()
+        else:
+            rss_item_ = ''
         
+        chude = self.browse(cr, uid, cd_id[0], context=context)
+        if chude.parent_id:
+            name = self.pool.get('yhoc_trangchu').parser_url(chude.name)
+            template = template_.replace('__LINKRSS__', domain + '/rss/')
+            template = template.replace('__TITLECHANNEL__', chude.name)
+            template = template.replace('__MOTACHANNEL__', chude.description or '(Chưa Cập Nhật)')
+            template = template.replace('__LINKCHANNEL__', domain +'/rss/%s.rss'%(name))
+            template = template.replace('__HINHCHANNEL__', domain + '/images/%s-chude-%s.jpg' %(str(chude.id),name))
+            
+            cungchude = self.pool.get('yhoc_thongtin').search(cr, uid, [('state','=','done'),('duan.chude_id.id', '=',chude.id)], limit=10, order='date desc', context=context)
+
+            allrss_item_ = ''
+            for ccd in cungchude:
+                thongtin = self.pool.get('yhoc_thongtin').browse(cr, uid, ccd, context=context)
+                rss_item = rss_item_.replace('__TITLEITEM__', thongtin.name or '')
+                rss_item = rss_item.replace('__MOTAITEM__', thongtin.motangan or '(Chưa cập nhật)')
+                rss_item = rss_item.replace('__LINKITEM__', thongtin.link + '/' or '#')
+                date = datetime.strptime(thongtin.date, '%Y-%m-%d %H:%M:%S')
+                date_rfc822 = formatdate(time.mktime(date.timetuple()))
+                rss_item = rss_item.replace('__DATEITEM__', date_rfc822)
+                if thongtin.url_thongtin:
+                    name_url = thongtin.url_thongtin
+                else:
+                    name_url = self.pool.get('yhoc_trangchu').parser_url(str(thongtin.name))
+                rss_item = rss_item.replace('__IMAGEITEM__', domain + '/images/thongtin/%s-thongtin-%s.jpg'%(str(thongtin.id),name_url))
+                allrss_item_ += rss_item
+                
+            template = template.replace('__RSSITEM__', allrss_item_)
+            
+            import codecs  
+            fw = codecs.open(duongdan +'/rss/%s.rss'%(name),'w','utf-8')
+            fw.write(template)
+            fw.close()     
+        return True
+    
+    def taotrangrss(self,cr,uid,context=None):
+        duongdan = self.pool.get('hlv.property')._get_value_project_property_by_name(cr, uid, 'path of template')
+        domain = self.pool.get('hlv.property')._get_value_project_property_by_name(cr, uid, 'Domain') or '../..'
+        kieufile = self.pool.get('hlv.property')._get_value_project_property_by_name(cr, uid, 'Kiểu lưu file') or 'html'
+        
+        folder_tags = duongdan + '/rss'
+        if not os.path.exists(folder_tags):
+            os.makedirs(folder_tags)
+                
+        if os.path.exists(duongdan+'/template/rss/index.html'):
+            fr = open(duongdan+'/template/rss/index.html', 'r')
+            template_ = fr.read()
+            fr.close()
+        else:
+            template_ = ''
+            
+        if os.path.exists(duongdan+'/template/rss/rss_item.html'):
+            fr = open(duongdan+'/template/rss/rss_item.html', 'r')
+            item_ = fr.read()
+            fr.close()
+        else:
+            item_ = ''
+        
+        chude = self.pool.get('yhoc_chude').search(cr, uid, [])
+        
+        rss_item_ = ''
+        for cd in chude:
+            cd = self.browse(cr, uid, cd, context=context)
+            if cd.parent_id:
+                name = self.pool.get('yhoc_trangchu').parser_url(cd.name)
+                item = item_.replace('__TITLECHUDE__', cd.name) 
+                item = item.replace('__LINKCHUDE__', domain +'/rss/%s.rss'%(name) or '#')                
+                rss_item_ += item
+                
+        #template = template_.replace('__SIDEBARMENU__', '''<?php include("../trangchu/vi/baivietnoibac.html")?>''')
+        #template = template.replace('__CHUDENOIBAC__', '''<?php include("../trangchu/vi/duanhoanthanh.html")?>''')
+        import codecs  
+        fw = codecs.open(folder_tags +'/rss_item.html','w','utf-8')
+        fw.write(rss_item_)
+        fw.close()
+        
+        fw = codecs.open(folder_tags +'/index.%s'%kieufile,'w','utf-8')
+        fw.write(template_)
+        fw.close()
+        return True
+
 yhoc_chude()

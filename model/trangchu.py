@@ -168,6 +168,9 @@ class yhoc_trangchu(osv.osv):
         chude = self.pool.get('yhoc_chude').search(cr, uid, [])
         for cd in chude:
             self.pool.get('yhoc_chude').capnhat_thongtin(cr,uid,[cd],context)
+            #Giang#0911- Cap Nhat RSS Chu De
+            self.pool.get('yhoc_chude').capnhat_rsschude(cr,uid,[cd],context)
+        self.pool.get('yhoc_chude').taotrangrss(cr, uid, context)
         return True
     
     def capnhat_allthanhvien(self, cr, uid, ids=None, context=None):
