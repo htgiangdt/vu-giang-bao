@@ -471,7 +471,12 @@ class yhoc_thongtin(osv.osv):
         self.taotrangblog(cr, uid, context)
 #cap nhat tong hieu dinh va tong dong gop
 #        self.capnhat_tonghieudinh_donggop(cr, uid, [tv.id], context)
-        
+
+#Giang_1311# Cap nhat RSS Chu de cua Bai viet
+        duan_cuabaiviet = self.pool.get('yhoc_duan').search(cr, uid, [('id', '=',thongtin.duan.id)], context=context)
+        duan = self.pool.get('yhoc_duan').browse(cr, uid, duan_cuabaiviet[0], context=context)
+        chude_cuabaiviet = self.pool.get('yhoc_chude').search(cr, uid, [('id', '=',duan.chude_id.id)], context=context)
+        self.pool.get('yhoc_chude').capnhat_rsschude(cr,uid,chude_cuabaiviet,context)
         return template,duongdan,domain
 
     def del_post_fb(self,cr,uid,ids, context=None):
