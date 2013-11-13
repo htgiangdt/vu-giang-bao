@@ -372,7 +372,8 @@ class yhoc_thongtin(osv.osv):
             template = template.replace('__LINKNGUOIDICH__',tv.link or '#')
         
         self.pool.get('hr.employee').capnhat_profiletrongtrangbaiviet(cr, uid, [tv.id], context)             
-        template = template.replace('__THONGTINNGUOIVIET__',duongdan + '/profile/%s/profiletrongtrangbaiviet.html' %str(tv.id))            
+        #Giang_1311#template = template.replace('__THONGTINNGUOIVIET__',duongdan + '/profile/%s/profiletrongtrangbaiviet.html' %str(tv.id))       
+        template = template.replace('__THONGTINNGUOIVIET__',duongdan + '/profile/%s/profiletrongtrangbaiviet.html' %str(tv.link_url))            
         
         template = template.replace('__CHUDE__', thongtin.duan.name or '') 
         

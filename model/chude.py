@@ -338,7 +338,6 @@ class yhoc_chude(osv.osv):
             fr.close()
         else:
             rss_item_ = ''
-        
         chude = self.browse(cr, uid, cd_id[0], context=context)
         if chude.parent_id:
             name = self.pool.get('yhoc_trangchu').parser_url(chude.name)
@@ -397,7 +396,7 @@ class yhoc_chude(osv.osv):
         else:
             item_ = ''
         
-        chude = self.pool.get('yhoc_chude').search(cr, uid, [])
+        chude = self.pool.get('yhoc_chude').search(cr, uid, [('link','!=',False)])
         
         rss_item_ = ''
         for cd in chude:
@@ -407,9 +406,7 @@ class yhoc_chude(osv.osv):
                 item = item_.replace('__TITLECHUDE__', cd.name) 
                 item = item.replace('__LINKCHUDE__', domain +'/rss/%s.rss'%(name) or '#')                
                 rss_item_ += item
-                
-        #template = template_.replace('__SIDEBARMENU__', '''<?php include("../trangchu/vi/baivietnoibac.html")?>''')
-        #template = template.replace('__CHUDENOIBAC__', '''<?php include("../trangchu/vi/duanhoanthanh.html")?>''')
+
         import codecs  
         fw = codecs.open(folder_tags +'/rss_item.html','w','utf-8')
         fw.write(rss_item_)

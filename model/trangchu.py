@@ -580,7 +580,8 @@ class yhoc_trangchu(osv.osv):
             thanhvien_tab = thanhvien_tab.replace('__DANHXUNG__', '')
             thanhvien_tab = thanhvien_tab.replace('__TENTHANHVIEN__', tv.name)
             thanhvien_tab = thanhvien_tab.replace('__HINHTHANHVIEN__', photo)
-            thanhvien_tab = thanhvien_tab.replace('__LINKTHANHVIEN__', '../../profile/%s/'%(tv.id))
+            #Giang_1311#thanhvien_tab = thanhvien_tab.replace('__LINKTHANHVIEN__', '../../profile/%s/'%(tv.id))
+            thanhvien_tab = thanhvien_tab.replace('__LINKTHANHVIEN__', '../../profile/%s/'%(tv.link_url))
             thanhvien_tab = thanhvien_tab.replace('__EMAIL__', tv.website or '')
             thanhvien_tab = thanhvien_tab.replace('__CHUCVU__', '')
             noidung_nhataitro += thanhvien_tab
