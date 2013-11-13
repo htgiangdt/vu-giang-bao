@@ -82,7 +82,8 @@ class yhoc_thongtin(osv.osv):
                 'keyword_ids': fields.many2many('yhoc_keyword', 'thongtin_keyword_rel', 'thongtin_id', 'keyword_id', 'Keyword'),
                 'link_url':fields.char('Link url',size=1000),
                 'url_thongtin':fields.char('URL',size=1000),
-                'main_key':fields.many2one('yhoc_keyword', 'Từ khóa chính'),               
+                'main_key':fields.many2one('yhoc_keyword', 'Từ khóa chính'),
+                'hinhlon':fields.binary('Hình lớn (ở trang chủ)'),               
                 }
     _defaults = {
                  'is_write': _default_quyensuabaiviet,
@@ -553,10 +554,14 @@ class yhoc_thongtin(osv.osv):
     
     def auto_tags(self,cr, uid, ids, context=None):
         thongtin = self.browse(cr, uid, ids[0], context=context)
+        cur_key = thongtin.keyword_ids
+        kq = []
+        for k in cur_key:
+            kq.append(k.id)
         noidung = thongtin.noidung
         noidung = noidung.lower()
         tags = self.pool.get('yhoc_keyword').search(cr, uid, [], order='priority desc', context=context)
-        kq = []
+        
         list = {}
         for t in tags:
             t = self.pool.get('yhoc_keyword').browse(cr, uid, t, context=context)
@@ -567,7 +572,8 @@ class yhoc_thongtin(osv.osv):
         list_tags = sorted(list, key=list.get, reverse=True)
         if len(list_tags)>9:        
             for i in range(0,9):
-                kq.append(list_tags[i])
+                if list_tags[i] not in kq:
+                    kq.append(list_tags[i])
         else:
             kq = list_tags
         

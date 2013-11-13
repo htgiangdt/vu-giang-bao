@@ -15,18 +15,117 @@ class yhoc_keyword(osv.osv):
     _description = "Keyword"
 #    _order = "comment_date desc"
 
+    def _get_kwlienquan(self, cr, uid, ids, field_name, arg, context=None):
+        result = {}
+        
+        dsbaiviet = self.pool.get('yhoc_thongtin').search(cr, uid, [('state','=','done'),('keyword_ids','=',ids[0])], context=context)
+        sql = '''select keyword_id,count(*) as solanxuathien 
+                from thongtin_keyword_rel,yhoc_keyword  
+                where thongtin_id in (select thongtin_id from thongtin_keyword_rel where keyword_id=%s)
+                and keyword_id=id and keyword_id not in (%s,-1)
+                group by keyword_id,name
+                order by solanxuathien desc'''%(ids[0],ids[0])
+        cr.execute(sql)
+        kq = []
+        dict_1 = cr.dictfetchall()
+        print dict_1
+        for k in dict_1:
+            diem = 0
+            for b in dsbaiviet:
+                sql = '''select keyword_id from thongtin_keyword_rel where thongtin_id=%s'''%b
+                cr.execute(sql)
+                key_bv = [r[0] for r in cr.fetchall()]    
+                if k['keyword_id'] in key_bv and ids[0] in key_bv:
+                    diem+=1
+            kq.append({'keyword_id':k['keyword_id'],
+                       'solanxuathien':diem})
+        print '==================='
+        print kq
+#        sql = '''select keyword_id,count(*) as solanxuathien 
+#                from thongtin_keyword_rel,yhoc_keyword  
+#                where thongtin_id in (select thongtin_id from thongtin_keyword_rel where keyword_id=%s)
+#                and keyword_id=id and keyword_id not in (%s,-1)
+#                group by keyword_id,name
+#                order by solanxuathien desc
+#                limit 15
+#                    '''%(ids[0],ids[0])
+#        
+#        kwlienquan = cr.dictfetchall()  
+        for record in self.browse(cr, uid, ids, context=context):
+            result[record.id] = []
+            if len(kq)<11:
+                for kw in kq:
+                    result[record.id].append(kw['keyword_id'])
+            else:
+                for i in range(0,10):
+                    result[record.id].append(kq[i]['keyword_id'])
+        return result
+    
+    def _get_baivietmoi(self, cr, uid, ids, field_name, arg, context=None):
+        result = {}
+        dsbaivietmoi = self.pool.get('yhoc_thongtin').search(cr, uid, [('state','=','done'),('keyword_ids','=',ids[0])], limit=8, order='date desc', context=context)  
+        for record in self.browse(cr, uid, ids, context=context):
+            result[record.id] = []
+            for bv in self.pool.get('yhoc_thongtin').browse(cr, uid, dsbaivietmoi, context=context):
+                result[record.id].append(bv.id)
+        return result
+    
+    def _get_baivietnoibac(self, cr, uid, ids, field_name, arg, context=None):
+        result = {}
+        dsbaiviet = self.pool.get('yhoc_thongtin').search(cr, uid, [('state','=','done'),('keyword_ids','=',ids[0])], limit=10, order='soluongxem desc', context=context)  
+        for record in self.browse(cr, uid, ids, context=context):
+            result[record.id] = []
+            for bv in self.pool.get('yhoc_thongtin').browse(cr, uid, dsbaiviet, context=context):
+                result[record.id].append(bv.id)
+        return result
+    
+    def _get_baivietbanner(self, cr, uid, ids, field_name, arg, context=None):
+        result = {}
+        dsbaiviet = self.pool.get('yhoc_thongtin').search(cr, uid, [('state','=','done'),('hinhlon','!=',False)], limit=30, order='soluongxem desc', context=context)  
+        for record in self.browse(cr, uid, ids, context=context):
+            result[record.id] = []
+            for bv in self.pool.get('yhoc_thongtin').browse(cr, uid, dsbaiviet, context=context):
+                result[record.id].append(bv.id)
+        return result
+    
+    
     
     _columns = {
         'name': fields.char('Keyword', size=500, required=1),
+        'khongdau': fields.char('Keyword', size=500, required=1),
         'priority': fields.integer('Priority'),
         'thongtin_ids': fields.many2many('yhoc_thongtin', 'thongtin_keyword_rel', 'keyword_id', 'thongtin_id', 'Keyword'),
         'soluongxem': fields.integer("Số lượng người xem"),
         'description':fields.text('Giới thiệu'),
-        'kwlienquan_ids': fields.many2many('yhoc_keyword', 'keyword_kwlienquan_rel', 'keyword_id', 'kwlienquan_id', 'Từ khóa liên quan'),
+        'kwlienquan_ids': fields.function(_get_kwlienquan, type='many2many', relation='yhoc_keyword', string='Từ khóa liên quan'),
+        'baivietnoibac':fields.function(_get_baivietnoibac, type='many2many', relation='yhoc_thongtin', string='Bài viết nổi bậc'),
+        'baivietmoi':fields.function(_get_baivietmoi, type='many2many', relation='yhoc_thongtin', string='Bài viết mới'),
+        'baivietbanner':fields.function(_get_baivietbanner, type='many2many', relation='yhoc_thongtin', string='Banner'),
+        'baiviet_ids': fields.many2many('yhoc_thongtin', 'thongtin_keyword_rel', 'keyword_id','thongtin_id', 'Bài viết chứa từ khóa'),
     }
 
     _defaults = {
     }
+    
+    def create(self, cr, uid, vals, context=None):
+        name_url = self.pool.get('yhoc_trangchu').parser_url(str(thongtin.name))
+        vals.update({'url_thongtin':name_url})
+        return super(yhoc_thongtin,self).create(cr,uid,vals,context=context)
+    
+    def write(self,cr, uid, ids, vals, context=None):
+#        print vals
+        for r in self.browse(cr, uid, ids, context=context):
+            if 'name' in vals:
+                name_url = self.pool.get('yhoc_trangchu').parser_url(str(vals['name']))
+                vals.update({'url_thongtin':name_url})
+            elif 'url_thongtin' not in vals and not r.url_thongtin:
+                name_url = self.pool.get('yhoc_trangchu').parser_url(str(r.name))
+                vals.update({'url_thongtin':name_url})
+                
+            if uid != 1:
+                if r.is_write == False:
+                    raise osv.except_osv(('Message'), ('Bạn không có quyền sửa bài viết của người khác!'))
+        return super(yhoc_thongtin,self).write(cr, uid, ids, vals, context=context)
     
     def capnhat_chude_tag(self,cr, uid,chudenoibac, duongdan, domain,kieufile, context=None):
         folder_trangchu = duongdan + '/trangchu/vi'
@@ -136,9 +235,75 @@ class yhoc_keyword(osv.osv):
             
             
         return True
+    
     def tukhoalienquan(self,cr,uid,context=None):
         
         return 0
 yhoc_keyword()
     
+
+
+
+
+
+
+class yhoc_search_kw(osv.osv):
+    _name = "yhoc_search_kw"
+    _columns = {
+                'name':fields.char('Search',size=500),
+                }
     
+    def create(self, cr, uid, vals,context=None):
+        vanban = self.browse(cr, uid, 1, context=context)
+        chuoi = self.pool.get('x_vanban').khongdau(vanban.name)
+        sql = '''  select id,loai
+                        from 
+                        (
+                            (select id, search_khongdau,ngayky, 'vbden' as loai from x_vanban_den where phobien = 'xahoi')
+                            union
+                            (select id, search_khongdau,ngayky, 'vbdi' as loai from x_vanban where phobien = 'xahoi')
+                            order by ngayky desc
+                        ) as kq
+                        where search_khongdau ilike '%'''+chuoi+'''%'
+                           '''
+        cr.execute(sql)
+        vanban_ids = cr.dictfetchall()
+        
+        duongdan = self.pool.get('hlv.property')._get_value_project_property_by_name(cr, uid, 'path of template')
+        domain = self.pool.get('hlv.property')._get_value_project_property_by_name(cr, uid, 'Domain') or '../..'
+        kieufile = self.pool.get('hlv.property')._get_value_project_property_by_name(cr, uid, 'Kiểu lưu file') or 'html'
+#        
+#        fr= open(duongdan+'/template/index_search.html', 'r')
+#        template_ = fr.read()
+#        fr.close()
+#
+#        fr= open(duongdan+'/template/search_tab.html', 'r')
+#        search_tab_ = fr.read()
+#        fr.close()
+#        
+#        
+#        noidungvanban = ''
+#        for i in range(0,len(vanban_ids)):
+#            if vanban_ids[i]['loai'] == 'vbdi':
+#                vanban = self.pool.get('x_vanban').browse(cr, uid, vanban_ids[i]['id'], context=context)
+#                noibanhanh = 'ĐH Nguyễn Tất Thành'
+#            else:
+#                vanban = self.pool.get('x_vanban_den').browse(cr, uid, vanban_ids[i]['id'], context=context)
+#                noibanhanh = vanban.noibanhanh.name or ''
+#            search_tab = ''                    
+#            search_tab = search_tab_.replace('__SOVAOSO__', vanban.name or '')
+#            search_tab = search_tab.replace('__LOAIVANBAN__', vanban.loaivanban.name or '')
+#            search_tab = search_tab.replace('__TRICHYEU__', vanban.trich_yeu or '')
+#            search_tab = search_tab.replace('__NGAYBANHANH__', vanban.ngayky or '')
+#            search_tab = search_tab.replace('__LINKVANBAN__', '%s/index.%s'%(vanban.id,kieufile))
+#            search_tab = search_tab.replace('__NGUOIKY__', vanban.nguoiky.name or '')
+#            noidungvanban += search_tab
+#            
+#        template = template_.replace('__NOIDUNGVANBAN__', noidungvanban)
+        import codecs  
+        fw= codecs.open(duongdan+'/search_result.php','w','utf-8')
+        fw.write('1111111111111')
+        fw.close()
+        return True
+        
+yhoc_search_kw()

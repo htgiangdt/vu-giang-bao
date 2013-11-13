@@ -119,6 +119,8 @@ class yhoc_employee(osv.osv):
         'link_url':fields.char('Link url',size=1000),
         'google_plus_acc':fields.char('Google+',size=500),
         'facebook_acc':fields.char('Facebook',size=500),
+        'keyword_ids': fields.many2many('yhoc_keyword', 'thanhvien_keyword_rel', 'thanhvien_id', 'keyword_id', 'Keyword'),
+        'main_key':fields.many2one('yhoc_keyword', 'Từ khóa chính'),
             }
     
     _defaults={
