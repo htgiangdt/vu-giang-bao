@@ -70,6 +70,15 @@ class yhoc_trangchu(osv.osv):
             for da in self.pool.get('yhoc_duan').browse(cr,uid,[x[0] for x in duanhoanchinh],context={}):
                 result[record.id].append(da.id)
         return result
+
+    def _get_baivietbanner(self, cr, uid, ids, field_name, arg, context=None):
+        result = {}
+        dsbaiviet = self.pool.get('yhoc_thongtin').search(cr, uid, [('state','=','done'),('hinhlon','!=',False)], limit=30, order='soluongxem desc', context=context)  
+        for record in self.browse(cr, uid, ids, context=context):
+            result[record.id] = []
+            for bv in self.pool.get('yhoc_thongtin').browse(cr, uid, dsbaiviet, context=context):
+                result[record.id].append(bv.id)
+        return result
         
     _columns = {
                 'name':fields.char("Tên",size=500, required='1'),
@@ -79,6 +88,7 @@ class yhoc_trangchu(osv.osv):
                 'muctieu': fields.text('Ý tưởng và mục tiêu'),
                 'thungo': fields.text('Thư ngỏ'),
                 'duanhoanthanh': fields.function(_get_duanhoanthanh, type='many2many', relation='yhoc_duan', string='Dự án hoàn thành'),
+                'baivietbanner':fields.function(_get_baivietbanner, type='many2many', relation='yhoc_thongtin', string='Banner'),
                 }
     _defaults={
               
@@ -823,7 +833,7 @@ class yhoc_trangchu(osv.osv):
         else:
             template = ''
         
-        banner = trangchu.banner
+        banner = trangchu.baivietbanner
         chudenoibac = trangchu.chudenoibac
         thungo = trangchu.thungo
         duanhoanthanh = trangchu.duanhoanthanh
@@ -860,22 +870,18 @@ class yhoc_trangchu(osv.osv):
         fr = open(duongdan+'/template/trangchu/anhtrangchu_tab.html', 'r')
         anhtrangchu_tab_ = fr.read()
         fr.close()
-        import random 
-        banner = random.sample(banner, 3)
-        for anh in banner:
+        if len(banner)>3:
+            import random 
+            banner = random.sample(banner, 3)
+        for bv in banner:
             photo = ''
-            if anh.photo:
-                if not os.path.exists(folder_trangchu + '/images/trangchu'):
-                    os.makedirs(folder_trangchu + '/images/trangchu')
-                path_hinh_ghixuong = folder_trangchu + '/images/trangchu' + '/anhtrangchu_%s.jpg' %(anh.id,)
-                fw = open(path_hinh_ghixuong,'wb')
-                fw.write(base64.decodestring(anh.photo))
-                fw.close()
-                photo = 'images/trangchu/anhtrangchu_%s.jpg' %(anh.id,)
-            anhtrangchu_tab = anhtrangchu_tab_.replace('__LINK__', anh.url or '#')
+            if bv.hinhdaidien:
+                name_url = self.pool.get('yhoc_trangchu').parser_url(str(bv.name))                
+                photo = domain + '/images/thongtin/%s-thongtin-%s.jpg'%(str(bv.id),name_url)
+            anhtrangchu_tab = anhtrangchu_tab_.replace('__LINK__', bv.link or '#')
             anhtrangchu_tab = anhtrangchu_tab.replace('__IMAGE__', photo)
-            anhtrangchu_tab = anhtrangchu_tab.replace('__NAME__', anh.name)
-            anhtrangchu_tab = anhtrangchu_tab.replace('__MOTANGAN__', anh.description or '(Chưa cập nhật)')
+            anhtrangchu_tab = anhtrangchu_tab.replace('__NAME__', bv.name)
+            anhtrangchu_tab = anhtrangchu_tab.replace('__MOTANGAN__', bv.motangan or '(Chưa cập nhật)')
             all_anhtrangchu += anhtrangchu_tab
             
         template = template.replace('__ANHTRANGCHU__',all_anhtrangchu)

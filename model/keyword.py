@@ -81,7 +81,7 @@ class yhoc_keyword(osv.osv):
     
     def _get_baivietbanner(self, cr, uid, ids, field_name, arg, context=None):
         result = {}
-        dsbaiviet = self.pool.get('yhoc_thongtin').search(cr, uid, [('state','=','done'),('hinhlon','!=',False)], limit=30, order='soluongxem desc', context=context)  
+        dsbaiviet = self.pool.get('yhoc_thongtin').search(cr, uid, [('state','=','done'),('hinhlon','!=',False),('keyword_ids','=',ids[0])], limit=30, order='soluongxem desc', context=context)  
         for record in self.browse(cr, uid, ids, context=context):
             result[record.id] = []
             for bv in self.pool.get('yhoc_thongtin').browse(cr, uid, dsbaiviet, context=context):
@@ -108,24 +108,21 @@ class yhoc_keyword(osv.osv):
     }
     
     def create(self, cr, uid, vals, context=None):
-        name_url = self.pool.get('yhoc_trangchu').parser_url(str(thongtin.name))
-        vals.update({'url_thongtin':name_url})
-        return super(yhoc_thongtin,self).create(cr,uid,vals,context=context)
+        if 'khongdau' not in vals or ('khongdau' in vals and vals['khongdau']==False):
+            name_url = self.pool.get('yhoc_trangchu').parser_url(vals['name'])
+            vals.update({'khongdau':name_url})
+        return super(yhoc_keyword,self).create(cr,uid,vals,context=context)
     
     def write(self,cr, uid, ids, vals, context=None):
-#        print vals
-        for r in self.browse(cr, uid, ids, context=context):
-            if 'name' in vals:
-                name_url = self.pool.get('yhoc_trangchu').parser_url(str(vals['name']))
-                vals.update({'url_thongtin':name_url})
-            elif 'url_thongtin' not in vals and not r.url_thongtin:
-                name_url = self.pool.get('yhoc_trangchu').parser_url(str(r.name))
-                vals.update({'url_thongtin':name_url})
-                
-            if uid != 1:
-                if r.is_write == False:
-                    raise osv.except_osv(('Message'), ('Bạn không có quyền sửa bài viết của người khác!'))
-        return super(yhoc_thongtin,self).write(cr, uid, ids, vals, context=context)
+#        self.pool.get('yhoc_search_kw').create(cr, uid,{'name':'123'},context=context)
+        r = self.browse(cr, uid, ids[0], context=context)
+        if 'name' in vals:
+            name_url = self.pool.get('yhoc_trangchu').parser_url(str(vals['name']))
+            vals.update({'khongdau':name_url})
+        elif 'khongdau' not in vals and not r.khongdau:
+            name_url = self.pool.get('yhoc_trangchu').parser_url(str(r.name))
+            vals.update({'khongdau':name_url})
+        return super(yhoc_keyword,self).write(cr, uid, ids, vals, context=context)
     
     def capnhat_chude_tag(self,cr, uid,chudenoibac, duongdan, domain,kieufile, context=None):
         folder_trangchu = duongdan + '/trangchu/vi'
@@ -254,55 +251,77 @@ class yhoc_search_kw(osv.osv):
                 }
     
     def create(self, cr, uid, vals,context=None):
-        vanban = self.browse(cr, uid, 1, context=context)
-        chuoi = self.pool.get('x_vanban').khongdau(vanban.name)
-        sql = '''  select id,loai
-                        from 
-                        (
-                            (select id, search_khongdau,ngayky, 'vbden' as loai from x_vanban_den where phobien = 'xahoi')
-                            union
-                            (select id, search_khongdau,ngayky, 'vbdi' as loai from x_vanban where phobien = 'xahoi')
-                            order by ngayky desc
-                        ) as kq
-                        where search_khongdau ilike '%'''+chuoi+'''%'
-                           '''
-        cr.execute(sql)
-        vanban_ids = cr.dictfetchall()
-        
+        keyword = self.browse(cr, uid, 1, context=context)
+        chuoi = self.pool.get('yhoc_trangchu').parser_url(keyword.name)
+#        chuoi = self.pool.get('yhoc_trangchu').parser_url('bệnh ung thư')
+        kqsearch = self.pool.get('yhoc_keyword').search(cr, uid, [('khongdau','=',chuoi)])
+                
         duongdan = self.pool.get('hlv.property')._get_value_project_property_by_name(cr, uid, 'path of template')
         domain = self.pool.get('hlv.property')._get_value_project_property_by_name(cr, uid, 'Domain') or '../..'
         kieufile = self.pool.get('hlv.property')._get_value_project_property_by_name(cr, uid, 'Kiểu lưu file') or 'html'
-#        
-#        fr= open(duongdan+'/template/index_search.html', 'r')
-#        template_ = fr.read()
-#        fr.close()
-#
-#        fr= open(duongdan+'/template/search_tab.html', 'r')
-#        search_tab_ = fr.read()
-#        fr.close()
-#        
-#        
-#        noidungvanban = ''
-#        for i in range(0,len(vanban_ids)):
-#            if vanban_ids[i]['loai'] == 'vbdi':
-#                vanban = self.pool.get('x_vanban').browse(cr, uid, vanban_ids[i]['id'], context=context)
-#                noibanhanh = 'ĐH Nguyễn Tất Thành'
-#            else:
-#                vanban = self.pool.get('x_vanban_den').browse(cr, uid, vanban_ids[i]['id'], context=context)
-#                noibanhanh = vanban.noibanhanh.name or ''
-#            search_tab = ''                    
-#            search_tab = search_tab_.replace('__SOVAOSO__', vanban.name or '')
-#            search_tab = search_tab.replace('__LOAIVANBAN__', vanban.loaivanban.name or '')
-#            search_tab = search_tab.replace('__TRICHYEU__', vanban.trich_yeu or '')
-#            search_tab = search_tab.replace('__NGAYBANHANH__', vanban.ngayky or '')
-#            search_tab = search_tab.replace('__LINKVANBAN__', '%s/index.%s'%(vanban.id,kieufile))
-#            search_tab = search_tab.replace('__NGUOIKY__', vanban.nguoiky.name or '')
-#            noidungvanban += search_tab
-#            
-#        template = template_.replace('__NOIDUNGVANBAN__', noidungvanban)
+        
+        fr= open(duongdan+'/template/search/search_index.html', 'r')
+        template_ = fr.read()
+        fr.close()
+
+        fr= open(duongdan+'/template/search/search_tag_item.html', 'r')
+        search_tab_ = fr.read()
+        fr.close()
+        
+        template = template_.replace('__SIDEBARMENU__', '''<?php include("trangchu/vi/baivietnoibac.html")?>''')
+        template = template.replace('__CHUDENOIBAC__', '''<?php include("trangchu/vi/duanhoanthanh.html")?>''')
+        
+        noidungkeyword = ''
+        if kqsearch:
+            keyword_ids = self.pool.get('yhoc_thongtin').search(cr, uid, [('keyword_ids','=',kqsearch[0])])
+            
+            for i in range(0,len(keyword_ids)):
+                thongtin = self.pool.get('yhoc_thongtin').browse(cr, uid, keyword_ids[i], context=context)
+                search_tab = ''                    
+                search_tab = search_tab_.replace('__NGUOIHIEUDINH__', thongtin.nguoihieudinh.name or '')
+                search_tab = search_tab.replace('__LINKNGUOIHIEUDINH__', thongtin.nguoihieudinh.link or '#')
+                search_tab = search_tab.replace('__DANHXUNGHD__', thongtin.nguoihieudinh.danhxung or '')
+                
+                search_tab = search_tab.replace('__DANHXUNGNT__',thongtin.nguoidich.danhxung or '')
+                search_tab = search_tab.replace('__NGUOIDICH__',thongtin.nguoidich.name)
+                search_tab = search_tab.replace('__LINKNGUOIDICH__',thongtin.nguoidich.link or '#')
+                
+                search_tab = search_tab.replace('__NAME__',thongtin.name or '')
+                search_tab = search_tab.replace('__NGAYTAO__',thongtin.date)
+                search_tab = search_tab.replace('__MOTANGAN__',thongtin.motangan or '(Chưa cập nhật)')
+                search_tab = search_tab.replace('__LINK__','../../../../../../%s'%(thongtin.link_url))
+                name_url = self.pool.get('yhoc_trangchu').parser_url(str(thongtin.name))
+                search_tab = search_tab.replace('__IMAGE__',domain + '/images/thongtin/%s-thongtin-%s.jpg'%(str(thongtin.id),name_url))
+                noidungkeyword += search_tab
+                       
+            
+            kqsearch = self.pool.get('yhoc_keyword').browse(cr, uid, kqsearch[0],context=context)
+            template = template.replace('__TAGNAME__', kqsearch.name)
+            
+            
+        else:
+            template = template.replace('__TAGNAME__', keyword.name)
+            kqsearch = self.pool.get('yhoc_keyword').search(cr, uid, [('khongdau','ilike','%'+chuoi+'%')])
+            if kqsearch:
+                temp_ = '''<a href="__LINK__">__NAME__</a>'''
+                for kq in kqsearch:
+                    kq = self.pool.get('yhoc_keyword').browse(cr,uid,kq,context=context)
+                    temp = ''
+                    name = self.pool.get('yhoc_trangchu').parser_url(kq.name)
+                    temp = temp_.replace('__LINK__',domain+'/tags/'+name)
+                    temp = temp.replace('__NAME__', kq.name)
+                    noidungkeyword += temp
+            else:
+                noidungkeyword = 'Không tìm thấy kết quả'
+                
+               
         import codecs  
-        fw= codecs.open(duongdan+'/search_result.php','w','utf-8')
-        fw.write('1111111111111')
+        fw = codecs.open(duongdan +'/search_item.html','w','utf-8')
+        fw.write(noidungkeyword)
+        fw.close()
+        
+        fw = codecs.open(duongdan +'/search_result.%s'%kieufile,'w','utf-8')
+        fw.write(template)
         fw.close()
         return True
         

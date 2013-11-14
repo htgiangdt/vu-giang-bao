@@ -149,8 +149,7 @@ class yhoc_employee(osv.osv):
         kieufile = self.pool.get('hlv.property')._get_value_project_property_by_name(cr, uid, 'Kiểu lưu file') or 'html'
         tv = self.browse(cr,uid,ids[0])
         name_url = self.pool.get('yhoc_trangchu').parser_url(str(tv.name))
-        #Giang_1311#folder_profile = duongdan + '/profile/%s' %str(tv.id)
-        folder_profile = duongdan + '/profile/%s' %str(tv.link_url)
+        folder_profile = duongdan + '/profile/%s' %name_url
         if not os.path.exists(folder_profile):
             os.makedirs(folder_profile)
         

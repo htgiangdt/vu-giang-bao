@@ -129,12 +129,18 @@ class yhoc_thongtin(osv.osv):
         return super(yhoc_thongtin,self).write(cr, uid, ids, {'state':'huy'}, context=context)
    
     def create(self, cr, uid, vals, context=None):
-        if 'url_thongtin' not in vals:
-            name_url = self.pool.get('yhoc_trangchu').parser_url(str(thongtin.name))
+        if 'url_thongtin' in vals and vals['url_thongtin']==False:
+            name_url = self.pool.get('yhoc_trangchu').parser_url(vals['name'])
             vals.update({'url_thongtin':name_url})
         return super(yhoc_thongtin,self).create(cr,uid,vals,context=context)
     
     def write(self,cr, uid, ids, vals, context=None):
+        ###################
+        a = self.pool.get('yhoc_keyword').search(cr, uid, [],context=context)
+        for i in a:
+            vals = {}
+            self.pool.get('yhoc_keyword').write(cr,uid, [i], vals, context=context)
+        ###################
 #        print vals
         for r in self.browse(cr, uid, ids, context=context):
             if 'name' in vals:
