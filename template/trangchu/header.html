@@ -33,7 +33,7 @@
 	  });
 	</script>
 </head>
-
+<form method="post" action="<?php echo htmlentities($_SERVER['PHP_SELF']); ?>" enctype="multipart/form-data">
 <body>
 <div id="wallpaper">
 
@@ -55,7 +55,24 @@
 		<div style="margin-top: -20px; width: 310px; float:right;">
 			<div style="margin-top: -20px; width:200px; float:left;">
 				<label for="textfield"></label>
-				<input name="textfield" type="text" class="search" id="textfield" value="Nhập thông tin cần tìm" />	
+				<input name="search_text" type="text" class="search" id="search_text" value="Nhập thông tin cần tìm" />	
+				<button id="submit" name="submit" type="submit">Tìm</button>
+			</div>
+			<?php 
+				if (isset($_POST['submit'])) {
+					session_start();
+					if(!$_POST['search_text'])
+					{
+						echo '<script type="text/javascript"> alert("Xin hãy nhập từ khóa cần tìm!") </script>';
+					}
+					else
+					{
+						$_SESSION['search'] = $_POST['search_text'];	
+						include ("xmlrpc/p_test.php");
+						header('Location: http:\\yhoccongdong.com\search_result.php');
+					}
+				}
+			?>
 		</div>
 		<div style="text-align: right;font-size: 13px; width:100px; float:right;">
 			<a href="http://yhoccongdong.com/dangky/" rel="nofollow" target="_blank"><u>Register</u></a>&nbsp;&nbsp;
