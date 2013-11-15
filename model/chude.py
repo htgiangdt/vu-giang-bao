@@ -341,8 +341,8 @@ class yhoc_chude(osv.osv):
         chude = self.browse(cr, uid, cd_id[0], context=context)
         if chude.parent_id:
             name = self.pool.get('yhoc_trangchu').parser_url(chude.name)
-            template = template_.replace('__LINKRSS__', domain + '/rss/')
-            template = template.replace('__TITLECHANNEL__', chude.name)
+            #template = template_.replace('__LINKRSS__', domain + '/rss/%s.rss'%(name))
+            template = template_.replace('__TITLECHANNEL__', chude.name)
             template = template.replace('__MOTACHANNEL__', chude.description or '(Chưa Cập Nhật)')
             template = template.replace('__LINKCHANNEL__', domain +'/rss/%s.rss'%(name))
             template = template.replace('__HINHCHANNEL__', domain + '/images/%s-chude-%s.jpg' %(str(chude.id),name))
