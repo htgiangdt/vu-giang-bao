@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
 	<channel>
-		<atom:link href="__LINKRSS__" rel="self" type="application/rss+xml" />
+		<atom:link href="__LINKCHANNEL__" rel="self" type="application/rss+xml" />
 		<title>__TITLECHANNEL__</title>
 		<description>__MOTACHANNEL__</description>
 		<link>__LINKCHANNEL__</link>
