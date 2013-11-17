@@ -161,11 +161,15 @@ class yhoc_trangchu(osv.osv):
                     
                     
                 template = template_.replace('__TAGNAME__', t.name)
+                template = template.replace('__ID_TAG__', str(t.id))
                 template = template.replace('__SIDEBARMENU__', '''<?php include("../../trangchu/vi/baivietnoibac.html")?>''')
                 template = template.replace('__CHUDENOIBAC__', '''<?php include("../../trangchu/vi/duanhoanthanh.html")?>''')
                 import codecs  
                 fw = codecs.open(folder_tags +'/tag_item.html','w','utf-8')
                 fw.write(tag_item_)
+                fw.close()
+                fw = codecs.open(folder_tags +'/index.%s'%kieufile,'w','utf-8')
+                fw.write(template)
                 fw.close()
                 
     def capnhat_allduan(self, cr, uid, ids=None, context=None):
@@ -299,6 +303,8 @@ class yhoc_trangchu(osv.osv):
             
             header_template = header_template.replace('__ROOTMENU__', root_menu)
             header_template = header_template.replace('__SUBMENU__', all_sub_menu)
+            #Giang_1711#
+            header_template = header_template.replace('__DOMAIN__', domain)
             
             #Cap nhat link cong dong bac si
             dsnganh = self.pool.get('yhoc_nganh').search(cr, uid, [('name','!=','Công nghệ thông tin'),('link','!=',False)], limit=1, context=context)
@@ -875,9 +881,12 @@ class yhoc_trangchu(osv.osv):
             banner = random.sample(banner, 3)
         for bv in banner:
             photo = ''
-            if bv.hinhdaidien:
-                name_url = self.pool.get('yhoc_trangchu').parser_url(str(bv.name))                
-                photo = domain + '/images/thongtin/%s-thongtin-%s.jpg'%(str(bv.id),name_url)
+            if bv.hinhlon:
+                name_url = self.pool.get('yhoc_trangchu').parser_url(str(bv.name))
+                folder_hinh_thongtin = duongdan+'/images/thongtin'
+                filename = str(bv.id) + '-thongtin_lon-' + name_url
+                self.pool.get('yhoc_thongtin').ghihinhxuong(folder_hinh_thongtin, filename, bv.hinhlon, 390, 650 , context=context)
+                photo = domain + '/images/thongtin/%s.jpg'%(filename)
             anhtrangchu_tab = anhtrangchu_tab_.replace('__LINK__', bv.link or '#')
             anhtrangchu_tab = anhtrangchu_tab.replace('__IMAGE__', photo)
             anhtrangchu_tab = anhtrangchu_tab.replace('__NAME__', bv.name)

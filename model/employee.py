@@ -146,22 +146,21 @@ class yhoc_employee(osv.osv):
     
     def capnhat_profiletrongtrangbaiviet(self, cr, uid, ids, context=None):
         duongdan = self.pool.get('hlv.property')._get_value_project_property_by_name(cr, uid, 'path of template')
+        domain = self.pool.get('hlv.property')._get_value_project_property_by_name(cr, uid, 'Domain') or '../..'
         kieufile = self.pool.get('hlv.property')._get_value_project_property_by_name(cr, uid, 'Kiểu lưu file') or 'html'
         tv = self.browse(cr,uid,ids[0])
         name_url = self.pool.get('yhoc_trangchu').parser_url(str(tv.name))
         folder_profile = duongdan + '/profile/%s' %name_url
         if not os.path.exists(folder_profile):
             os.makedirs(folder_profile)
-        
-        template_ = '''<h2>
-                        <a href="__LINKNGUOIDICH__"><img src="__HINHNGUOIDICH__" width="150"/></a>
-                        <div itemprop="author" itemscope="" itemtype="http://schema.org/Person" style="font-size: 15px;padding-top: 8px;line-height: 18px;">
-                            <a href="__LINKNGUOIDICH__">__DANHXUNGNT____NGUOIDICH__ </a></br>
-                            __TRINHDOCHUYENMON__</br>
-                            __NGANH____CHUYENNGANH__</br>            
-                        </div>
-                    </h2>'''
-        template = ''
+            
+        if os.path.exists(duongdan+'/template/profile/profile.html'):
+            fr = open(duongdan+'/template/profile/profile.html', 'r')
+            template_ = fr.read()
+            fr.close()
+        else:
+            template_ = ''
+				
         if tv:
     #Cap nhat thong tin nguoi viet
             photo = ''
@@ -171,7 +170,7 @@ class yhoc_employee(osv.osv):
                 filename = str(tv.id) + '-profile-' + name_url
                 folder_hinh_profile = duongdan + '/images/profile'
                 self.pool.get('yhoc_thongtin').ghihinhxuong(folder_hinh_profile, filename, tv.image, 150, 150, context=context)
-                photo = '../../../../../../images/profile/%s.jpg' %(filename)
+                photo = domain + '/images/profile/%s.jpg' %(filename)
         
             template = template_.replace('__HINHNGUOIDICH__', photo)
             
@@ -192,6 +191,37 @@ class yhoc_employee(osv.osv):
             template = template.replace('__NGUOIDICH__',tv.name)
             template = template.replace('__LINKNGUOIDICH__',tv.link or '#')
             
+            if os.path.exists(duongdan+'/template/profile/profile_item.html'):
+                fr = open(duongdan+'/template/profile/profile_item.html', 'r')
+                link_item_ = fr.read()
+                fr.close()
+            else:
+                link_item_ = ''
+			
+            alllink_item_ = ''
+            if tv.work_email:
+				link_item = link_item_.replace('__LINK__', 'mailto:' + tv.work_email)
+				link_item = link_item.replace('__TIITLELINK__', 'Gửi email cho tác giả')
+				link_item = link_item.replace('__IMAGELINK__', domain + '/images/icon/email.png')
+				alllink_item_ += link_item
+            if tv.facebook_acc:
+				link_item = link_item_.replace('__LINK__', tv.facebook_acc)
+				link_item = link_item.replace('__TIITLELINK__', 'Facebook')
+				link_item = link_item.replace('__IMAGELINK__', domain + '/images/icon/facebook.png')
+				alllink_item_ += link_item
+            if tv.google_plus_acc:
+				link_item = link_item_.replace('__LINK__', tv.google_plus_acc)
+				link_item = link_item.replace('__TIITLELINK__', 'Google+')
+				link_item = link_item.replace('__IMAGELINK__', domain + '/images/icon/google_plus.png')
+				alllink_item_ += link_item
+            if tv.link:
+                link_item = link_item_.replace('__LINK__', tv.link)
+                link_item = link_item.replace('__TIITLELINK__', 'Những đóng góp của tác giả')
+                link_item = link_item.replace('__IMAGELINK__', domain + '/images/icon/yhoccongdong.png')
+                alllink_item_ += link_item
+
+            template = template.replace('__PROFILEITEM__', alllink_item_)	
+			
         import codecs  
         fw= codecs.open(folder_profile+'/profiletrongtrangbaiviet.html','w','utf-8')
         fw.write(template)
@@ -434,9 +464,9 @@ class yhoc_employee(osv.osv):
 #                    duan_tab = duan_tab.replace('__COL2__', m.name)
 #            noidung_duan += duan_tab
         self.pool.get('yhoc_duan').capnhat_duantrongprofile(cr, uid, ids, context)
-        template = template.replace('__DUAN__','duantrongprofile.html') 
-        
-        import codecs  
+        template = template.replace('__DUAN__','duantrongprofile.html')
+        template = template.replace('__ID_PROFILE__',str(nhanvien.id))
+        import codecs
         fw= codecs.open(folder_profile+'/index.' + kieufile,'w','utf-8')
         fw.write(template)
         fw.close()
