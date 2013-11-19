@@ -21,9 +21,35 @@
 	<meta property="article:publisher" content="yhoccongdong.com" />
 	<meta property="article:published_time" itemprop="datePublished" content="__NGAYTAO__" />
 	<meta property="article:author" content="__NGUOIDICH__" />
-
+	<meta property="twitter:creator" content="@yhoccongdong">
+	<meta property="twitter:site" content="@yhoccongdong">
+	<meta property="twitter:card" content="summary">
+	<meta property="twitter:url" content="https://twitter.com/yhoccongdong">
+ 	<link rel="stylesheet" type="text/css" href="__DOMAIN__/css/ts-fab.css" />
+ 
 <?php include("__DUONGDAN__/trangchu/vi/header.html")?>
 <!-- MENU END-->
+<script language="javascript" type="text/javascript" src="__DOMAIN__/js/ts-fab.js"></script>
+<script type="text/javascript" src="//s7.addthis.com/js/300/addthis_widget.js#pubid=ra-528991ea3fc5a56a"></script>
+ <!--Son_1311_ButtonTop-->
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.6/jquery.min.js?ver=3.4.2"></script>
+<script type="text/javascript">
+    $(document).ready(function(){ 
+        $(window).scroll(function(){
+            if ($(this).scrollTop() > 500) {
+                $('.scrollup').fadeIn();
+            } else {
+                $('.scrollup').fadeOut();
+            }
+        }); 
+ 
+        $('.scrollup').click(function(){
+            $("html, body").animate({ scrollTop: 0 }, 600);
+            return false;
+        });
+    });
+</script>
+<!--Son_1311-->
 <div id="fb-root"></div>
 <!--Script button Like-->
 <script>
@@ -148,12 +174,22 @@
 			</td>
 		</tr>
 	</table>	
-	<div style="line-height: 20px;max-width: 700px;" itemprop="articleBody">	
+	<div style="margin-top:20px; line-height: 25px; max-width:700px;"  itemprop="articleBody">	
 __NOIDUNG_THONGTIN__
 	</div>
 	<div div style="text-align: right; font-style: italic;">
 		<a href="__NGUONBAIVIET__">__NGUONBAIVIET__</a>
 	</div>
+<!-- AddThis Button BEGIN -->
+	<div class="addthis_toolbox addthis_default_style addthis_32x32_style">
+		<a class="addthis_button_facebook"></a>
+		<a class="addthis_button_google_plusone_share"></a>
+		<a class="addthis_button_twitter"></a>
+		<a class="addthis_button_email"></a>
+		<a class="addthis_button_print"></a>
+	</div>
+<!-- AddThis Button END -->
+	</br>
 	<!--#Giang_start#-->
 	<div class="socialize-containter" style="background-color:#DDE8F4; border: 3px double #ABC5E4; padding: 8px 11px 6px">
 		<div> Hãy ủng hộ cho Y Học Cộng Đồng bằng cách bấm vào các trang mạng xã hội sau:</div></br>
@@ -165,27 +201,23 @@ __NOIDUNG_THONGTIN__
 		<a href="https://twitter.com/share" class="twitter-share-button" data-via="yhoccongdong" data-related="yhoccongdong" data-hashtags="Yhọccộngđồng" data-dnt="true">Tweet</a>
 	</div>
 	<!--#Giang_end#-->
-	
+<?php include("__AUTHORBOX__")?>
 	<div id="comment">
-		<div class="cm-bar">TAGS</div>
-			__LIST_TAGS__
-		
-		</br></br>
 		<div class="cm-bar">Các bài viết liên quan</div>
 			<div>
-				<ul style="margin: 0px; padding: 0px; position: relative; list-style-type: none; z-index: 1;">
+				<ul style="margin: 0px; padding: 0px; position: relative; list-style-type: none; z-index: 0;">
 					<?php include("baivietcungduantrongbaiviet_end.html"); ?>			
 				</ul>
 				<br clear="all" />
 			</div>
-			
-		
-		</br></br>
+		</br>
 		<div class="cm-bar">Trao đổi và bình luận</div>
-		
-		<div id="con_comment">
-			<div class="fb-comments" data-href="<?php echo curPageURL(); ?>" data-width="650" data-num-posts="20"></div>			
-		</div>		
+			<div id="con_comment">
+				<div class="fb-comments" data-href="<?php echo curPageURL(); ?>" data-width="650" data-num-posts="20"></div>			
+			</div>
+		</br>
+		<div class="cm-bar">TAGS</div>
+		__LIST_TAGS__
 		
 	</table>
 	</div>
