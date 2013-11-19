@@ -181,16 +181,30 @@ class yhoc_employee(osv.osv):
                 if r[0] == capbac:
                     chuyenmon = r[1]
                     break
-            template = template.replace('__TRINHDOCHUYENMON__',chuyenmon)
+			#Giang_2011# Chỉnh sửa thông tin dưới profile trong bài viết
+#            template = template.replace('__TRINHDOCHUYENMON__',chuyenmon)
             template = template.replace('__DANHXUNGNT__',tv.danhxung or '')
-            template = template.replace('__NGANH__',(tv.nganh and tv.nganh.name) or '')
-            if tv.nganh and tv.chuyennganh:
-                template = template.replace('__CHUYENNGANH__',' - ' + tv.chuyennganh or '')
-            else:
-                template = template.replace('__CHUYENNGANH__',tv.chuyennganh or '')
+#            template = template.replace('__NGANH__',(tv.nganh and tv.nganh.name) or '')
+#            if tv.nganh and tv.chuyennganh:
+#                template = template.replace('__CHUYENNGANH__',' - ' + tv.chuyennganh or '')
+#            else:
+#                template = template.replace('__CHUYENNGANH__',tv.chuyennganh or '')
             template = template.replace('__NGUOIDICH__',tv.name)
             template = template.replace('__LINKNGUOIDICH__',tv.link or '#')
+			
+			#Giang_2011# Kiểm tra, nếu có thông tin thì hiển thị,không thì loại bỏ
+            description =''
+            if chuyenmon:
+                description += chuyenmon
+            if tv.nganh:
+                description += '</br>%s' %tv.nganh.name
+            if tv.chuyennganh:
+                description += '</br>%s' %tv.chuyennganh
+            if tv.noilamviec_id.name:
+                description += '</br>%s' %tv.noilamviec_id.name
             
+            template = template.replace('__DESCRIPTION__',description)
+
             if os.path.exists(duongdan+'/template/profile/profile_item.html'):
                 fr = open(duongdan+'/template/profile/profile_item.html', 'r')
                 link_item_ = fr.read()
@@ -214,8 +228,8 @@ class yhoc_employee(osv.osv):
 				link_item = link_item.replace('__TIITLELINK__', 'Google+')
 				link_item = link_item.replace('__IMAGELINK__', domain + '/images/icon/google_plus.png')
 				alllink_item_ += link_item
-            if tv.link:
-                link_item = link_item_.replace('__LINK__', tv.link)
+            if os.path.exists(duongdan+'/tags/' + name_url):
+                link_item = link_item_.replace('__LINK__', domain + '/tags/' + name_url + '/')
                 link_item = link_item.replace('__TIITLELINK__', 'Những đóng góp của tác giả')
                 link_item = link_item.replace('__IMAGELINK__', domain + '/images/icon/yhoccongdong.png')
                 alllink_item_ += link_item
@@ -224,6 +238,154 @@ class yhoc_employee(osv.osv):
 			
         import codecs  
         fw= codecs.open(folder_profile+'/profiletrongtrangbaiviet.html','w','utf-8')
+        fw.write(template)
+        fw.close()
+        return True
+
+	#Giang_2011#Cập nhật button follow tác giả
+    def capnhat_authorfollow(self, cr, uid, ids, context=None):
+        duongdan = self.pool.get('hlv.property')._get_value_project_property_by_name(cr, uid, 'path of template')
+        domain = self.pool.get('hlv.property')._get_value_project_property_by_name(cr, uid, 'Domain') or '../..'
+        kieufile = self.pool.get('hlv.property')._get_value_project_property_by_name(cr, uid, 'Kiểu lưu file') or 'html'
+        tv = self.browse(cr,uid,ids[0])
+        name_url = self.pool.get('yhoc_trangchu').parser_url(str(tv.name))
+        import codecs
+        if tv.facebook_acc:
+            if os.path.exists(duongdan+'/template/profile/follow_facebook.html'):
+                fr = open(duongdan+'/template/profile/follow_facebook.html', 'r')
+                template_ = fr.read()
+                fr.close()
+            else:
+                template_ = ''
+            template = template_.replace('__FACEBOOK__', tv.facebook_acc)
+            fw = codecs.open(duongdan +'/profile/%s/follow_facebook.html'%(name_url),'w','utf-8')
+            fw.write(template)
+            fw.close()
+        
+        if tv.google_plus_acc:
+            if os.path.exists(duongdan+'/template/profile/follow_googleplus.html'):
+                fr = open(duongdan+'/template/profile/follow_googleplus.html', 'r')
+                template_ = fr.read()
+                fr.close()
+            else:
+                template_ = ''
+            template = template_.replace('__GOOGLEPLUS__', tv.google_plus_acc)
+            fw = codecs.open(duongdan +'/profile/%s/follow_googleplus.html'%(name_url),'w','utf-8')
+            fw.write(template)
+            fw.close()
+        
+#        if tv.twitter_acc:
+#            if os.path.exists(duongdan+'/template/profile/follow_twitter.html'):
+#                fr = open(duongdan+'/template/profile/follow_twitter.html', 'r')
+#                template_ = fr.read()
+#                fr.close()
+#            else:
+#                template_ = ''
+#            template = template_.replace('__TWITTER__', tv.facebook_acc)
+#            template = template_.replace('__TWITTERNAME__', tv.name)
+#            fw = codecs.open(duongdan +'/profile/%s/follow_twitter.html'%(name_url),'w','utf-8')
+#            fw.write(template)
+#            fw.close()
+        
+        return True
+    
+	#Giang_1811# Author_box
+    def capnhat_authorbox(self, cr, uid, ids, context=None):
+        duongdan = self.pool.get('hlv.property')._get_value_project_property_by_name(cr, uid, 'path of template')
+        domain = self.pool.get('hlv.property')._get_value_project_property_by_name(cr, uid, 'Domain') or '../..'
+        kieufile = self.pool.get('hlv.property')._get_value_project_property_by_name(cr, uid, 'Kiểu lưu file') or 'html'
+        tv = self.browse(cr,uid,ids[0])
+        name_url = self.pool.get('yhoc_trangchu').parser_url(str(tv.name))
+            
+        if os.path.exists(duongdan+'/template/profile/author_box.html'):
+            fr = open(duongdan+'/template/profile/author_box.html', 'r')
+            template_ = fr.read()
+            fr.close()
+        else:
+            template_ = ''
+            
+        if os.path.exists(duongdan+'/template/profile/author_box_item.html'):
+            fr = open(duongdan+'/template/profile/author_box_item.html', 'r')
+            item_ = fr.read()
+            fr.close()
+        else:
+            item_ = ' '
+                
+        if tv:
+            photo = ''
+            if tv.image:
+                if not os.path.exists(duongdan + '/images/profile'):
+                    os.makedirs(duongdan + '/images/profile')
+                filename = str(tv.id) + '-profile-' + name_url
+                folder_hinh_profile = duongdan + '/images/profile'
+                self.pool.get('yhoc_thongtin').ghihinhxuong(folder_hinh_profile, filename, tv.image, 150, 150, context=context)
+                photo = domain + '/images/profile/%s.jpg' %(filename)
+        
+            template = template_.replace('__HINHNGUOIDICH__', photo)
+            template = template.replace('__LINKNGUOIDICH__',tv.link or '#')
+            template = template.replace('__DANHXUNGNT__',tv.danhxung or '')
+            template = template.replace('__NGUOIDICH__',tv.name)
+            
+            capbac = tv.capbac or ''
+            trinhdo = self.pool.get('hlv.property')._get_value_project_property_by_name(cr, uid, 'Trình độ chuyên môn') or '[]'
+            chuyenmon = ''
+            for r in eval(trinhdo):
+                if r[0] == capbac:
+                    chuyenmon = r[1]
+                    break
+            description =''
+            if chuyenmon:
+                description += chuyenmon
+            if tv.nganh:
+                description += '''</br>Ngành: ''' + tv.nganh.name
+            if tv.chuyennganh:
+                description += '''</br>Chuyên: ''' + tv.chuyennganh
+            if tv.noilamviec_id.name:
+                description += '''</br>Công tác tại: ''' + tv.noilamviec_id.name
+            
+            template = template.replace('__DESCRIPTION__',description)
+            
+            if tv.facebook_acc:
+                tab_facebook = '''<li class="ts-fab-facebook-link">
+                <a href="#facebook">Facebook</a>
+            </li>'''
+                template = template.replace('<!--__TABFACEBOOK__-->',tab_facebook)
+                item = item_.replace('__TYPE__', 'facebook')
+                item = item.replace('__LINK__', tv.facebook_acc)
+                item = item.replace('__HINH__', photo)
+                item = item.replace('__NAME__', tv.name)
+                item = item.replace('__FOLLOW_AUTHOR__','<?php include("' + duongdan + '/profile/%s/follow_facebook.html'%name_url + '"); ?>')
+                template = template.replace('<!--__FACEBOOK_FOLLOW__-->',item)
+
+            if tv.google_plus_acc:
+                tab_googleplus = '''<li class="ts-fab-googleplus-link">
+                <a href="#googleplus">Google+</a>
+            </li>'''
+                template = template.replace('<!--__TABGOOGLEPLUS__-->',tab_googleplus)
+                item = item_.replace('__TYPE__', 'googleplus')
+                item = item.replace('__LINK__', tv.google_plus_acc)
+                item = item.replace('__HINH__', photo)
+                item = item.replace('__NAME__', tv.name)
+                item = item.replace('__FOLLOW_AUTHOR__','<?php include("' + duongdan + '/profile/%s/follow_googleplus.html'%name_url + '"); ?>')
+                template = template.replace('<!--__GOOGLEPLUS_FOLLOW__-->',item)
+            
+#            if tv.twitter_acc:
+#                tab_twitter = '''<li class="ts-fab-twitter-link">
+#                <a href="#twitter">Twitter</a>
+#            </li>'''
+#                template = template.replace('<!--__TABTWITTER__-->',tab_twitter)
+#                item = item_.replace('__TYPE__', 'twitter')
+#                item = item.replace('__LINK__', tv.twitter_acc)
+#                item = item.replace('__HINH__', photo)
+#                item = item.replace('__NAME__', tv.name)
+#                item = item.replace('__FOLLOW_AUTHOR__', duongdan + '/profile/%s/follow_twitter.html'%name_url)
+#                template = template.replace('<!--__TWITTER_FOLLOW__-->',item) 
+
+            template = template.replace('__TATCABAIVIET__', domain + '/tags/%s/'%name_url)
+            template = template.replace('__BAIVIETMOI__', duongdan + '/profile/%s/author_baivietmoi.html'%name_url)
+                        
+        import codecs  
+        fw = codecs.open(duongdan +'/profile/%s/author_box.html'%(name_url),'w','utf-8')
         fw.write(template)
         fw.close()
         return True
@@ -481,6 +643,12 @@ class yhoc_employee(osv.osv):
             self.capnhat_trangtvcongtac(cr, uid, context)
         
         self.capnhat_profiletrongtrangbaiviet(cr, uid, ids, context=context)
+        
+        #Giang_1911# Cap nhat author follow (Google+ , Facebook, Twitter)
+        self.capnhat_authorfollow(cr, uid, ids, context)
+        #Giang_1811# Cap nhat author box
+        self.capnhat_authorbox(cr, uid, ids, context)
+        
         return template,duongdan,domain
     
 yhoc_employee()

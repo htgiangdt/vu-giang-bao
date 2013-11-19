@@ -135,13 +135,14 @@ class yhoc_thongtin(osv.osv):
         return super(yhoc_thongtin,self).create(cr,uid,vals,context=context)
     
     def write(self,cr, uid, ids, vals, context=None):
-        ###################
-        a = self.pool.get('yhoc_keyword').search(cr, uid, [],context=context)
-        for i in a:
-            vals = {}
-            self.pool.get('yhoc_keyword').write(cr,uid, [i], vals, context=context)
-        ###################
-#        print vals
+#Giang_2011# Trên server trước lúc cập nhật (20/11/2013-12:00AM) không có nên comment lại !
+        # ###################
+        # a = self.pool.get('yhoc_keyword').search(cr, uid, [],context=context)
+        # for i in a:
+            # vals = {}
+            # self.pool.get('yhoc_keyword').write(cr,uid, [i], vals, context=context)
+        # ###################
+# #        print vals
         for r in self.browse(cr, uid, ids, context=context):
             if 'name' in vals:
                 name_url = self.pool.get('yhoc_trangchu').parser_url(str(vals['name']))
@@ -223,6 +224,38 @@ class yhoc_thongtin(osv.osv):
         fw.close()
         
         return tongdonggop
+
+#Giang_1811# Bai viet moi cua tac gia - trong author box
+    def capnhat_baivietmoicuatacgia(self, cr, uid, nhanvien_ids, baiviet_id, context=None):
+        duongdan = self.pool.get('hlv.property')._get_value_project_property_by_name(cr, uid, 'path of template')
+        domain = self.pool.get('hlv.property')._get_value_project_property_by_name(cr, uid, 'Domain') or '../..'
+        kieufile = self.pool.get('hlv.property')._get_value_project_property_by_name(cr, uid, 'Kiểu lưu file') or 'html'
+        thongtin = self.pool.get('yhoc_thongtin').search(cr, uid, [('nguoidich.id','=',nhanvien_ids[0]),('id','!=',baiviet_id),('state','=','done')], limit=3, order='date desc', context=context)
+        if os.path.exists(duongdan+'/template/profile/author_baivietmoi.html'):
+            fr = open(duongdan+'/template/profile/author_baivietmoi.html', 'r')
+            author_baivietmoi_ = fr.read()
+            fr.close()
+        else:
+            author_baivietmoi_ = ''
+            
+        author_listbaivietmoi_ =''
+        for bv in thongtin:
+            bv_moi = self.pool.get('yhoc_thongtin').browse(cr, uid, bv, context=context)
+            author_baivietmoi = author_baivietmoi_.replace('__TENBAIVIET__', bv_moi.name)
+            author_baivietmoi = author_baivietmoi.replace('__LINKBAIVIET__', domain + '/%s/'%(bv_moi.link_url))
+            date_default = datetime.strptime(bv_moi.date, '%Y-%m-%d %H:%M:%S')
+            date = date_default.strftime('%d/%m/%Y')
+            author_baivietmoi = author_baivietmoi.replace('__NGAYDANG__', date)
+            author_listbaivietmoi_ += author_baivietmoi
+        
+        nhanvien = self.pool.get('hr.employee').browse(cr,uid,nhanvien_ids[0])
+        
+        import codecs  
+        fw= codecs.open(duongdan + '/profile/%s'%nhanvien.link_url + '/author_baivietmoi.html','w','utf-8')
+        fw.write(author_listbaivietmoi_)
+        fw.close()
+        
+        return True
     
     def ghihinhxuong(self, path, filename, image, heigh, width, context=None):
         if not os.path.exists(path):
@@ -370,16 +403,22 @@ class yhoc_thongtin(osv.osv):
 #                template = template.replace('__CHUYENNGANH__',' - ' + tv.chuyennganh or '')
 #            else:
 #                template = template.replace('__CHUYENNGANH__',tv.chuyennganh or '')
+        template = template.replace('__DOMAIN__',domain)
         template = template.replace('__DANHXUNGNT__',tv.danhxung or '')
         template = template.replace('__NGUOIDICH__',tv.name)
         if tv.google_plus_acc:
             template = template.replace('__LINKNGUOIDICH__',tv.google_plus_acc +'?rel=author')
         else:
             template = template.replace('__LINKNGUOIDICH__',tv.link or '#')
-        
-        self.pool.get('hr.employee').capnhat_profiletrongtrangbaiviet(cr, uid, [tv.id], context)             
+        #Giang_2011#Khi bấm nút xuất bản bài viết, không cần phải cập nhật profile trong bài viết
+        #self.pool.get('hr.employee').capnhat_profiletrongtrangbaiviet(cr, uid, [tv.id], context)
         #Giang_1311#template = template.replace('__THONGTINNGUOIVIET__',duongdan + '/profile/%s/profiletrongtrangbaiviet.html' %str(tv.id))       
         template = template.replace('__THONGTINNGUOIVIET__',duongdan + '/profile/%s/profiletrongtrangbaiviet.html' %str(tv.link_url))            
+        
+        #Giang_1811# Author Bai viet moi
+        self.capnhat_baivietmoicuatacgia(cr, uid, [tv.id], ids[0], context)
+        #Giang_1811# Author box
+        template = template.replace('__AUTHORBOX__',duongdan + '/profile/%s/author_box.html' %str(tv.link_url))            
         
         template = template.replace('__CHUDE__', thongtin.duan.name or '') 
         
@@ -507,56 +546,55 @@ class yhoc_thongtin(osv.osv):
         access_token_page = self.pool.get('hlv.property')._get_value_project_property_by_name(cr, uid, 'access_token_page_fb') or '/'
         
         #access_token_page='AAAHxBEJZAaGQBAJ7E2YZB40gVnwfTaZAGL20ZAwC2iuutlRrD9O632wBjZBHRXWrQhbvyDi7KZAeZC4asbyvVLDF8ZC3pxMGWsUQiFKmDQdTuRHqBkcvcfYStAenGWLUU2AZD'
-        for bv in self.browse(cr,uid,ids, context=None):
-            if bv.state != 'done':
-                raise osv.except_osv(('Message'), ('Chưa thể đăng 1 bài viết lên facebook khi chưa xuất bản lên website!'))
-            if bv.state == 'done' and access_token_page != '/':
-                
+        #Giang_1911#local# for bv in self.browse(cr,uid,ids, context=None):
+		#Giang_2011# Chỉnh sửa theo lúc lấy từ Server
+        bv = self.browse(cr,uid,ids[0], context=None)
+        
+        if bv.state != 'done':
+            raise osv.except_osv(('Message'), ('Chưa thể đăng 1 bài viết lên facebook khi chưa xuất bản lên website!'))
+        if bv.state == 'done' and access_token_page != '/':
+            
 #                FACEBOOK_APP_ID = '546475572029540'
 #                FACEBOOK_APP_SECRET = 'dcf0e2796a6577732d5c5f60978579e2'
-                FACEBOOK_PROFILE_ID = '525884304122872'
+			FACEBOOK_PROFILE_ID = '525884304122872'
                 #FACEBOOK_PROFILE_ID = '100002499548724'
-                
-                
 #                oauth_args = dict(client_id     = FACEBOOK_APP_ID,
 #                                  client_secret = FACEBOOK_APP_SECRET,
 #                                  grant_type    = 'client_credentials')
 #                oauth_response = urllib.urlopen('https://graph.facebook.com/oauth/access_token?' + urllib.urlencode(oauth_args)).read()
-                
-                access_token_app = facebook.get_app_access_token('546475572029540', 'dcf0e2796a6577732d5c5f60978579e2')
-                graph = facebook.GraphAPI(str(access_token_page))
-                ########################################################
-                
-                accounts = graph.get_connections("100002499548724", "accounts")
-                for acc in accounts['data']:
-                    if acc['id'] == '525884304122872':
-                        graph = facebook.GraphAPI(str(acc['access_token']))
-                        print access_token_page
-                        print acc['access_token']
-                ############################################################
-                name = bv.name
-                name_url = self.pool.get('yhoc_trangchu').parser_url(str(bv.name))
-                link = bv.link
-                picture = domain + '/images/thongtin/%s-thongtin-%s.jpg'%(str(bv.id),name_url)
+			access_token_app = facebook.get_app_access_token('546475572029540', 'dcf0e2796a6577732d5c5f60978579e2')
+			graph = facebook.GraphAPI(str(access_token_page))
+			########################################################
+			accounts = graph.get_connections("100002499548724", "accounts")
+			for acc in accounts['data']:
+				if acc['id'] == '525884304122872':
+					graph = facebook.GraphAPI(str(acc['access_token']))
+					print access_token_page
+					print acc['access_token']
+			############################################################
+			name = bv.name
+			name_url = self.pool.get('yhoc_trangchu').parser_url(str(bv.name))
+			link = bv.link
+			picture = domain + '/images/thongtin/%s-thongtin-%s.jpg'%(str(bv.id),name_url)
 #                folder_thongtin = duongdan+'/chude/%s'%(bv.link_url,)
-                if not os.path.exists(duongdan+'/images/thongtin/%s-thongtin-%s.jpg'%(str(bv.id),name_url)):
-                    if bv.hinhdaidien:
-                        folder_hinh_thongtin = duongdan+'/images/thongtin'
-                        filename = str(bv.id) + '-thongtin-' + name_url
-                        self.pool.get('yhoc_thongtin').ghihinhxuong(folder_hinh_thongtin, filename, bv.hinhdaidien, 95, 125, context=context)
+			if not os.path.exists(duongdan+'/images/thongtin/%s-thongtin-%s.jpg'%(str(bv.id),name_url)):
+				if bv.hinhdaidien:
+					folder_hinh_thongtin = duongdan+'/images/thongtin'
+					filename = str(bv.id) + '-thongtin-' + name_url
+					self.pool.get('yhoc_thongtin').ghihinhxuong(folder_hinh_thongtin, filename, bv.hinhdaidien, 95, 125, context=context)
 
-                description = bv.motangan or '(Chưa cập nhật mô tả)'
-                attach = {
-                  "name": name,
-                  "link": link,
-                  "description": description,
-                  "picture" : picture,
-                  "page_token" : str(access_token_page)
-                }
-                msg = name
-                post = graph.put_wall_post(message=msg, attachment=attach,profile_id=FACEBOOK_PROFILE_ID)
-                post_id = post['id'].replace(FACEBOOK_PROFILE_ID+'_','')
-                super(yhoc_thongtin,self).write(cr,uid,ids,{'is_post_fb':True,'fb_post_id':post_id}, context=context)
+			description = bv.motangan or '(Chưa cập nhật mô tả)'
+			attach = {
+			  "name": name,
+			  "link": link,
+			  "description": description,
+			  "picture" : picture,
+			  "page_token" : str(access_token_page)
+			}
+			msg = name
+			post = graph.put_wall_post(message=msg, attachment=attach,profile_id=FACEBOOK_PROFILE_ID)
+			post_id = post['id'].replace(FACEBOOK_PROFILE_ID+'_','')
+			super(yhoc_thongtin,self).write(cr,uid,ids,{'is_post_fb':True,'fb_post_id':post_id}, context=context)
         return True
     
     def auto_tags(self,cr, uid, ids, context=None):
