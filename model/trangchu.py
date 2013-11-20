@@ -168,9 +168,11 @@ class yhoc_trangchu(osv.osv):
                 fw = codecs.open(folder_tags +'/tag_item.html','w','utf-8')
                 fw.write(tag_item_)
                 fw.close()
+
                 fw = codecs.open(folder_tags +'/index.%s'%kieufile,'w','utf-8')
                 fw.write(template)
                 fw.close()
+
                 
     def capnhat_allduan(self, cr, uid, ids=None, context=None):
         duan = self.pool.get('yhoc_duan').search(cr, uid, [])
@@ -715,15 +717,19 @@ class yhoc_trangchu(osv.osv):
         fw.write(str(all_baivietmoi))
         fw.close()
 
-    def capnhat_baivietnoibac(self,cr, uid,chudenoibac, duongdan, domain,kieufile, context=None):
-        folder_trangchu = duongdan + '/trangchu/vi'
+    def capnhat_baivietnoibac(self,cr, uid,chudenoibac, path_luu_xuong, domain,kieufile, context=None):
+        duongdan = self.pool.get('hlv.property')._get_value_project_property_by_name(cr, uid, 'path of template')
         if os.path.exists(duongdan+'/template/trangchu/sidebar_menu_tab.html'):
             fr = open(duongdan+'/template/trangchu/sidebar_menu_tab.html', 'r')
             sidebar_menu_tab_ = fr.read()
             fr.close()
             all_sidebar_menu_tab = ''
-            import random
-            baivietnoibac = random.sample(chudenoibac, 6)       
+            if len(chudenoibac)>6:
+                import random
+                baivietnoibac = random.sample(chudenoibac, 6)
+            else:
+                baivietnoibac = chudenoibac
+                
             for bv in baivietnoibac:
                 if not bv.link:
                     try:
@@ -753,7 +759,7 @@ class yhoc_trangchu(osv.osv):
                     all_sidebar_menu_tab += sidebar_menu_tab 
             
             import codecs
-            fw = codecs.open(folder_trangchu +'/baivietnoibac.html','w','utf-8')
+            fw = codecs.open(path_luu_xuong +'/baivietnoibac.html','w','utf-8')
             fw.write(str(all_sidebar_menu_tab))
             fw.close()
     
@@ -851,7 +857,7 @@ class yhoc_trangchu(osv.osv):
         noidung_footer = self.capnhat_footer(cr, uid, chudecha, duongdan, domain, folder_trangchu,context=context)
         
 #Câp nhật menu các bài viết nổi bậc
-        self.capnhat_baivietnoibac(cr,uid, chudenoibac, duongdan, domain, kieufile, context=context)
+        self.capnhat_baivietnoibac(cr,uid, chudenoibac, folder_trangchu, domain, kieufile, context=context)
         template = template.replace('__SIDEBARMENU__', '''<?php include("../../trangchu/vi/baivietnoibac.html")?>''')
         
 #Tao file menu nganh

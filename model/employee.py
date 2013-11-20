@@ -626,9 +626,11 @@ class yhoc_employee(osv.osv):
 #                    duan_tab = duan_tab.replace('__COL2__', m.name)
 #            noidung_duan += duan_tab
         self.pool.get('yhoc_duan').capnhat_duantrongprofile(cr, uid, ids, context)
+
         template = template.replace('__DUAN__','duantrongprofile.html')
         template = template.replace('__ID_PROFILE__',str(nhanvien.id))
         import codecs
+
         fw= codecs.open(folder_profile+'/index.' + kieufile,'w','utf-8')
         fw.write(template)
         fw.close()

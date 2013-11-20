@@ -38,9 +38,22 @@ class yhoc_keyword(osv.osv):
                 if k['keyword_id'] in key_bv and ids[0] in key_bv:
                     diem+=1
             kq.append({'keyword_id':k['keyword_id'],
-                       'solanxuathien':diem})
-        print '==================='
-        print kq
+                       'solanxuathien':diem,
+                       'solanroot':k['solanxuathien']})
+        import operator
+#        aa = sorted(kq.items(), key=lambda x: x[1])
+        d = sorted(kq, key = lambda user: (user['solanxuathien']))
+        kq_fn = []
+        for i in range(1,len(d)):
+            x = (d[len(d)-i]['solanxuathien']*d[len(d)-i]['solanxuathien'])/d[len(d)-i]['solanroot']
+            kq_fn.append({'keyword_id':d[len(d)-i]['keyword_id'],
+                       'solanxuathien':x})
+        
+        print kq_fn    
+        kq_fn = sorted(kq_fn, key = lambda user: (user['solanxuathien']))
+            
+#        print '==================='
+#        print kq
 #        sql = '''select keyword_id,count(*) as solanxuathien 
 #                from thongtin_keyword_rel,yhoc_keyword  
 #                where thongtin_id in (select thongtin_id from thongtin_keyword_rel where keyword_id=%s)
@@ -53,18 +66,18 @@ class yhoc_keyword(osv.osv):
 #        kwlienquan = cr.dictfetchall()  
         for record in self.browse(cr, uid, ids, context=context):
             result[record.id] = []
-            if len(kq)<11:
-                for kw in kq:
+            if len(kq_fn)<21:
+                for kw in kq_fn:
                     result[record.id].append(kw['keyword_id'])
             else:
                 for i in range(0,10):
-                    result[record.id].append(kq[i]['keyword_id'])
+                    result[record.id].append(kq_fn[i]['keyword_id'])
         return result
     
     def _get_baivietmoi(self, cr, uid, ids, field_name, arg, context=None):
         result = {}
-        dsbaivietmoi = self.pool.get('yhoc_thongtin').search(cr, uid, [('state','=','done'),('keyword_ids','=',ids[0])], limit=8, order='date desc', context=context)  
         for record in self.browse(cr, uid, ids, context=context):
+            dsbaivietmoi = self.pool.get('yhoc_thongtin').search(cr, uid, [('state','=','done'),('keyword_ids','=',record.id)], limit=8, order='date desc', context=context)
             result[record.id] = []
             for bv in self.pool.get('yhoc_thongtin').browse(cr, uid, dsbaivietmoi, context=context):
                 result[record.id].append(bv.id)
@@ -72,8 +85,8 @@ class yhoc_keyword(osv.osv):
     
     def _get_baivietnoibac(self, cr, uid, ids, field_name, arg, context=None):
         result = {}
-        dsbaiviet = self.pool.get('yhoc_thongtin').search(cr, uid, [('state','=','done'),('keyword_ids','=',ids[0])], limit=10, order='soluongxem desc', context=context)  
         for record in self.browse(cr, uid, ids, context=context):
+            dsbaiviet = self.pool.get('yhoc_thongtin').search(cr, uid, [('state','=','done'),('keyword_ids','=',record.id)], limit=10, order='soluongxem desc', context=context)
             result[record.id] = []
             for bv in self.pool.get('yhoc_thongtin').browse(cr, uid, dsbaiviet, context=context):
                 result[record.id].append(bv.id)
@@ -81,8 +94,8 @@ class yhoc_keyword(osv.osv):
     
     def _get_baivietbanner(self, cr, uid, ids, field_name, arg, context=None):
         result = {}
-        dsbaiviet = self.pool.get('yhoc_thongtin').search(cr, uid, [('state','=','done'),('hinhlon','!=',False),('keyword_ids','=',ids[0])], limit=30, order='soluongxem desc', context=context)  
         for record in self.browse(cr, uid, ids, context=context):
+            dsbaiviet = self.pool.get('yhoc_thongtin').search(cr, uid, [('state','=','done'),('hinhlon','!=',False),('keyword_ids','=',record.id)], limit=30, order='soluongxem desc', context=context)
             result[record.id] = []
             for bv in self.pool.get('yhoc_thongtin').browse(cr, uid, dsbaiviet, context=context):
                 result[record.id].append(bv.id)
@@ -219,7 +232,10 @@ class yhoc_keyword(osv.osv):
             
             
             template = template_.replace('__TAGNAME__', t.name)
-            template = template.replace('__SIDEBARMENU__', '''<?php include("../../trangchu/vi/baivietnoibac.html")?>''')
+            template = template.replace('__ID_TAG__', str(t.id))
+            baivietnoibac = t.baivietnoibac
+            self.pool.get('yhoc_trangchu').capnhat_baivietnoibac(cr,uid, baivietnoibac, folder_tags, domain, kieufile, context=context)
+            template = template.replace('__SIDEBARMENU__', '''<?php include("%s/tags/%s/baivietnoibac.html")?>'''%(domain,name))
             template = template.replace('__CHUDENOIBAC__', '''<?php include("../../trangchu/vi/duanhoanthanh.html")?>''')
             import codecs  
             fw = codecs.open(folder_tags +'/tag_item.html','w','utf-8')
@@ -248,11 +264,29 @@ class yhoc_search_kw(osv.osv):
     _name = "yhoc_search_kw"
     _columns = {
                 'name':fields.char('Search',size=500),
+                'khongdau':fields.char('Search',size=500),
+                'soluottim':fields.integer('Số lượt tìm'),
                 }
     
     def create(self, cr, uid, vals,context=None):
         keyword = self.browse(cr, uid, 1, context=context)
         chuoi = self.pool.get('yhoc_trangchu').parser_url(keyword.name)
+        
+        cr.execute('''select id from yhoc_search_kw where khongdau='%s' and id not in (1,-1)'''%chuoi)
+        ids = map(lambda x: x[0], cr.fetchall())
+        if not ids:            
+            vals={}
+            vals.update({'name':keyword.name,
+                         'khongdau':chuoi})
+            super(yhoc_search_kw,self).create(cr, uid, vals,context=context)
+#            cr.execute('''insert into yhoc_search_kw(id,name,khongdau) values('%s','%s')'''%(keyword.name,chuoi))
+        else:
+            k = self.browse(cr, uid, ids[0], context=context)
+            cr.execute('''update yhoc_search_kw set name = '%s', khongdau = '%s',soluottim=%s where id=%s'''%(keyword.name,chuoi,k.soluottim+1,ids[0]))
+        
+        
+        
+        
 #        chuoi = self.pool.get('yhoc_trangchu').parser_url('bệnh ung thư')
         kqsearch = self.pool.get('yhoc_keyword').search(cr, uid, [('khongdau','=',chuoi)])
                 
@@ -273,30 +307,32 @@ class yhoc_search_kw(osv.osv):
         
         noidungkeyword = ''
         if kqsearch:
-            keyword_ids = self.pool.get('yhoc_thongtin').search(cr, uid, [('keyword_ids','=',kqsearch[0])])
-            
-            for i in range(0,len(keyword_ids)):
-                thongtin = self.pool.get('yhoc_thongtin').browse(cr, uid, keyword_ids[i], context=context)
-                search_tab = ''                    
-                search_tab = search_tab_.replace('__NGUOIHIEUDINH__', thongtin.nguoihieudinh.name or '')
-                search_tab = search_tab.replace('__LINKNGUOIHIEUDINH__', thongtin.nguoihieudinh.link or '#')
-                search_tab = search_tab.replace('__DANHXUNGHD__', thongtin.nguoihieudinh.danhxung or '')
-                
-                search_tab = search_tab.replace('__DANHXUNGNT__',thongtin.nguoidich.danhxung or '')
-                search_tab = search_tab.replace('__NGUOIDICH__',thongtin.nguoidich.name)
-                search_tab = search_tab.replace('__LINKNGUOIDICH__',thongtin.nguoidich.link or '#')
-                
-                search_tab = search_tab.replace('__NAME__',thongtin.name or '')
-                search_tab = search_tab.replace('__NGAYTAO__',thongtin.date)
-                search_tab = search_tab.replace('__MOTANGAN__',thongtin.motangan or '(Chưa cập nhật)')
-                search_tab = search_tab.replace('__LINK__','../../../../../../%s'%(thongtin.link_url))
-                name_url = self.pool.get('yhoc_trangchu').parser_url(str(thongtin.name))
-                search_tab = search_tab.replace('__IMAGE__',domain + '/images/thongtin/%s-thongtin-%s.jpg'%(str(thongtin.id),name_url))
-                noidungkeyword += search_tab
-                       
-            
+#            keyword_ids = self.pool.get('yhoc_thongtin').search(cr, uid, [('keyword_ids','=',kqsearch[0])])
+#            
+#            for i in range(0,len(keyword_ids)):
+#                thongtin = self.pool.get('yhoc_thongtin').browse(cr, uid, keyword_ids[i], context=context)
+#                search_tab = ''                    
+#                search_tab = search_tab_.replace('__NGUOIHIEUDINH__', thongtin.nguoihieudinh.name or '')
+#                search_tab = search_tab.replace('__LINKNGUOIHIEUDINH__', thongtin.nguoihieudinh.link or '#')
+#                search_tab = search_tab.replace('__DANHXUNGHD__', thongtin.nguoihieudinh.danhxung or '')
+#                
+#                search_tab = search_tab.replace('__DANHXUNGNT__',thongtin.nguoidich.danhxung or '')
+#                search_tab = search_tab.replace('__NGUOIDICH__',thongtin.nguoidich.name)
+#                search_tab = search_tab.replace('__LINKNGUOIDICH__',thongtin.nguoidich.link or '#')
+#                
+#                search_tab = search_tab.replace('__NAME__',thongtin.name or '')
+#                search_tab = search_tab.replace('__NGAYTAO__',thongtin.date)
+#                search_tab = search_tab.replace('__MOTANGAN__',thongtin.motangan or '(Chưa cập nhật)')
+#                search_tab = search_tab.replace('__LINK__','../../../../../../%s'%(thongtin.link_url))
+#                name_url = self.pool.get('yhoc_trangchu').parser_url(str(thongtin.name))
+#                search_tab = search_tab.replace('__IMAGE__',domain + '/images/thongtin/%s-thongtin-%s.jpg'%(str(thongtin.id),name_url))
+#                noidungkeyword += search_tab
+#                       
+#            
             kqsearch = self.pool.get('yhoc_keyword').browse(cr, uid, kqsearch[0],context=context)
-            template = template.replace('__TAGNAME__', kqsearch.name)
+            name = self.pool.get('yhoc_trangchu').parser_url(kqsearch.name)
+            redirect = '''<script language="javascript" type="text/javascript">window.location.href="../../tags/%s/index.php";</script>'''%name
+            template = template.replace('__TAGNAME__', redirect)
             
             
         else:

@@ -135,6 +135,7 @@ class yhoc_thongtin(osv.osv):
         return super(yhoc_thongtin,self).create(cr,uid,vals,context=context)
     
     def write(self,cr, uid, ids, vals, context=None):
+
 #Giang_2011# Trên server trước lúc cập nhật (20/11/2013-12:00AM) không có nên comment lại !
         # ###################
         # a = self.pool.get('yhoc_keyword').search(cr, uid, [],context=context)
@@ -143,6 +144,7 @@ class yhoc_thongtin(osv.osv):
             # self.pool.get('yhoc_keyword').write(cr,uid, [i], vals, context=context)
         # ###################
 # #        print vals
+
         for r in self.browse(cr, uid, ids, context=context):
             if 'name' in vals:
                 name_url = self.pool.get('yhoc_trangchu').parser_url(str(vals['name']))
@@ -546,6 +548,7 @@ class yhoc_thongtin(osv.osv):
         access_token_page = self.pool.get('hlv.property')._get_value_project_property_by_name(cr, uid, 'access_token_page_fb') or '/'
         
         #access_token_page='AAAHxBEJZAaGQBAJ7E2YZB40gVnwfTaZAGL20ZAwC2iuutlRrD9O632wBjZBHRXWrQhbvyDi7KZAeZC4asbyvVLDF8ZC3pxMGWsUQiFKmDQdTuRHqBkcvcfYStAenGWLUU2AZD'
+
         #Giang_1911#local# for bv in self.browse(cr,uid,ids, context=None):
 		#Giang_2011# Chỉnh sửa theo lúc lấy từ Server
         bv = self.browse(cr,uid,ids[0], context=None)
@@ -554,47 +557,51 @@ class yhoc_thongtin(osv.osv):
             raise osv.except_osv(('Message'), ('Chưa thể đăng 1 bài viết lên facebook khi chưa xuất bản lên website!'))
         if bv.state == 'done' and access_token_page != '/':
             
+
 #                FACEBOOK_APP_ID = '546475572029540'
 #                FACEBOOK_APP_SECRET = 'dcf0e2796a6577732d5c5f60978579e2'
-			FACEBOOK_PROFILE_ID = '525884304122872'
-                #FACEBOOK_PROFILE_ID = '100002499548724'
+
+            FACEBOOK_PROFILE_ID = '525884304122872'
+            #FACEBOOK_PROFILE_ID = '100002499548724'
+            
 #                oauth_args = dict(client_id     = FACEBOOK_APP_ID,
 #                                  client_secret = FACEBOOK_APP_SECRET,
 #                                  grant_type    = 'client_credentials')
 #                oauth_response = urllib.urlopen('https://graph.facebook.com/oauth/access_token?' + urllib.urlencode(oauth_args)).read()
-			access_token_app = facebook.get_app_access_token('546475572029540', 'dcf0e2796a6577732d5c5f60978579e2')
-			graph = facebook.GraphAPI(str(access_token_page))
+            access_token_app = facebook.get_app_access_token('546475572029540', 'dcf0e2796a6577732d5c5f60978579e2')
+            graph = facebook.GraphAPI(str(access_token_page))
 			########################################################
-			accounts = graph.get_connections("100002499548724", "accounts")
-			for acc in accounts['data']:
-				if acc['id'] == '525884304122872':
-					graph = facebook.GraphAPI(str(acc['access_token']))
-					print access_token_page
-					print acc['access_token']
-			############################################################
-			name = bv.name
-			name_url = self.pool.get('yhoc_trangchu').parser_url(str(bv.name))
-			link = bv.link
-			picture = domain + '/images/thongtin/%s-thongtin-%s.jpg'%(str(bv.id),name_url)
-#                folder_thongtin = duongdan+'/chude/%s'%(bv.link_url,)
-			if not os.path.exists(duongdan+'/images/thongtin/%s-thongtin-%s.jpg'%(str(bv.id),name_url)):
-				if bv.hinhdaidien:
-					folder_hinh_thongtin = duongdan+'/images/thongtin'
-					filename = str(bv.id) + '-thongtin-' + name_url
-					self.pool.get('yhoc_thongtin').ghihinhxuong(folder_hinh_thongtin, filename, bv.hinhdaidien, 95, 125, context=context)
+            accounts = graph.get_connections("100002499548724", "accounts")
+            for acc in accounts['data']:
+            	if acc['id'] == '525884304122872':
+            		graph = facebook.GraphAPI(str(acc['access_token']))
+            		print access_token_page
+            		print acc['access_token']
+            ############################################################
+            name = bv.name
+            name_url = self.pool.get('yhoc_trangchu').parser_url(str(bv.name))
+            link = bv.link
+            picture = domain + '/images/thongtin/%s-thongtin-%s.jpg'%(str(bv.id),name_url)
+            
+            if not os.path.exists(duongdan+'/images/thongtin/%s-thongtin-%s.jpg'%(str(bv.id),name_url)):
+            	if bv.hinhdaidien:
+            		folder_hinh_thongtin = duongdan+'/images/thongtin'
+            		filename = str(bv.id) + '-thongtin-' + name_url
+            		self.pool.get('yhoc_thongtin').ghihinhxuong(folder_hinh_thongtin, filename, bv.hinhdaidien, 95, 125, context=context)
+            
+            description = bv.motangan or '(Chưa cập nhật mô tả)'
+            attach = {
+              "name": name,
+              "link": link,
+              "description": description,
+              "picture" : picture,
+              "page_token" : str(access_token_page)
+            }
+            msg = name
+            post = graph.put_wall_post(message=msg, attachment=attach,profile_id=FACEBOOK_PROFILE_ID)
+            post_id = post['id'].replace(FACEBOOK_PROFILE_ID+'_','')
+            super(yhoc_thongtin,self).write(cr,uid,ids,{'is_post_fb':True,'fb_post_id':post_id}, context=context)
 
-			description = bv.motangan or '(Chưa cập nhật mô tả)'
-			attach = {
-			  "name": name,
-			  "link": link,
-			  "description": description,
-			  "picture" : picture,
-			  "page_token" : str(access_token_page)
-			}
-			msg = name
-			post = graph.put_wall_post(message=msg, attachment=attach,profile_id=FACEBOOK_PROFILE_ID)
-			post_id = post['id'].replace(FACEBOOK_PROFILE_ID+'_','')
-			super(yhoc_thongtin,self).write(cr,uid,ids,{'is_post_fb':True,'fb_post_id':post_id}, context=context)
         return True
     
     def auto_tags(self,cr, uid, ids, context=None):

@@ -355,7 +355,8 @@ class yhoc_chude(osv.osv):
                 rss_item = rss_item_.replace('__TITLEITEM__', thongtin.name or '')
                 rss_item = rss_item.replace('__MOTAITEM__', thongtin.motangan or '(Chưa cập nhật)')
                 rss_item = rss_item.replace('__LINKITEM__', thongtin.link + '/' or '#')
-                date = datetime.strptime(thongtin.date, '%Y-%m-%d %H:%M:%S')
+                date = thongtin.date.split('.')
+                date = datetime.strptime(date[0], '%Y-%m-%d %H:%M:%S')
                 date_rfc822 = formatdate(time.mktime(date.timetuple()))
                 rss_item = rss_item.replace('__DATEITEM__', date_rfc822)
                 if thongtin.url_thongtin:
