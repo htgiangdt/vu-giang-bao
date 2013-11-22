@@ -31,25 +31,6 @@
 <!-- MENU END-->
 <script language="javascript" type="text/javascript" src="__DOMAIN__/js/ts-fab.js"></script>
 <script type="text/javascript" src="//s7.addthis.com/js/300/addthis_widget.js#pubid=ra-528991ea3fc5a56a"></script>
- <!--Son_1311_ButtonTop-->
-<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.6/jquery.min.js?ver=3.4.2"></script>
-<script type="text/javascript">
-    $(document).ready(function(){ 
-        $(window).scroll(function(){
-            if ($(this).scrollTop() > 500) {
-                $('.scrollup').fadeIn();
-            } else {
-                $('.scrollup').fadeOut();
-            }
-        }); 
- 
-        $('.scrollup').click(function(){
-            $("html, body").animate({ scrollTop: 0 }, 600);
-            return false;
-        });
-    });
-</script>
-<!--Son_1311-->
 <div id="fb-root"></div>
 <!--Script button Like-->
 <script>
@@ -63,9 +44,11 @@
 </script>
 <!--Script button G+-->	
 	<script type="text/javascript">
+	  window.___gcfg = {lang: 'vi'};
+
 	  (function() {
 		var po = document.createElement('script'); po.type = 'text/javascript'; po.async = true;
-		po.src = 'https://apis.google.com/js/plusone.js';
+		po.src = 'https://apis.google.com/js/platform.js';
 		var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(po, s);
 	  })();
 	</script>
@@ -190,17 +173,22 @@ __NOIDUNG_THONGTIN__
 	</div>
 <!-- AddThis Button END -->
 	</br>
-	<!--#Giang_start#-->
-	<div class="socialize-containter" style="background-color:#DDE8F4; border: 3px double #ABC5E4; padding: 8px 11px 6px">
-		<div> Hãy ủng hộ cho Y Học Cộng Đồng bằng cách bấm vào các trang mạng xã hội sau:</div></br>
-			<!--Google+--> 
-		<div class="g-plusone" data-size="medium"></div>
-			<!--Facebook Like--> 
-		<div class="fb-like" data-href="<?php echo curPageURL(); ?>" data-width="60" data-height="20" data-colorscheme="light" data-layout="button_count" data-action="like" data-show-faces="false" data-send="false"></div>
-			<!--Twitter--> 
-		<a href="https://twitter.com/share" class="twitter-share-button" data-via="yhoccongdong" data-related="yhoccongdong" data-hashtags="Yhọccộngđồng" data-dnt="true">Tweet</a>
+	<!--ShareBox_Son-->
+	<div class="socialize-containter" style="background-color:#DDE8F4; border: 1px #336699;border-style:solid; padding: 7px 10px; width:693px; display:inline-block; font-size:14px;">
+		<div style="width:240px;border-right:1px solid #336699;float: left;padding-right:10px;margin-right:10px">								
+			<div style="padding:5px 0px 10px; font-weight: bold; color: rgb(15, 73, 114);"> Ủng hộ bài viết trên FB, G+</div>
+			<div class="fb-like" data-href="<?php echo curPageURL(); ?>" data-width="60" data-height="20" data-colorscheme="light" data-layout="button_count" data-action="like" data-show-faces="false" data-send="false"></div>
+			<div class="g-plusone" data-size="medium" data-href="<?php echo curPageURL(); ?>"></div>
+		</div>
+		<div style="width:430px;float:left;">					
+			<div style="padding:5px 0px 10px; font-weight: bold; color: rgb(15, 73, 114);">Theo dõi Y Học Cộng Đồng trên mạng xã hội</div>
+			<div class="fb-like" data-href="https://www.facebook.com/yhoccongdong" data-layout="button_count" data-action="like" data-show-faces="false" data-share="false"></div>
+			<div class="fb-follow" data-href="http://www.facebook.com/yhoccongdong" data-colorscheme="light" data-layout="button_count" data-show-faces="false"></div>
+			<div class="g-follow" data-annotation="bubble" data-height="20" data-href="https://plus.google.com/+Yhoccongdong" data-rel="publisher"></div>
+			<div class="g-plusone" data-size="medium" data-href="https://plus.google.com/+Yhoccongdong"></div>
+		</div>
 	</div>
-	<!--#Giang_end#-->
+	<!--ShareBox_Son_end-->
 <?php include("__AUTHORBOX__")?>
 	<div id="comment">
 		<div class="cm-bar">Các bài viết liên quan</div>
