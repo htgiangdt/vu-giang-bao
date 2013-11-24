@@ -458,7 +458,7 @@ class yhoc_employee(osv.osv):
             template = ''
 
 #Tao folder cho thongtin
-        folder_profile = duongdan + '/profile/%s' %link_url
+        folder_profile = duongdan + '/profile/%s/' %link_url
         if not os.path.exists(folder_profile):
             os.makedirs(folder_profile)
             
@@ -581,7 +581,7 @@ class yhoc_employee(osv.osv):
         template = template.replace('__TENPROFILE__', tennhanvien)
         template = template.replace('__ANHPROFILE__', photo)
         template = template.replace('__TRIETLY__', trietly or '')
-        template = template.replace('__LINKPROFILE__', link or '''%s/profile/%s'''%(domain,link_url))
+        template = template.replace('__LINKPROFILE__', link or '''%s/profile/%s/'''%(domain,link_url))
         template = template.replace('__EMAIL__', email or '(Chưa cập nhật)')
         template = template.replace('__GIOITHIEU__', gioithieu or '(Chưa cập nhật)')
 #        template = template.replace('__TONGHIEUDINH__', str(len(baiviet_hieudinh)))

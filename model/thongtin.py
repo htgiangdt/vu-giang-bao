@@ -202,7 +202,7 @@ class yhoc_thongtin(osv.osv):
         for bv in thongtin:
             tongxem_baiviet.append(bv.id)
             baiviet_tab = baiviet_tab_.replace('__COL1__', bv.name or '')
-            baiviet_tab = baiviet_tab.replace('__LINK1__', '../../../../../../%s'%(bv.link_url))
+            baiviet_tab = baiviet_tab.replace('__LINK1__', domain + '/%s/'%(bv.link_url))
             baiviet_tab = baiviet_tab.replace('__COL2__', (bv.duan and bv.duan.name) or '')
             baiviet_tab = baiviet_tab.replace('__LINK2__', (bv.duan and bv.duan.link) or '#')
             #baiviet_tab = baiviet_tab.replace('__COL3__', str('--'))
@@ -253,7 +253,7 @@ class yhoc_thongtin(osv.osv):
         nhanvien = self.pool.get('hr.employee').browse(cr,uid,nhanvien_ids[0])
         
         import codecs  
-        fw= codecs.open(duongdan + '/profile/%s'%nhanvien.link_url + '/author_baivietmoi.html','w','utf-8')
+        fw= codecs.open(duongdan + '/profile/%s/author_baivietmoi.html'%nhanvien.link_url,'w','utf-8')
         fw.write(author_listbaivietmoi_)
         fw.close()
         
@@ -463,7 +463,7 @@ class yhoc_thongtin(osv.osv):
         template = template.replace('__HINHBAIVIET__', photo)
         template = template.replace('__MOTA__', thongtin.motangan or thongtin.name)
         
-        link_xemnhanh = domain + '/' + link_url
+        link_xemnhanh = domain + '/%s/'%link_url
         super(yhoc_thongtin,self).write(cr,uid,ids,{'link':link_xemnhanh,
                                                     'date':date,
                                                     'link_url':link_url}, context=context)
@@ -516,6 +516,8 @@ class yhoc_thongtin(osv.osv):
         self.pool.get('yhoc_duan').capnhat_thongtin(cr,uid,[thongtin.duan.id],context)
         self.capnhat_baiviettrongprofile(cr, uid, [thongtin.nguoidich.id], context)
         
+#Giang_2411# Cap nhat share button
+        self.capnhat_sharebutton(cr, uid, thongtin.id, context=context)
 #Tao trang Blog
         self.taotrangblog(cr, uid, context)
 #cap nhat tong hieu dinh va tong dong gop
@@ -670,6 +672,38 @@ class yhoc_thongtin(osv.osv):
         return ok
      #{'keyword_ids': [[6, False, [243, 382, 785, 799, 846, 878, 922, 924, 923]]]}
      
+#Giang_2411# Cap nhat share button cua bai viet
+    def capnhat_sharebutton(self, cr, uid, ids, context=None):
+        duongdan = self.pool.get('hlv.property')._get_value_project_property_by_name(cr, uid, 'path of template')
+        domain = self.pool.get('hlv.property')._get_value_project_property_by_name(cr, uid, 'Domain') or '../..'
+        bv = self.browse(cr,uid,ids)
+        if os.path.exists(duongdan+'/template/thongtin/share_button16.html'):
+            fr = open(duongdan+'/template/thongtin/share_button16.html', 'r')
+            template_ = fr.read()
+            fr.close()
+        else:
+            template_ = ''
+        template = template_.replace('__DOMAIN__', domain)
+        template = template.replace('__URL__', domain + '/%s/'%bv.link_url)
+        template = template.replace('__TITTLE__', bv.name)
+        import codecs  
+        fw = codecs.open(duongdan + '/%s/share_button16.html'%bv.link_url,'w','utf-8')
+        fw.write(template)
+        fw.close()
+		
+        if os.path.exists(duongdan+'/template/thongtin/share_button32.html'):
+            fr = open(duongdan+'/template/thongtin/share_button32.html', 'r')
+            template_ = fr.read()
+            fr.close()
+        else:
+            template_ = ''
+        template = template_.replace('__DOMAIN__', domain)
+        template = template.replace('__URL__', domain + '/%s/'%bv.link_url)
+        template = template.replace('__TITTLE__', bv.name)
+        fw = codecs.open(duongdan + '/%s/share_button32.html'%bv.link_url,'w','utf-8')
+        fw.write(template)
+        fw.close()     
+        return True
     def taotrangblog(self,cr,uid,context=None):
         dsbaivietmoi = self.pool.get('yhoc_thongtin').search(cr, uid, [('state','=','done')], limit=15, order='date desc', context=context)
         duongdan = self.pool.get('hlv.property')._get_value_project_property_by_name(cr, uid, 'path of template')
@@ -710,6 +744,8 @@ class yhoc_thongtin(osv.osv):
             item = item.replace('__NGAYTAO__',thongtin.date)
             item = item.replace('__MOTANGAN__',thongtin.motangan or '(Chưa cập nhật)')
             item = item.replace('__LINK__',domain + '/%s'%(thongtin.link_url))
+			#Giang_2411# Them share button vao blog
+            item = item.replace('__SHAREBUTTON__',duongdan + '/%s/share_button16.html'%(thongtin.link_url))
             if thongtin.url_thongtin:
                 name_url = thongtin.url_thongtin
             else:
