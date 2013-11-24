@@ -29,8 +29,8 @@
  
 <?php include("__DUONGDAN__/trangchu/vi/header.html")?>
 <!-- MENU END-->
+<script type="text/javascript" src="__DOMAIN__/js/printpage.js"></script>
 <script language="javascript" type="text/javascript" src="__DOMAIN__/js/ts-fab.js"></script>
-<script type="text/javascript" src="//s7.addthis.com/js/300/addthis_widget.js#pubid=ra-528991ea3fc5a56a"></script>
 <div id="fb-root"></div>
 <!--Script button Like-->
 <script>
@@ -109,6 +109,8 @@
 	</td>
 	<td class="right">
 	__LINKTREE__
+<!--Giang_2411#Print-->
+	<div id="print">
 	<h1 itemprop="name">__TUADETHONGTIN__</h1>	
 	<table style="padding-left:60px;width: 100%;">
 		<tr>
@@ -123,6 +125,11 @@
 			<td width="30%">
 				<table>
 					<tr>
+						<!--Giang_2411#Share button 16-->
+						<?php include("share_button16.html")?>
+						<a target="_blank" onclick="printpage('print')">
+							<img alt="print" src="__DOMAIN__/images/icon/print16.gif" style="cursor: pointer;" border="0" align="bottom"></img>
+						</a>
 						<td style="text-align: right">
 							<script type="text/javascript">
 								function fbshare()
@@ -163,15 +170,14 @@ __NOIDUNG_THONGTIN__
 	<div div style="text-align: right; font-style: italic;">
 		<a href="__NGUONBAIVIET__">__NGUONBAIVIET__</a>
 	</div>
-<!-- AddThis Button BEGIN -->
-	<div class="addthis_toolbox addthis_default_style addthis_32x32_style">
-		<a class="addthis_button_facebook"></a>
-		<a class="addthis_button_google_plusone_share"></a>
-		<a class="addthis_button_twitter"></a>
-		<a class="addthis_button_email"></a>
-		<a class="addthis_button_print"></a>
-	</div>
-<!-- AddThis Button END -->
+</div>
+<!--Giang_2411#Print end-->
+<!--Giang_2411#Share button 32-->
+	<div style="float:left; margin-right:5px;line-height: 32px; font-size: 14px;"">Chia sẻ bài viết:</div>
+ 	<?php include("share_button32.html")?>
+	<a target="_blank" onclick="printpage('print')">
+		<img alt="print" src="__DOMAIN__/images/icon/print32.png" style="cursor: pointer;" border="0" align="bottom"></img>
+	</a>
 	</br>
 	<!--ShareBox_Son-->
 	<div class="socialize-containter" style="background-color:#DDE8F4; border: 1px #336699;border-style:solid; padding: 7px 10px; width:693px; display:inline-block; font-size:14px;">
