@@ -66,11 +66,33 @@ class yhoc_keyword(osv.osv):
 #        kwlienquan = cr.dictfetchall()  
         for record in self.browse(cr, uid, ids, context=context):
             result[record.id] = []
-            if len(kq_fn)<21:
+            dp_1 = self.search(cr,uid,[('name','ilike','%'+record.name+'%'),('name','!=',record.name)])
+            
+            if len(dp_1)<11:
+                for i in dp_1:
+                    result[record.id].append(i)
+            else:
+                for i in range(0,11):
+                    result[record.id].append(dp_1[i])
+            dp_2 = []
+            id_dp_2 = self.search(cr,uid,[])
+            for id in id_dp_2:
+                r = self.browse(cr, uid, id, context=context)
+                if (r.name in record.name and r.name != record.name):
+                    dp_2.append(id)
+                    
+            if len(dp_2)<9:       
+                for i in dp_2:
+                    result[record.id].append(i)
+            else:
+                for i in range(0,9):
+                    result[record.id].append(pd_2[i])
+                
+            if len(kq_fn)<8:
                 for kw in kq_fn:
                     result[record.id].append(kw['keyword_id'])
             else:
-                for i in range(0,10):
+                for i in range(0,8):
                     result[record.id].append(kq_fn[i]['keyword_id'])
         return result
     
