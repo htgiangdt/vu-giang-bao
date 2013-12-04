@@ -135,6 +135,7 @@ class yhoc_thongtin(osv.osv):
         return super(yhoc_thongtin,self).create(cr,uid,vals,context=context)
     
     def write(self,cr, uid, ids, vals, context=None):
+#        self.tao_mucluc(cr, uid, context)
 
 #Giang_2011# Trên server trước lúc cập nhật (20/11/2013-12:00AM) không có nên comment lại !
         # ###################
@@ -779,6 +780,7 @@ class yhoc_thongtin(osv.osv):
         fw.close()
         return True
 
+
     def tao_mucluc(self, cr, uid, ids, context=None):
         duongdan = self.pool.get('hlv.property')._get_value_project_property_by_name(cr, uid, 'path of template')
         domain = self.pool.get('hlv.property')._get_value_project_property_by_name(cr, uid, 'Domain') or '../..'
@@ -836,6 +838,7 @@ class yhoc_thongtin(osv.osv):
         self.write(cr, uid, ids, vals, context=context)
         
         return True
+
 yhoc_thongtin()
 
 

@@ -137,6 +137,7 @@ class yhoc_keyword(osv.osv):
         'baivietmoi':fields.function(_get_baivietmoi, type='many2many', relation='yhoc_thongtin', string='Bài viết mới'),
         'baivietbanner':fields.function(_get_baivietbanner, type='many2many', relation='yhoc_thongtin', string='Banner'),
         'baiviet_ids': fields.many2many('yhoc_thongtin', 'thongtin_keyword_rel', 'keyword_id','thongtin_id', 'Bài viết chứa từ khóa'),
+        'loai_tukhoa':fields.selection([('bacsi','Bác sĩ'),('tukhoa','Từ khóa'),('theh2','Thẻ H2')],'Loại từ khóa'), 
     }
 
     _defaults = {
@@ -259,6 +260,7 @@ class yhoc_keyword(osv.osv):
             #self.pool.get('yhoc_trangchu').capnhat_baivietnoibac(cr,uid, baivietnoibac, folder_tags, domain, kieufile, context=context)
             #template = template.replace('__SIDEBARMENU__', '''<?php include("%s/tags/%s/baivietnoibac.html")?>'''%(domain,name))
             #template = template.replace('__CHUDENOIBAC__', '''<?php include("../../trangchu/vi/duanhoanthanh.html")?>''')
+
             import codecs  
             fw = codecs.open(folder_tags +'/tag_item.html','w','utf-8')
             fw.write(tag_item_)

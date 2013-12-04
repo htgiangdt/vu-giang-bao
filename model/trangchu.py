@@ -733,8 +733,10 @@ class yhoc_trangchu(osv.osv):
         domain = self.pool.get('hlv.property')._get_value_project_property_by_name(cr, uid, 'Domain') or '../..'
         duongdan = self.pool.get('hlv.property')._get_value_project_property_by_name(cr, uid, 'path of template')
         kieufile = self.pool.get('hlv.property')._get_value_project_property_by_name(cr, uid, 'Kiểu lưu file') or 'html'
+
         fr = open(duongdan+'/template/trangchu/%s.html'%ten_template, 'r')
         baivietmoi_tab_ = fr.read()
+
         fr.close()
             
         all_baivietmoi = ''
@@ -1015,16 +1017,17 @@ class yhoc_trangchu(osv.osv):
         import random 
         duanhoanthanh = random.sample(duanhoanthanh, 6)
         for nb in duanhoanthanh:
+
 #            chudenoibac_tab = '''<li><a href="__LINK__"><strong>__NAME__</strong></a></li>'''
             #Giang_0511#chudenoibac_tab = chudenoibac_tab.replace('__LINK__', '../../../../../../%s/'%(nb.link_url))
             name_url = self.pool.get('yhoc_trangchu').parser_url(nb.name)
             picture = domain + '/images/duan/%s-duan-%s.jpg'%(str(nb.id),name_url)
             
             if not os.path.exists(duongdan+'/images/duan/%s-duan-%s.jpg'%(str(nb.id),name_url)):
-				if nb.photo:
-					folder_hinh_thongtin = duongdan+'/images/duan'
-					filename = str(nb.id) + '-duan-' + name_url
-					self.pool.get('yhoc_thongtin').ghihinhxuong(folder_hinh_thongtin, filename, nb.photo, 135, 105, context=context)
+                if nb.photo:
+                    folder_hinh_thongtin = duongdan+'/images/duan'
+                    filename = str(nb.id) + '-duan-' + name_url
+                    self.pool.get('yhoc_thongtin').ghihinhxuong(folder_hinh_thongtin, filename, nb.photo, 135, 105, context=context)
 					
             loatbai_tab = loatbai_tab_.replace('__LINK__', domain + '/%s/'%(nb.link_url))
             loatbai_tab = loatbai_tab.replace('__NAME__', nb.name)
@@ -1033,6 +1036,7 @@ class yhoc_trangchu(osv.osv):
             loatbai_tab = loatbai_tab.replace('__ICON__', domain + '/images/multi_document.png')
             loatbai_tab = loatbai_tab.replace('__SOLUONGBAIVIET__', str(nb.soluongbaiviet))
             all_chudenoibac += loatbai_tab
+
         
         import codecs
         fw = codecs.open(folder_trangchu +'/duanhoanthanh.html','w','utf-8')
