@@ -1,33 +1,5 @@
-﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+﻿<?php include("__DUONGDAN__/trangchu/vi/header1.html")?>
 
-<html lang="vi" xmlns="http://www.w3.org/1999/xhtml" xmlns:og="http://ogp.me/ns#" xmlns:fb="http://www.facebook.com/2008/fbml" itemscope itemtype="http://schema.org/NewsArticle">
-
-<head prefix="og: http://ogp.me/ns# fb: http://ogp.me/ns/fb# website: http://ogp.me/ns/website#">
-	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-	<link rel="shortcut icon" href="http://yhoccongdong.com/images/Yhoccongdong.ico" type="image/x-icon"/>
-	<meta name="description" content="__MOTA__" />	
-	<title>__TUADETHONGTIN__</title>	
-	<meta name="robots" content="index,follow,noodp" />
-	<link rel="canonical" href="<?php echo curPageURL(); ?>"/>
-	<meta name="copyright" content="Copyright © 2012 by YHocCongDong.com" />
-	<meta name="distribution" content="Global" />	
-	<meta property="fb:admins" content="100005119690063" />
-	<meta property="og:title" itemprop="headline" content="__TUADETHONGTIN__"/>
-	<meta property="og:url" itemprop="url"  content="<?php echo curPageURL(); ?>"/>
-	<meta property="og:description" itemprop="description" content="__MOTA__"/>
-    <meta property="og:locale" itemprop="inLanguage" content="vi_VN" />
-	<meta property="og:site_name" content="YHocCongDong.com"/>
-	<meta property="og:image" itemprop="thumbnailUrl" content="__HINHBAIVIET__"/>
-	<meta property="article:publisher" content="yhoccongdong.com" />
-	<meta property="article:published_time" itemprop="datePublished" content="__NGAYTAO__" />
-	<meta property="article:author" content="__NGUOIDICH__" />
-	<meta property="twitter:creator" content="@yhoccongdong">
-	<meta property="twitter:site" content="@yhoccongdong">
-	<meta property="twitter:card" content="summary">
-	<meta property="twitter:url" content="https://twitter.com/yhoccongdong">
- 	<link rel="stylesheet" type="text/css" href="__DOMAIN__/css/ts-fab.css" />
- 
-<?php include("__DUONGDAN__/trangchu/vi/header.html")?>
 <!-- MENU END-->
 <script type="text/javascript" src="__DOMAIN__/js/printpage.js"></script>
 <script language="javascript" type="text/javascript" src="__DOMAIN__/js/ts-fab.js"></script>
@@ -64,164 +36,116 @@
 <!--Google Analytics Social Button Tracking -->
 	<script type="text/javascript" src="https://code.google.com/p/analytics-api-samples/source/browse/trunk/src/tracking/javascript/v5/social/ga_social_tracking.js"></script>
 <!--#Giang_end#-->
-<script>
-	$('#jump_to_loc').click(function(){
-		var jump = $(this).attr('href');
-		var new_position = $('#'+jump).offset();
-		window.scrollTo(new_position.left,new_position.top);
-		return false;
-	});
-</script>
-<?php
-	function curPageURL() {
-	 $pageURL = 'http';
-	 #Giang_1112#if ($_SERVER["HTTPS"] == "on") {$pageURL .= "s";}
-	 if (!empty($_SERVER['HTTPS'])) {$pageURL .= "s";}  
-	 $pageURL .= "://";
-	 if ($_SERVER["SERVER_PORT"] != "80") {
-	  $pageURL .= $_SERVER["SERVER_NAME"].":".$_SERVER["SERVER_PORT"].$_SERVER["REQUEST_URI"];
-	 } else {
-	  $pageURL .= $_SERVER["SERVER_NAME"].$_SERVER["REQUEST_URI"];
-	 }
-	 return $pageURL;
-	}
-?>
-	<div id="noidung">
-	<table class="noidung" cellpadding="0" cellspacing="0">
-	<tr>
-	<td class="left">
-	<!--h2>
-		<a href="__LINKNGUOIDICH__"><img src="__HINHNGUOIDICH__" width="150"/></a>
-		<div style="font-size: 15px;padding-top: 8px;line-height: 18px;">
-			<a href="__LINKNGUOIDICH__">__DANHXUNGNT____NGUOIDICH__ </a></br>
-			__TRINHDOCHUYENMON__</br>
-			__NGANH____CHUYENNGANH__</br>			
-		</div>
-	</h2-->
-	<?php include("__THONGTINNGUOIVIET__")?>
-	<h3 >
-	__CHUDE__
-	</h3>	
-	<ul>
-		<?php include("__BAIVIET_CUNGCHUDE__")?>
-		
-	</ul>
-	</td>
-	<td class="right">
-	__LINKTREE__
-<!--Giang_2411#Print-->
-	<div id="print">
-	<h1 itemprop="name">__TUADETHONGTIN__</h1>	
-	<table style="padding-left:60px;width: 100%;">
-		<tr>
-			<td width="70%" style="text-align: left; font-style: italic;color: rgb(109, 105, 105);font-size: 11px;">
-				<div>
-					Biên soạn: <strong style="color: #0F4972">__DANHXUNGNT__ </strong><a itemprop="author" href="__LINKNGUOIDICH__" >__NGUOIDICH__</a></br>
-					Hiệu đính: <a itemprop="editor" href="__LINKNGUOIHIEUDINH__">__DANHXUNGHD____NGUOIHIEUDINH__</a></br>
-					Ngày đăng: <span itemprop="datePublished">__NGAYTAO__</span>
+	<article class="thongtin" style="margin-top: 35px;margin-bottom: 35px;">
+		<section class="thongtinleft">
+			<?php include("__THONGTINNGUOIVIET__")?>
+				</br>
+				<header class="secondary-header">
+					<a href="__LINKDUAN__"><strong style="padding-left: 10px; ">__DUAN__</strong>
+						<p style="text-align:right;  font-style:italic;">
+							<img src="http://yhoccongdong.com/images/multi_document.png" />
+							__SOLUONGBAIVIET__ bài
+						</p>
+					</a>
+				</header>
+				<div class="thongtinleftmenu">
+					<ul>
+						<?php include("__BAIVIET_CUNGCHUDE__")?>
+					</ul>
 				</div>
-			</td>
-					
-			<td width="30%">
-				<table>
-					<tr>
-						<!--Giang_2411#Share button 16-->
-						<?php include("share_button16.html")?>
-						<a target="_blank" onclick="printpage('print')">
-							<img alt="print" src="__DOMAIN__/images/icon/print16.gif" style="cursor: pointer;" border="0" align="bottom"></img>
-						</a>
-						<td style="text-align: right">
-							<script type="text/javascript">
-								function fbshare()
-								{
-									window.open ("http://www.facebook.com/share.php?u=<?php echo curPageURL(); ?>","Facebook_Share","menubar=1,resizable=1,width=900,height=500");								
-								}
-							</script>
-							<a href="javascript:fbshare()">
-								<img src="http://yhoccongdong.com/images/Share.png" width="51px" height="20px"/>
+			</section>
+		</section>
+		<div style="float: right; width:75%; border-left: 1px solid #f1f1f1;">
+			<section class="thongtincenter">
+			<?php include("__LINKTREE__")?>
+				<div id="print">
+					<h1 itemprop="name">__TUADETHONGTIN__</h1>	
+					<div class="thongtinhieudinh">
+						Biên soạn: <a>__DANHXUNGNT__ </a><a itemprop="author" href="__LINKNGUOIDICH__">__NGUOIDICH__</a><br>
+						Hiệu đính: <a itemprop="editor" href="__LINKNGUOIHIEUDINH__">__DANHXUNGHD__ __NGUOIHIEUDINH__</a><br>
+						Ngày đăng: <span itemprop="datePublished">__NGAYTAO__</span>
+						<div style="width: 160px; clear: both; float: right; margin-top:-30px;">
+							<?php include("share_button16.html")?>
+							<a target="_blank" onclick="printpage('print')">
+								<img alt="print" src="__DOMAIN__/images/icon/print16.gif" style="cursor: pointer;" border="0" align="bottom"></img>
 							</a>
-							<iframe src="//www.facebook.com/plugins/like.php?href=<?php echo curPageURL(); ?>&amp;send=false&amp;layout=button_count&amp;width=100&amp;show_faces=false&amp;font&amp;colorscheme=light&amp;action=like&amp;height=21&amp;appId=546475572029540" scrolling="no" frameborder="0" style="border:none; overflow:hidden; width:100px; height:21px;" allowTransparency="true"></iframe>							
-						</td>
-					</tr>
-					<tr>
-						<td>
-							<div style="font-style: italic;color: rgb(109, 105, 105);  font-size: 11px;">								
+							<p style="display:block; font-style: italic; font-size: 11px;">
 								Số lượt xem: <span itemprop="interactionCount">
-											<?php 
-												#$string = curPageURL();
-												#$res = explode('/', $string);
-												#echo '<pre>'; print_r($res); echo '<pre/>';
-												#$string_page = explode('-', $res[count($res)-1]);
-												#$kq = explode('.',$string_page[count($string_page)-1]);
-												#$baiviet_id = $kq[0];
-												include("__DUONGDAN__/count.php");
-												echo update_viewer(__ID__);
-											 ?> </span>
-							</div>
-						</td>
-					</tr>
-				</table>						
-			</td>
-		</tr>
-	</table>	
-	<div style="margin-top:20px; line-height: 25px; max-width:700px;"  itemprop="articleBody">	
-__NOIDUNG_THONGTIN__
-	</div>
-	<div div style="text-align: right; font-style: italic;">
-		<a href="__NGUONBAIVIET__">__NGUONBAIVIET__</a>
-	</div>
-</div>
-<!--Giang_2411#Print end-->
-<!--Giang_2411#Share button 32-->
-	<div style="float:left; margin-right:5px;line-height: 32px; font-size: 14px;"">Chia sẻ bài viết:</div>
- 	<?php include("share_button32.html")?>
-	<a target="_blank" onclick="printpage('print')">
-		<img alt="print" src="__DOMAIN__/images/icon/print32.png" style="cursor: pointer;" border="0" align="bottom"></img>
-	</a>
-	</br>
-	<!--ShareBox_Son-->
-	<div class="socialize-containter" style="background-color:#DDE8F4; border: 1px #336699;border-style:solid; padding: 7px 10px; width:693px; display:inline-block; font-size:14px;">
-		<div style="width:240px;border-right:1px solid #336699;float: left;padding-right:10px;margin-right:10px">								
-			<div style="padding:5px 0px 10px; font-weight: bold; color: rgb(15, 73, 114);"> Ủng hộ bài viết trên FB, G+</div>
-			<div class="fb-like" data-href="<?php echo curPageURL(); ?>" data-width="60" data-height="20" data-colorscheme="light" data-layout="button_count" data-action="like" data-show-faces="false" data-send="false"></div>
-			<div class="g-plusone" data-size="medium" data-href="<?php echo curPageURL(); ?>"></div>
-		</div>
-		<div style="width:430px;float:left;">					
-			<div style="padding:5px 0px 10px; font-weight: bold; color: rgb(15, 73, 114);">Theo dõi Y Học Cộng Đồng trên mạng xã hội</div>
-			<div class="fb-like" data-href="https://www.facebook.com/yhoccongdong" data-layout="button_count" data-action="like" data-show-faces="false" data-share="false"></div>
-			<div class="fb-follow" data-href="http://www.facebook.com/yhoccongdong" data-colorscheme="light" data-layout="button_count" data-show-faces="false"></div>
-			<div class="g-follow" data-annotation="bubble" data-height="20" data-href="https://plus.google.com/+Yhoccongdong" data-rel="publisher"></div>
-			<div class="g-plusone" data-size="medium" data-href="https://plus.google.com/+Yhoccongdong"></div>
-		</div>
-	</div>
-	<!--ShareBox_Son_end-->
-<?php include("__AUTHORBOX__")?>
-	<div id="comment">
-		<div class="cm-bar">Các bài viết liên quan</div>
-			<div>
-				<ul style="margin: 0px; padding: 0px; position: relative; list-style-type: none; z-index: 0;">
-					<?php include("baivietcungduantrongbaiviet_end.html"); ?>			
-				</ul>
-				<br clear="all" />
+												<?php 
+													include("__DUONGDAN__/count.php");
+													echo update_viewer(__ID__);
+												 ?> 
+											</span>
+							</p>
+						</div>
+					</div>
+				<div style="clear:both;font-size: 16px; line-height:20px; padding-top: 10px;">
+					<strong style="font-style:italic">Tóm tắt: </strong>
+					<em>__MOTANGAN__</em>
+				</div>
+				<div id="mucluc">
+					<div id="toctitle">
+						<strong class="footermenutitle" style="padding-bottom: 10px;">Mục lục</strong>
+					</div>
+					<ul style="display: block;">
+					</ul>
+				</div>
+				<div style="padding-top:15px; line-height: 25px; max-width:700px; display;block; clear: both;" itemprop="articleBody">	
+					__NOIDUNG_THONGTIN__
+					<p>&nbsp;</p>
+				</div>
+				</div>
+			</section>
+			<div style="width: 98%; display: inline-block; margin-left: 10px;">
+				<header class="secondary-header">
+					<strong style="padding-left: 10px;">Chia sẻ bài viết</strong>
+				</header>
+				<?php include("share_button32.html")?>
+				<a target="_blank" onclick="printpage('print')">
+					<img alt="print" src="__DOMAIN__/images/icon/print32.png" style="cursor: pointer;" border="0" align="bottom"></img>
+				</a>
+				<div class="socialize-containter" style="background-color:#DDE8F4; border: 2px #327539;border-style:solid; padding: 7px 0 10px 0; width:99.5%; display:inline-block; font-size:14px; margin-left: 0px;">
+					<div style="width:210px;border-right:1px solid #336699;float: left;padding-right:10px;margin-right:10px">								
+						<div style="padding:5px 0px 10px; font-weight: bold; color: rgb(15, 73, 114);"> Ủng hộ bài viết trên FB, G+</div>
+						<div class="fb-like" data-href="__URL__" data-width="60" data-height="20" data-colorscheme="light" data-layout="button_count" data-action="like" data-show-faces="false" data-send="false"></div>
+						<div class="g-plusone" data-size="medium" data-href="__URL__"></div>
+					</div>
+					<div style="width:430px;float:left;">					
+						<div style="padding:5px 0px 10px; font-weight: bold; color: rgb(15, 73, 114);">Theo dõi Y Học Cộng Đồng trên mạng xã hội</div>
+						<div class="fb-like" data-href="https://www.facebook.com/yhoccongdong" data-layout="button_count" data-action="like" data-show-faces="false" data-share="false"></div>
+						<div class="fb-follow" data-href="http://www.facebook.com/yhoccongdong.quanly" data-colorscheme="light" data-layout="button_count" data-show-faces="false"></div>
+						<div class="g-follow" data-annotation="bubble" data-height="20" data-href="https://plus.google.com/+Yhoccongdong" data-rel="publisher"></div>
+						<div class="g-plusone" data-size="medium" data-href="https://plus.google.com/+Yhoccongdong"></div>
+					</div>
+				</div>
 			</div>
-		</br>
-		<div class="cm-bar">Trao đổi và bình luận</div>
-			<div id="con_comment">
-				<div class="fb-comments" data-href="<?php echo curPageURL(); ?>" data-width="650" data-num-posts="20"></div>			
-			</div>
-		</br>
-		<div class="cm-bar">TAGS</div>
-		__LIST_TAGS__
-		
-	</table>
-	</div>
-	<!--===================================================-->
-	</td>
-	</tr>
-	</table>
-	</div>
-	</div>
-</div>
-<!--Run Tracking GA Social-->
+				<div style="width: 98%; display: inline-block; margin-left: 10px;">		
+				<?php include("__AUTHORBOX__")?>
+				</div>
+				<div class="social_block">
+					<header class="secondary-header">
+						<strong style="padding-left: 10px;">Các bài viết liên quan</strong>
+					</header>
+				</div>
+				<div class="social_block">
+					<header class="secondary-header">
+						<strong style="padding-left: 10px;">Trao đổi bình luận</strong>
+					</header>
+					</br>
+					<div id="con_comment">
+						<div class="fb-comments" data-href="__URL__" data-width="706" data-num-posts="5">
+						</div>
+					</div>
+				</div>
+				<div class="social_block">
+					<header class="secondary-header">
+						<strong style="padding-left: 10px;">Từ khóa liên quan</strong>
+					</header>
+					<div style="margin: 0 auto; margin-bottom:10px; margin-top:10px;">
+						__LIST_TAGS__
+					</div>
+				</div>
+		</div>
+	</article>
 <script>_ga.trackSocial();</script>
-<?php include("__DUONGDAN__/trangchu/vi/footer.html")?>
+<?php include("__DUONGDAN__/trangchu/vi/footer1.html")?>

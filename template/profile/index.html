@@ -184,28 +184,28 @@
             <div id="content_right">
             	<div id=""></div>
             	<p><?php 
-						$string = curPageURL();
-						$res = explode('/', $string);
+						#$string = curPageURL();
+						#$res = explode('/', $string);
 						#echo '<pre>'; print_r($res); echo '<pre/>';
-						$string_page = explode('-', $res[count($res)-2]);
-						$baiviet_id = $string_page[0];						
-						echo tongsobaiviet($baiviet_id);
+						#$string_page = explode('-', $res[count($res)-2]);
+						#$baiviet_id = $string_page[0];						
+						echo tongsobaiviet(__ID_PROFILE__);
 					 ?> bài đóng góp</p>
 				<p><?php 
-						$string = curPageURL();
-						$res = explode('/', $string);
+						#$string = curPageURL();
+						#$res = explode('/', $string);
 						#echo '<pre>'; print_r($res); echo '<pre/>';
-						$string_page = explode('-', $res[count($res)-2]);
-						$baiviet_id = $string_page[0];					
-						echo tongsohieudinh($baiviet_id);
+						#$string_page = explode('-', $res[count($res)-2]);
+						#$baiviet_id = $string_page[0];					
+						echo tongsohieudinh(__ID_PROFILE__);
 					 ?> bài hiệu đính</p>                
 				<p> <?php 
-						$string = curPageURL();
-						$res = explode('/', $string);
+						#$string = curPageURL();
+						#$res = explode('/', $string);
 						#echo '<pre>'; print_r($res); echo '<pre/>';
-						$string_page = explode('-', $res[count($res)-2]);
-						$baiviet_id = $string_page[0];						
-						echo update_viewer($baiviet_id);
+						#$string_page = explode('-', $res[count($res)-2]);
+						#$baiviet_id = $string_page[0];						
+						echo update_viewer(__ID_PROFILE__);
 					 ?> người quan tâm</p>
             </div>
         </div>

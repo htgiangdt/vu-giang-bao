@@ -1,63 +1,114 @@
-	<link rel="stylesheet" type="text/css" href="__DOMAIN__/css/main_css.css" />
-	<link rel="stylesheet" type="text/css" href="__DOMAIN__/css/main_ddmegamenu.css" />
-	<link rel="stylesheet" type="text/css" href="__DOMAIN__/css/main_style.css">
-	<link rel="stylesheet" type="text/css" href="__DOMAIN__/css/main_chitietbaiviet.css">
-	<link rel="stylesheet" type="text/css" href="__DOMAIN__/css/main_profile.css">
-	<link rel="stylesheet" type="text/css" href="__DOMAIN__/css/main_danhmuc.css">
-	<link rel="stylesheet" type="text/css" href="__DOMAIN__/css/footer_menu.css">
-	<link rel="stylesheet" type="text/css" href="__DOMAIN__/css/yhoc_thinh.css">
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
-	<script language="javascript" type="text/javascript" src="__DOMAIN__/js/jquery.min.js"></script>
-	<script language="javascript" type="text/javascript" src="__DOMAIN__/js/ddmegamenu.js"></script>	
-	<script language="javascript" type="text/javascript" src="__DOMAIN__/js/yhoc_js1.js"></script>
-	<script language="javascript" type="text/javascript" src="__DOMAIN__/js/yhoc_js.js"></script>	
-	<script language="javascript" type="text/javascript" src="__DOMAIN__/js/yhoc_thinh_js.js"></script>
-	<script type="text/javascript">
-	  $(document).ready(function() {
-		$(".tabLink").each(function(){
-		  $(this).click(function(){
-			tabeId = $(this).attr('id');
-			$(".tabLink").removeClass("activeLink");
-			$(this).addClass("activeLink");
-			$(".tabcontent").addClass("hide");
-			$("#"+tabeId+"-1").removeClass("hide")   
-			return false;	  
-		  });
-		});  
-	  });
+<html xmlns="http://www.w3.org/1999/xhtml" itemscope itemtype="http://schema.org/__ITEMTYPE__">
+
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+	<link rel="shortcut icon" href="http://yhoccongdong.com/images/Yhoccongdong.ico" type="image/x-icon"/>
+	<meta name="description" content="__DESCRIPTION__" />	
+	<title>__TITLE__</title>	
+	<meta name="google-site-verification" content="hOscgIY8rgaYMJfzp5AbEjPBimZ2uKazVOj721vELc4" />
+	<meta name="robots" content="index,follow,noodp" />
+	<link rel="canonical" href="__URL__"/>
+	<meta name="copyright" content="Copyright © 2012 by YHocCongDong.com" />
+	<meta name="distribution" content="Global" />	
+	<meta property="fb:admins" content="100005119690063" />
+	<meta property="og:title" itemprop="headline" content="__TITLE__"/>
+	<meta property="og:url" itemprop="url"  content="__URL__"/>
+	<meta property="og:description" itemprop="description" content="__DESCRIPTION__"/>
+    <meta property="og:locale" itemprop="inLanguage" content="vi_VN" />
+	<meta property="og:site_name" content="YHocCongDong.com"/>
+	<meta property="twitter:creator" content="@yhoccongdong">
+	<meta property="twitter:site" content="@yhoccongdong">
+	<meta property="twitter:url" content="https://twitter.com/yhoccongdong">
+
+	<link rel="stylesheet" type="text/css" href="__DOMAIN__/css_/main_css.css" />
+	<link rel="stylesheet" type="text/css" href="__DOMAIN__/css_/search.css" />
+	
+	<link rel="stylesheet" type="text/css" href="__DOMAIN__/css_/keyword.css" />
+	<!--Footer-->
+	<link rel="stylesheet" type="text/css" href="__DOMAIN__/css_/footer.css" />
+	
+	<!--Bai Viet-->
+	<link rel="stylesheet" type="text/css" href="__DOMAIN__/css_/baiviet_lienquan.css" />
+	<script language="javascript" type="text/javascript" src="__DOMAIN__/js_/baiviet_lienquan.js"></script>	
+	<link rel="stylesheet" type="text/css" href="__DOMAIN__/css_/main_thongtin.css" />
+	<link rel="stylesheet" type="text/css" href="__DOMAIN__/css_/social_css.css" />
+	<link rel="stylesheet" type="text/css" href="__DOMAIN__/css_/mucluc_css.css" />
+	<link rel="stylesheet" type="text/css" href="__DOMAIN__/css_/ts-fab.css" />
+	
+	<!--Menu-->
+	<link rel="stylesheet" type="text/css" href="__DOMAIN__/css_/ddmegamenu.css" />
+	
+	<script language="javascript" type="text/javascript" src="__DOMAIN__/js_/jquery.min.js"></script>
+	<script language="javascript" type="text/javascript" src="__DOMAIN__/js_/jquery.js"></script>
+	<script language="javascript" type="text/javascript" src="__DOMAIN__/js_/jquery.easing.js"></script>
+	<script language="javascript" type="text/javascript" src="__DOMAIN__/js_/ddmegamenu.js"></script>
+	<script language="javascript" type="text/javascript" src="__DOMAIN__/js_/init.ddmegamenu.js"></script>
+	<!--Slide-->
+	<link href="__DOMAIN__/css_/js-image-slider.css" rel="stylesheet" type="text/css" />
+    <script src="__DOMAIN__/js_/js-image-slider.js" type="text/javascript"></script>
+    <script src="__DOMAIN__/js_/js-image-slider.js" type="text/javascript"></script>
+
+	
+	<!--Slide of Bác sĩ -->
+	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.8/jquery.min.js"></script>
+	<script>window.jQuery || document.write('<script src="__DOMAIN__/js_/jquery.min.js"><\/script>')</script>
+
+	<script src="__DOMAIN__/js_/jquery.easing.1.2.js"></script>
+
+	<link rel="stylesheet" href="__DOMAIN__/css_/js-image-bacsi.css" media="screen">
+	<script src="__DOMAIN__/js_/jquery.jatt.min.js"></script>
+	<script src="__DOMAIN__/js_/jquery.anythingslider.js"></script>
+	<link rel="stylesheet" href="__DOMAIN__/css_/js-bacsi-theme-metallic.css">
+
+	<!-- Script chạy Slide của Bác sĩ-->
+	<script>
+		// Set up Sliders
+		// **************
+		$(function(){
+
+			$('#slider1').anythingSlider({
+				theme           : 'metallic',
+				easing          : 'easeInOutBack',
+				navigationFormatter : function(index, panel){
+					return ['Slab', 'Parking Lot', 'Drive', 'Glorius Dawn', 'Bjork?', 'Traffic Circle'][index - 1];
+				},
+				onSlideComplete : function(slider){
+					// alert('Welcome to Slide #' + slider.currentPage);
+				}
+			});
+		});
 	</script>
+	
 </head>
-<form method="post" action="<?php echo htmlentities($_SERVER['PHP_SELF']); ?>" enctype="multipart/form-data">	
 <body>
-<div id="wallpaper">
-
-	<div>
-		<div id="logo" style="margin-top: 10px;"><a href="__DOMAIN__"><img src="__DOMAIN__/images/logo.jpg" width="419" height="70" /></a></div>
+<div class="container">
+	<!--HEADER-->
+	<header>
+		<div id="logo" style="margin-top: 10px;"><a href="http://yhoccongdong.com"><img src="__DOMAIN__/images/logo.jpg" alt="logo Y học cộng đồng" width="419" height="70"></a></div>
 		<div style="float:right;">
-			<span><a href="__DOMAIN__"><img src="__DOMAIN__/images/social/home.png" alt="facebook" title="Trang chủ"/></a></span>
-			<span style="padding-left: 10px;"><a href="http://facebook.com/yhoccongdong/"><img src="__DOMAIN__/images/social/facebook.png" alt="facebook" title="Facebook"/></a></span>
-			<span style="padding-left: 10px;"><a href="https://twitter.com/yhoccongdong/"><img src="__DOMAIN__/images/social/twitter.png" alt="twitter" title="Twitter"/></a></span>
-			<span style="padding-left: 10px;"><a href="https://plus.google.com/+YHocCongDong/"><img src="__DOMAIN__/images/social/google-plus.png" alt="g+" title="Google+"/></a></span>
-			<span style="padding-left: 10px;"><a href="http://www.youtube.com/yhoccongdong/"><img src="__DOMAIN__/images/social/youtube.png" alt="youtube" title="Youtube"/></a></span>
-			<span style="padding-left: 10px;"><a href="http://me.zing.vn/yhoccongdong"><img src="__DOMAIN__/images/social/zingme.png" alt="zing me" title="Zing me"/></a></span>
-			<span style="padding-left: 10px;"><a href="http://blog.yhoccongdong.com"><img src="__DOMAIN__/images/social/blog.png" alt="blog" title="Yhoccongdong Blog"/></a></span>
-			<span style="padding-left: 10px;"><a href="http://yhoccongdongcom.blogspot.com"><img src="__DOMAIN__/images/social/blogger.png" alt="Blogspot" title="Google Blog"/></a></span>
-			<span style="padding-left: 10px;"><a href="http://www.slideshare.net/yhoccongdong"><img src="__DOMAIN__/images/social/slideshare.png" alt="Slideshare" title="Slideshare"/></a></span>
-			<span style="padding-left: 10px;"><a href="__DOMAIN__/rss/"><img src="__DOMAIN__/images/social/rss.png" alt="RSS" title="RSS"/></a></span>
+			<span><a href="http://yhoccongdong.com"><img src="__DOMAIN__/images/social/home.png" alt="facebook" title="Trang chủ"></a></span>
+			<span style="padding-left: 10px;"><a href="http://facebook.com/yhoccongdong/"><img src="__DOMAIN__/images/social/facebook.png" alt="facebook" title="Facebook"></a></span>
+			<span style="padding-left: 10px;"><a href="https://twitter.com/yhoccongdong/"><img src="__DOMAIN__/images/social/twitter.png" alt="twitter" title="Twitter"></a></span>
+			<span style="padding-left: 10px;"><a href="https://plus.google.com/+YHocCongDong/"><img src="__DOMAIN__/images/social/google-plus.png" alt="g+" title="Google+"></a></span>
+			<span style="padding-left: 10px;"><a href="http://www.youtube.com/yhoccongdong/"><img src="__DOMAIN__/images/social/youtube.png" alt="youtube" title="Youtube"></a></span>
+			<span style="padding-left: 10px;"><a href="http://me.zing.vn/yhoccongdong"><img src="__DOMAIN__/images/social/zingme.png" alt="zing me" title="Zing me"></a></span>
+			<span style="padding-left: 10px;"><a href="http://blog.yhoccongdong.com"><img src="__DOMAIN__/images/social/blog.png" alt="blog" title="Yhoccongdong Blog"></a></span>
+			<span style="padding-left: 10px;"><a href="http://yhoccongdongcom.blogspot.com"><img src="__DOMAIN__/images/social/blogger.png" alt="Blogspot" title="Google Blog"></a></span>
+			<span style="padding-left: 10px;"><a href="http://www.slideshare.net/yhoccongdong"><img src="__DOMAIN__/images/social/slideshare.png" alt="Slideshare" title="Slideshare"></a></span>
+			<span style="padding-left: 10px;"><a href="rss/"><img src="__DOMAIN__/images/social/rss.png" alt="RSS" title="RSS"></a></span>
+			<span style="padding-left: 10px;"><a href="http://yhoccongdong.com/dangky/"><img src="__DOMAIN__/images/social/register.png" alt="Register" title="Register"></a></span>
 		</div>
-		<br clear="all"/>
-		<div style="margin-top: -20px; width: 450px; float:right;">
-			<div style="margin-top: -20px; width:285px; float:left;">
-			 	<div class="form-wrapper cf">
-					<!--button id="submit" name="submit" type="submit">Tìm</button-->
-                    			<input name="search_text" id="search_text" type="text" placeholder="Nhập từ khóa tìm kiếm..." required="" oninvalid="setCustomValidity('Vui lòng nhập từ khóa để được hỗ trợ tốt hơn')" oninput="setCustomValidity('')">
-                    			<button id="submit" name="submit" type="submit">Tìm</button>
-		       		</div>
-
-				<!--label for="textfield"></label>
-				<button style="float:right;" id="submit" name="submit" type="submit">Tìm</button>
-				<input name="search_text" type="text" class="search" id="search_text"/-->	
-				<!--button style="float:left;" id="submit" name="submit" type="submit">Tìm</button-->
+		<br clear="all">
+		<form method="post" action="<?php echo htmlentities($_SERVER['PHP_SELF']); ?>" enctype="multipart/form-data">	
+			<div style="margin-top: -20px; width: 475px; float:right;">
+				<div style="margin-top: -20px; width:100%; float:right;">
+					<div class="form-wrapper cf">
+						<input name="search_text" id="search_text" type="text" placeholder="Nhập từ khóa tìm kiếm..." required="" oninvalid="setCustomValidity('Vui lòng nhập từ khóa để được hỗ trợ tốt hơn')" oninput="setCustomValidity('')">
+						<button id="submit" name="submit" type="submit">Tìm</button>
+					</div>
+				</div>
 			</div>
 			<?php 
 				if (isset($_POST['submit'])) {
@@ -76,77 +127,32 @@ window.location.href="../../search_result.php";
 					}
 				}
 			?>
-		<div style="text-align: right;font-size: 13px; width:100px; float:right;">
-			<a href="__DOMAIN__/dangky/" rel="nofollow" target="_blank"><u>Register</u></a>&nbsp;&nbsp;
-			<a href="__DOMAIN__:2069/" rel="nofollow" target="_blank"><u>Login</u></a>
-		</div>
-		</div>
-		<!--div class="form-wrapper cf">
-                    <input name="search_text" id="search_text" type="text" placeholder="Nhập từ khóa tìm kiếm..." required="" oninvalid="setCustomValidity('Vui lòng nhập từ khóa để được NTTUoogle hỗ trợ tốt hơn')" oninput="setCustomValidity('')">
-                    <button id="submit" name="submit" type="submit">Tìm</button>
-                </div-->
-		<br clear="all" />
-	</div>
+		</form>
+		<br clear="all">
+	</header>
 
-<!-- MENU START-->
-	<div>
-		<ul id="solidmenu" class="solidblockmenu"  style="background:url(__DOMAIN__/images/bgmenu.jpg)">
-			<li><a href="__DOMAIN__">Trang chủ</a></li>
+	
+	<!--START MENU-->
+	
+	<div class="startmenu">
+		<div class="menu">
+			<ul id="solidmenu" class="solidblockmenu">
+				<li><a href="#" rel="about" class="trigger">Giới thiệu</a>			
+				__ROOTMENU__
+				<li><br clear="all" /></li>
+			</ul>
+			<div id="about" class="mega solidblocktheme" style="width:200px">
+				<ul class="ulmenu">
+					<li ><a href="__DOMAIN__/trangchu/vi/muctieuytuong.__KIEUFILE__" >Ý tưởng và mục tiêu</a></li>
+					<li ><a href="__DOMAIN__/trangchu/vi/thungo.__KIEUFILE__" >Thư ngỏ</a></li>
+					<li><a href="__LINKCONGDONGBS__" >Cộng đồng bác sĩ</a></li>
+					<li><a href="__DOMAIN__/trangchu/vi/nhomcongtac.__KIEUFILE__" >Nhóm cộng tác viên</a></li>
+					<li ><a href="__DOMAIN__/trangchu/vi/nhomphattrien.__KIEUFILE__" >Điều hành và phát triển</a></li>
+					<li ><a href="__DOMAIN__/trangchu/vi/nhataitro.__KIEUFILE__" >Nhà tài trợ</a></li>
+				</ul>
+			</div>
 			
-			<!-- <li><a href="#" rel="thuongthuc" class="trigger">bệnh và triệu chứng</a></li>
-			<li><a href="#">sống khỏe</a></li>
-			<li><a href="#">mẹ và bé</a></li>
-			<li><a href="#" >trẻ em</a></li>
-			<li><a href="#" rel="treem" class="trigger">thanh niên</a></li>
-			<li><a href="#" rel="chuyende" class="trigger">Người lớn tuổi</a></li>  -->
-			<li><a href="#" rel="about" class="trigger">Giới thiệu</a>			
-			__ROOTMENU__
-			<li><br clear="all" /></li>
-		</ul>
-		
-		
-		<div id="about" class="mega solidblocktheme" style="width:200px">
-			<ul class="ulmenu">
-				<li ><a href="__DOMAIN__/trangchu/vi/muctieuytuong.__KIEUFILE__" >Ý tưởng và mục tiêu</a></li>
-				<li ><a href="__DOMAIN__/trangchu/vi/thungo.__KIEUFILE__" >Thư ngỏ</a></li>
-				<li><a href="__LINKCONGDONGBS__" >Cộng đồng bác sĩ</a></li>
-				<li><a href="__DOMAIN__/trangchu/vi/nhomcongtac.__KIEUFILE__" >Nhóm cộng tác viên</a></li>
-				<li ><a href="__DOMAIN__/trangchu/vi/nhomphattrien.__KIEUFILE__" >Điều hành và phát triển</a></li>
-				<li ><a href="__DOMAIN__/trangchu/vi/nhataitro.__KIEUFILE__" >Nhà tài trợ</a></li>
-			</ul>
+			__SUBMENU__
+			﻿
 		</div>
-		__SUBMENU__
-		<!-- 
-		<div id="thuongthuc" class="mega solidblocktheme" style="width:200px">
-			<ul class="ulmenu">
-				<li ><a href="#" >Kiến thức căn bản</a></li>
-				<li><a href="#" >Bách khoa toàn thư</a></li>
-				<li><a href="#" >Khảo cứu tình dục học</a></li>
-				<li><a href="#" >Giới tính tuổi hoa</a></li> 
-				<li><a href="#" >Sinh con theo ý muốn</a></li> 
-				<li><a href="#" >Bác sĩ giải đáp "chuyện ấy"	</a></li>
-				<li><a href="#" >Các vấn đề khác</a></li>
-			</ul>
-		</div>
-		
-		<div id="treem" class="mega solidblocktheme" style="width:200px">
-			<ul class="ulmenu">
-				<li ><a href="#" >Đầu Mặt Cổ</a></li>
-				<li><a href="#" >Ngực Bụng</a></li> 
-				<li><a href="#" >Da Cơ Xương</a></li>
-				<li><a href="#" >Sinh dục - Bài tiết</a></li>
-				<li><a href="#" >300 câu hỏi cho bố mẹ trẻ</a></li>
-			</ul>
-		</div>
-        
-        <div id="chuyende" class="mega solidblocktheme" style="width:200px">
-			<ul class="ulmenu">
-				<li ><a href="#" >Tăng huyết áp</a></li>
-				<li><a href="#" >Bệnh Quai bị</a></li> 
-				<li><a href="#" >Đái tháo đường</a></li>
-				<li><a href="#" >U xơ tử cung</a></li>
-				<li><a href="#" >Công dụng của Mật ong</a></li>
-			</ul>
-		</div> -->
 	</div>
-<!-- MENU END-->

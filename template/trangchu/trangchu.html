@@ -1,25 +1,4 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-
-<html xmlns="http://www.w3.org/1999/xhtml" itemscope itemtype="http://schema.org/WebPage">
-
-<head>
-	<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
-	<link rel="shortcut icon" href="http://yhoccongdong.com/images/Yhoccongdong.ico" type="image/x-icon"/>
-	<meta name="description" content="Yhoccongdong.com cung cấp thông tin chăm sóc, sức khỏe và bệnh" />	
-	<title>Y Học Cộng Đồng</title>	
-	<meta name="google-site-verification" content="hOscgIY8rgaYMJfzp5AbEjPBimZ2uKazVOj721vELc4" />
-	<meta name="robots" content="index,follow,noodp" />
-	<link rel="canonical" href="<?php echo curPageURL(); ?>"/>
-	<meta name="copyright" content="Copyright © 2012 by YHocCongDong.com" />
-	<meta name="distribution" content="Global" />	
-	<meta property="fb:admins" content="100005119690063" />
-	<meta property="og:title" itemprop="headline" content="Y Học Cộng Đồng"/>
-	<meta property="og:url" itemprop="url"  content="<?php echo curPageURL(); ?>"/>
-	<meta property="og:description" itemprop="description" content="Yhoccongdong.com cung cấp thông tin chăm sóc, sức khỏe và bệnh"/>
-    <meta property="og:locale" itemprop="inLanguage" content="vi_VN" />
-	<meta property="og:site_name" content="YHocCongDong.com"/>
-
-<?php include("__DUONGDAN__/trangchu/vi/header.html")?>
+<?php include("__DUONGDAN__/trangchu/vi/header1.html")?>
 
 <?php
 	function curPageURL() {
@@ -36,88 +15,107 @@
 	}
 ?>
 <!-- MENU END-->	
-	<!-- <div id="breadcrumb">
-		<span class="current-time">Thứ Tư, ngày 13 tháng 12, 2012</span>Bạn đang ở<span class="home"></span> trang chủ<br clear="all" />
-	</div> -->
-	
-	<div>
-		<div id="content">
-			<div id="banner">
-				 <div id="slider_container_3">
-					<div id="SliderName_3" class="SliderName_3"> <!-- đối tượng truyền vào phải là div -->
+	<article>
+		<div style="float: left; width:640px; margin-top: 35px;">
+			<section id="slide">
+				<div id="sliderFrame">
+					<div id="slider">
 						__ANHTRANGCHU__
 					</div>
-					<div class="c"></div>
 					
-					<!-- Importance Script -->
-					<script type="text/javascript">
-						// khai báo các một tập hợp effect bao gồm name: 'myeffect', hiệu ứng bắt đầu từ(left, top, right , bottom)-> chỉ khai báo một cái thôi ^_^!, có di chuyển hay không, khoảng thời gian cho effect.
-						demo3Effect1 = {name: 'myEffect31', top: true, move: true, duration: 400};
-						demo3Effect2 = {name: 'myEffect32', right: true, move: true, duration: 400};
-						demo3Effect3 = {name: 'myEffect33', bottom: true, move: true, duration: 400};
-						demo3Effect4 = {name: 'myEffect34', left: true, move: true, duration: 400};
-						demo3Effect5 = {name: 'myEffect35', rows: 3, cols: 9, delay: 50, duration: 100, order: 'random', fade: true};
-						demo3Effect6 = {name: 'myEffect36', rows: 2, cols: 4, delay: 100, duration: 400, order: 'random', fade: true, chess: true};
-						
-						effectsDemo3 = [demo3Effect1,demo3Effect2,demo3Effect3,demo3Effect4,demo3Effect5,demo3Effect6,'blinds'];
-
-						var demoSlider_3 = MySlider.slider({container: 'SliderName_3', width: 650, height: 390, effects: effectsDemo3, 
-						display: { 
-							autoplay: 5000,
-							always_show_loading: 200, // testing loading mode
-							description: {background: '#ffffff', opacity: 0.8, height: 80, position: 'bottom'}, // image description box settings
-							buttons: {opacity: 1, prev: {className: 'SliderNamePrev_3', label: ''}, next: {className: 'SliderNameNext_3', label: ''}}, // Next/Prev buttons settings
-							}
-						});
-					</script>
-
-					<div class="c"></div>
-				</div>
-      
-			</div>
-<!------------------------------------- BÀI MỚI START ------------------------------------------------->
-			<div id="timhieudaitrang">   
-				<h4>Bài mới</h4>
-				<div>
-					<ul style="margin: 0px; padding: 0px; position: relative; list-style-type: none; z-index: 1;">
+				</div>				
+			</section>
+			</br>
+			
+			<section id="content_center">
+				<div class="center_left">
+					<header class="secondary-header">
+						<h1>Sức khỏe mỗi ngày</h1>
+					</header>
+					<ul class="main-sub-article">
 						<?php include("__DUONGDAN__/trangchu/vi/baivietmoi.html")?>
 					</ul>
-					<br clear="all" />
+					<!--ul class="main-sub-article">
+						
+					</ul>
+					<ul class="main-sub-article">
+						
+					</ul>
+					<ul class="main-sub-article">
+						
+					</ul-->
 				</div>
-			</div>
-<!------------------------------------- BÀI MỚI END ------------------------------------------------->
-		</div>
+				<div class="center_right">
+				<div class="img_news">
+				<header class="secondary-header">
+					<h1>Một số loạt bài nổi bật</h1>
+				</header>
+				<!--div class="titlemodule">
+					<div class="titlespan">
+						Một số loạt bài nổi bật
+					</div>
+				</div-->
 
-<!------------------------------------- SIDEBAR START------------------------------------------------->		
-		<div id="sidebar">
-		<!------------------------------------- 6 MENU START------------------------------------------------->		
-			<div class="rowsidebar">
-				<strong><a href="#">Các bài viết nổi bật</a></strong>
-				<div class="content_side">
-					__SIDEBARMENU__	
-					<br clear="all" />					
-				</div>
-			</div>
-		<!------------------------------------- 6 MENU END------------------------------------------------->		
-		
-		
-		<!------------------------------------- CHỦ ĐỀ NỔI BẬC START------------------------------------------------->		
-			
-			
-			<div class="rowsidebar">
-				<strong><a href="#">Một số dự án đã hoàn thành</a></strong>
-				<div class="content_side">
-				    __CHUDENOIBAC__
-					<br clear="all" />				  
+				__CHUDENOIBAC__
 				
+				
+			</div>
+				</div>
+			</section>
+		</div>
+		
+		<section id="rightslide">
+			<!--header class="secondary-header">
+				<h1>Các từ khóa liên quan sức khỏe</h1>
+			</header-->
+			<div class="titlemodule">
+				<div class="titlespan">
+					Các từ khóa liên quan
 				</div>
 			</div>
-			<br clear="all" /> 
-		</div>
-		<!------------------------------------- CHỦ ĐỀ NỔI BẬC END------------------------------------------------->		
-<!------------------------------------- SIDEBAR END------------------------------------------------->		
-		<br clear="all" />
-	</div>
-</div>
+			<div style="margin: 0 auto; margin-bottom:20px;"> 
+				__LIST_TAGS__
+				<!--a href="#" class="HeaderTagCloudGreen">ăn gì tốt cho sức khỏe</a> 
+				<a href="#" class="HeaderTagCloud">bảo vệ hạnh phúc gia đình</a> 
+				<a href="#" class="HeaderTagCloud">bé biếng ăn</a> 
+				<a href="#" class="HeaderTagCloudGreen">bí quyết chăm sóc da</a> 
+				<a href="#" class="HeaderTagCloudGreen">sữa cho bé</a> 
+				<a href="#" class="HeaderTagCloud">các giai đoạn phát triển của trẻ</a> 
+				<a href="#" class="HeaderTagCloud">dạy con</a> 
+				<a href="#" class="HeaderTagCloud">chăm sóc</a> 
+				<a href="#" class="HeaderTagCloudRed">sức khỏe bà bầu</a> 
+				<a href="#" class="HeaderTagCloud">sức khỏe đàn ông</a> 
+				<a href="#" class="HeaderTagCloud">mẹ yêu bé</a> 
+				<a href="#" class="HeaderTagCloud">sức khỏe mẹ và bé</a> 
+				<a href="#" class="HeaderTagCloudRed">cách dạy con</a> 
+				<a href="#" class="HeaderTagCloud">chăm sóc thai</a> 
+				<a href="#" class="HeaderTagCloud">chăm sóc vùng kín</a>
+				<a href="#" class="HeaderTagCloud">chăm sóc sức khỏe hôn nhân</a--> 
+			</div>
+			<!--header class="secondary-header">
+				<h1>Gương mặt thành viên tiêu biểu</h1>
+			</header-->
+			<div class="titlemodule">
+				<div class="titlespan">
+					Gương mặt tiêu biểu
+				</div>
+			</div>
+			<div style="margin: 0 auto"> 
+				<ul id="slider1">
+					<?php include("__DUONGDAN__/trangchu/vi/dsbacsiotrangchu.html")?>
+				</ul>
+			</div>
+					
+			<div class="img_news">
+				<div class="titlemodule">
+					<div class="titlespan">
+						Các chủ đề hay
+					</div>
+				</div>
+				__SIDEBARMENU__
+			</div>
+		</section>
+	</article>
+<!--////////////////////////////////////////////////////-->	
 
-<?php include("__DUONGDAN__/trangchu/vi/footer.html")?>
+<?php include("__DUONGDAN__/trangchu/vi/footer1.html")?>
