@@ -37,34 +37,52 @@ class yhoc_trangchu(osv.osv):
                 result[record.id].append(bv.id)
         return result
     
-    def _get_baivietnoibac(self, cr, uid, ids, field_name, arg, context=None):
+    def _get_chudenoibac(self, cr, uid, ids, field_name, arg, context=None):
         result = {}
-        dsbaiviet = self.pool.get('yhoc_thongtin').search(cr, uid, [('state','=','done')], limit=30, order='soluongxem desc', context=context)  
+        dsbaiviet = self.pool.get('yhoc_chude').search(cr, uid, [('parent_id','!=',False),('link','!=',False)], limit=10, order='soluongxem desc', context=context)  
         for record in self.browse(cr, uid, ids, context=context):
             result[record.id] = []
-            for bv in self.pool.get('yhoc_thongtin').browse(cr, uid, dsbaiviet, context=context):
+            for bv in self.pool.get('yhoc_chude').browse(cr, uid, dsbaiviet, context=context):
                 result[record.id].append(bv.id)
         return result
     
     def _get_duanhoanthanh(self, cr, uid, ids, field_name, arg, context=None):
         result = {}
-        sql = '''select duan_done.duan 
+#        sql = '''select duan_done.duan 
+#                 from 
+#                    (select count(t.id) as sobaiviet,t.duan 
+#                        from yhoc_thongtin t, yhoc_duan d 
+#                        where t.duan = d.id
+#                            and state='done'
+#                        group by t.duan) as duan_done,
+#                    
+#                    (select count(t.id) as sobaiviet,t.duan 
+#                    from yhoc_thongtin t, yhoc_duan d 
+#                    where t.duan = d.id
+#                    group by t.duan) as duan_all
+#                where duan_done.duan = duan_all.duan
+#                        and duan_done.sobaiviet= duan_all.sobaiviet
+#                    '''
+        sql = '''select duan_done.duan
                  from 
-                    (select count(t.id) as sobaiviet,t.duan 
-                        from yhoc_thongtin t, yhoc_duan d 
-                        where t.duan = d.id
-                            and state='done'
-                        group by t.duan) as duan_done,
+                    (select count(t.id) as sobaiviet,t.duan,d.soluongxem
+                    from yhoc_thongtin t, yhoc_duan d 
+                    where t.duan = d.id
+                        and state='done'
+                    group by t.duan,d.soluongxem) as duan_done,
                     
-                    (select count(t.id) as sobaiviet,t.duan 
+                    (select count(t.id) as tongsobaiviet,t.duan 
                     from yhoc_thongtin t, yhoc_duan d 
                     where t.duan = d.id
                     group by t.duan) as duan_all
                 where duan_done.duan = duan_all.duan
-                        and duan_done.sobaiviet= duan_all.sobaiviet
-                    '''
+                and duan_done.sobaiviet > duan_all.tongsobaiviet/2
+                and duan_all.tongsobaiviet > 5 
+                order by duan_done.soluongxem desc
+                limit 20
+                '''
         cr.execute(sql)
-        duanhoanchinh = cr.fetchall()  
+        duanhoanchinh = cr.fetchall()
         for record in self.browse(cr, uid, ids, context=context):
             result[record.id] = []
             for da in self.pool.get('yhoc_duan').browse(cr,uid,[x[0] for x in duanhoanchinh],context={}):
@@ -82,8 +100,10 @@ class yhoc_trangchu(osv.osv):
         
     _columns = {
                 'name':fields.char("Tên",size=500, required='1'),
+				'title': fields.char("Tên website",size=65, required='1'),
+				'description': fields.char("Mô tả ngắn",size=255, required='1'),
                 'banner': fields.one2many('x_lienket', 'trangchu_id', 'Banner'),
-                'chudenoibac':fields.function(_get_baivietnoibac, type='many2many', relation='yhoc_thongtin', string='Bài viết nổi bậc'),
+                'chudenoibac':fields.function(_get_chudenoibac, type='many2many', relation='yhoc_chude', string='Bài viết nổi bậc'),
                 'baivietmoi':fields.function(_get_baivietmoi, type='many2many', relation='yhoc_thongtin', string='Bài viết mới'),
                 'muctieu': fields.text('Ý tưởng và mục tiêu'),
                 'thungo': fields.text('Thư ngỏ'),
@@ -245,7 +265,7 @@ class yhoc_trangchu(osv.osv):
     def unlink(self,cr, uid, ids, context=None):
         raise osv.except_osv('Warning!', 'Bạn không thể xóa trang chủ!')
     
-    def capnhat_header(self, cr, uid, chudecha, duongdan, domain, folder_trangchu, context=None):
+    def capnhat_header(self, cr, uid, ids, chudecha, duongdan, domain, folder_trangchu, context=None):
         kieufile = self.pool.get('hlv.property')._get_value_project_property_by_name(cr, uid, 'Kiểu lưu file') or 'html'
         header_template = ''
         if os.path.exists(duongdan+'/template/trangchu/header.html'):
@@ -307,6 +327,12 @@ class yhoc_trangchu(osv.osv):
             header_template = header_template.replace('__SUBMENU__', all_sub_menu)
             #Giang_1711#
             header_template = header_template.replace('__DOMAIN__', domain)
+			#Giang_2911#
+            trangchu = self.browse(cr, uid, ids[0], context=context)
+            header_template = header_template.replace('__ITEMTYPE__', 'WebPage')
+            header_template = header_template.replace('__DESCRIPTION__', trangchu.description)
+            header_template = header_template.replace('__TITLE__', trangchu.title)
+            header_template = header_template.replace('__URL__', domain)			
             
             #Cap nhat link cong dong bac si
             dsnganh = self.pool.get('yhoc_nganh').search(cr, uid, [('name','!=','Công nghệ thông tin'),('link','!=',False)], limit=1, context=context)
@@ -322,7 +348,7 @@ class yhoc_trangchu(osv.osv):
             header_template = header_template.replace('__DOMAIN__', domain)
             if not os.path.exists(folder_trangchu):
                 os.makedirs(folder_trangchu)    
-            fw = codecs.open(folder_trangchu + '/header.html','w','utf-8')
+            fw = codecs.open(folder_trangchu + '/header1.html','w','utf-8')
             fw.write(header_template)
             fw.close()
         return header_template
@@ -330,6 +356,8 @@ class yhoc_trangchu(osv.osv):
     #Giang_0511#def capnhat_footer(self, cr, uid, chudecha, duongdan, folder_trangchu,context=None):
     def capnhat_footer(self, cr, uid, chudecha, duongdan, domain, folder_trangchu,context=None):
         #Doc file footer
+        sequence = self.pool.get('hlv.property')._get_value_project_property_by_name(cr, uid, 'Thứ tự menu footer') or '[]'
+        sequence = eval(sequence)
         kieufile = self.pool.get('hlv.property')._get_value_project_property_by_name(cr, uid, 'Kiểu lưu file') or 'html'
         li_tab_ = '''<li><a href="__LINK__">__NAME__</a></li>'''
         
@@ -347,44 +375,46 @@ class yhoc_trangchu(osv.osv):
             fr.close()
         
         footer_menu = ''
-        for chude in chudecha:
+        for s in sequence:
              
-            chude = self.pool.get('yhoc_chude').browse(cr, uid, chude, context=context)
-            if chude.link:
-                #Giang_0511#chunkyfootercolumn = chunkyfootercolumn_.replace('__LINK_CHUDECHA__', '../../../../../../%s/'%(chude.link_url))
-                chunkyfootercolumn = chunkyfootercolumn_.replace('__LINK_CHUDECHA__',domain + '/%s/'%(chude.link_url))
-                chunkyfootercolumn = chunkyfootercolumn.replace('__NAME_CHUDECHA__', chude.name)
-                
-                chudecon_da = self.pool.get('yhoc_duan').search(cr, uid, [('chude_id','=',chude.id)])
-                chudecon_cd = self.pool.get('yhoc_chude').search(cr, uid, [('parent_id','=',chude.id)])
-                chudecon = chudecon_da + chudecon_cd
-                sub_menu_tab = ''
-                if chudecon:
-                    all_item_sub_menu = ''
-                    #doc sub menu tab
-                    for cd in chudecon_cd:
-                        cd = self.pool.get('yhoc_chude').browse(cr, uid, cd, context=context)
-                        if cd.link:
-                            #Giang_0511#li_tab = li_tab_.replace('__LINK__', '../../../../../../%s/'%(cd.link_url))
-                            li_tab = li_tab_.replace('__LINK__', domain + '/%s/'%(cd.link_url))
-                            li_tab = li_tab.replace('__NAME__', cd.name)
-                            all_item_sub_menu += li_tab
-                        
-                    for cd in chudecon_da:
-                        cd = self.pool.get('yhoc_duan').browse(cr, uid, cd, context=context)
-                        if cd.link:
-                            #Giang_0511#li_tab = li_tab_.replace('__LINK__', '../../../../../../%s/'%(cd.link_url))
-                            li_tab = li_tab_.replace('__LINK__', domain + '/%s/'%(cd.link_url))
-                            li_tab = li_tab.replace('__NAME__', cd.name)
-                            all_item_sub_menu += li_tab
-                        
-                    chunkyfootercolumn = chunkyfootercolumn.replace('__CHUDECON__', all_item_sub_menu)
-                    footer_menu += chunkyfootercolumn
+            chude = self.pool.get('yhoc_chude').search(cr, uid, [('name','=',s)], context=context)
+            if chude:
+                chude = self.pool.get('yhoc_chude').browse(cr, uid, chude[0], context=context)
+                if chude.link:
+                    #Giang_0511#chunkyfootercolumn = chunkyfootercolumn_.replace('__LINK_CHUDECHA__', '../../../../../../%s/'%(chude.link_url))
+    #                chunkyfootercolumn = chunkyfootercolumn_.replace('__LINK_CHUDECHA__',domain + '/%s/'%(chude.link_url))
+                    chunkyfootercolumn = chunkyfootercolumn_.replace('__NAME_CHUDECHA__', chude.name)
+                    
+                    chudecon_da = self.pool.get('yhoc_duan').search(cr, uid, [('chude_id','=',chude.id)])
+                    chudecon_cd = self.pool.get('yhoc_chude').search(cr, uid, [('parent_id','=',chude.id)])
+                    chudecon = chudecon_da + chudecon_cd
+                    sub_menu_tab = ''
+                    if chudecon:
+                        all_item_sub_menu = ''
+                        #doc sub menu tab
+                        for cd in chudecon_cd:
+                            cd = self.pool.get('yhoc_chude').browse(cr, uid, cd, context=context)
+                            if cd.link:
+                                #Giang_0511#li_tab = li_tab_.replace('__LINK__', '../../../../../../%s/'%(cd.link_url))
+                                li_tab = li_tab_.replace('__LINK__', domain + '/%s/'%(cd.link_url))
+                                li_tab = li_tab.replace('__NAME__', cd.name)
+                                all_item_sub_menu += li_tab
+                            
+                        for cd in chudecon_da:
+                            cd = self.pool.get('yhoc_duan').browse(cr, uid, cd, context=context)
+                            if cd.link:
+                                #Giang_0511#li_tab = li_tab_.replace('__LINK__', '../../../../../../%s/'%(cd.link_url))
+                                li_tab = li_tab_.replace('__LINK__', domain + '/%s/'%(cd.link_url))
+                                li_tab = li_tab.replace('__NAME__', cd.name)
+                                all_item_sub_menu += li_tab
+                            
+                        chunkyfootercolumn = chunkyfootercolumn.replace('__CHUDECON__', all_item_sub_menu)
+                        footer_menu += chunkyfootercolumn
                     
         footer_template = footer_template.replace('__FOOTER_MENU__', footer_menu)  
         if not os.path.exists(folder_trangchu):
             os.makedirs(folder_trangchu)    
-        fw = codecs.open(folder_trangchu + '/footer.html','w','utf-8')
+        fw = codecs.open(folder_trangchu + '/footer1.html','w','utf-8')
         fw.write(footer_template)
         fw.close()
         return footer_template
@@ -451,6 +481,23 @@ class yhoc_trangchu(osv.osv):
 #        
 #        self.capnhat_trangchu(cr, uid, [1], context)
 #        return True
+
+    def capnhat_tukhoa_trangchu(self, cr, uid, context=None):
+        duongdan = self.pool.get('hlv.property')._get_value_project_property_by_name(cr, uid, 'path of template')
+        domain = self.pool.get('hlv.property')._get_value_project_property_by_name(cr, uid, 'Domain') or '../..'
+        kieufile = self.pool.get('hlv.property')._get_value_project_property_by_name(cr, uid, 'Kiểu lưu file') or 'html'
+        all_tag = self.pool.get('yhoc_keyword').search(cr, uid, [('soluongxem','>',0)], limit=15, order='soluongxem desc', context=context)
+        temp_ = '''
+        <a href="__LINK__" class="HeaderTagCloud">__NAME__</a>'''
+        list_tag = '' 
+        for t in all_tag:
+            t = self.pool.get('yhoc_keyword').browse(cr, uid, t, context=context)
+            name = self.pool.get('yhoc_trangchu').parser_url(t.name)
+            temp = temp_.replace('__LINK__',domain+'/tags/'+name)
+            temp = temp.replace('__NAME__',t.name)
+            list_tag += temp
+        return list_tag
+    
     
     def capnhat_thongtin(self,cr,uid,ids=None,context=None):
         self.capnhat_trangchu(cr, uid, [1], context=context)
@@ -676,18 +723,24 @@ class yhoc_trangchu(osv.osv):
         fw.close()
     
     def capnhat_baivietmoi(self, cr, uid, list_baiviet_rc, path_luu_xuong, context=None):
+        if not context:
+            context = {}
+        if 'ten_template' in context:
+            ten_template = context['ten_template']
+        else:
+            ten_template = 'baivietmoi_tab'
 #        Cap nhat bai viet moi
         domain = self.pool.get('hlv.property')._get_value_project_property_by_name(cr, uid, 'Domain') or '../..'
         duongdan = self.pool.get('hlv.property')._get_value_project_property_by_name(cr, uid, 'path of template')
         kieufile = self.pool.get('hlv.property')._get_value_project_property_by_name(cr, uid, 'Kiểu lưu file') or 'html'
-
-        fr = open(duongdan+'/template/trangchu/baivietmoi_tab.html', 'r')
+        fr = open(duongdan+'/template/trangchu/%s.html'%ten_template, 'r')
         baivietmoi_tab_ = fr.read()
         fr.close()
             
         all_baivietmoi = ''
         
-        for bv in list_baiviet_rc:
+        for i in range(0,len(list_baiviet_rc)):
+            bv = list_baiviet_rc[i]
             baivietmoi_tab = ''
             photo = ''
             if bv.hinhdaidien or thongtin.duan.photo:
@@ -710,42 +763,49 @@ class yhoc_trangchu(osv.osv):
             baivietmoi_tab = baivietmoi_tab_.replace('__LINK__', domain + '/%s/'%(bv.link_url))
             baivietmoi_tab = baivietmoi_tab.replace('__NAME__', bv.name)
             baivietmoi_tab = baivietmoi_tab.replace('__IMAGE__', photo)
+            if i%2==0:
+                baivietmoi_tab = baivietmoi_tab.replace('__CLASS__', '')
+            elif i%2==1:
+                baivietmoi_tab = baivietmoi_tab.replace('__CLASS__', 'class="last"')
             all_baivietmoi += baivietmoi_tab
             
         import codecs
         fw = codecs.open(path_luu_xuong,'w','utf-8')
         fw.write(str(all_baivietmoi))
         fw.close()
+        
 
     def capnhat_baivietnoibac(self,cr, uid,chudenoibac, path_luu_xuong, domain,kieufile, context=None):
+        '''Dùng ở trang chủ và keyword'''
+        
         duongdan = self.pool.get('hlv.property')._get_value_project_property_by_name(cr, uid, 'path of template')
         if os.path.exists(duongdan+'/template/trangchu/sidebar_menu_tab.html'):
             fr = open(duongdan+'/template/trangchu/sidebar_menu_tab.html', 'r')
             sidebar_menu_tab_ = fr.read()
             fr.close()
             all_sidebar_menu_tab = ''
-            if len(chudenoibac)>6:
+            if len(chudenoibac)>4:
                 import random
-                baivietnoibac = random.sample(chudenoibac, 6)
+                baivietnoibac = random.sample(chudenoibac, 4)
             else:
                 baivietnoibac = chudenoibac
                 
             for bv in baivietnoibac:
                 if not bv.link:
                     try:
-                        self.pool.get('yhoc_thongtin').xuatban_thongtin(cr, uid, [bv.id], context=context)
+                        self.pool.get('yhoc_chude').capnhat_thongtin(cr, uid, [bv.id], context=context)
                     except:
                         pass
                 else:
                     photo = ''
-                    if bv.hinhdaidien:
+                    if bv.photo:
                         name_url = self.parser_url(bv.name)
-                        filename = str(bv.id) + '-thongtin-' + name_url
-                        if not os.path.exists(duongdan+'/images/thongtin/%s-thongtin-%s.jpg'%(str(bv.id),name_url)):
-                            folder_hinh_baiviet = duongdan + '/images/thongtin'
-                            self.pool.get('yhoc_thongtin').ghihinhxuong(folder_hinh_baiviet, filename, bv.hinhdaidien, 95,125, context=context)
+                        filename = str(bv.id) + '-chude-' + name_url
+                        if not os.path.exists(duongdan+'/images/chude/%s-chude-%s.jpg'%(str(bv.id),name_url)):
+                            folder_hinh_baiviet = duongdan + '/images/chude'
+                            self.pool.get('yhoc_thongtin').ghihinhxuong(folder_hinh_baiviet, filename, bv.hinhdaidien, 110,110, context=context)
                         #Giang_0511#photo = '../../../../../../images/thongtin/%s.jpg' %(filename)
-                        photo = domain + '/images/thongtin/%s.jpg' %(filename)
+                        photo = domain + '/images/chude/%s.jpg' %(filename)
 #                        path_hinh_ghixuong = duongdan + '/thongtin/%s/images/anhbaiviet.jpg'%(bv.id)
 #                        if not os.path.exists(path_hinh_ghixuong):
 #                            fw = open(path_hinh_ghixuong,'wb')
@@ -754,6 +814,7 @@ class yhoc_trangchu(osv.osv):
 #                        photo = '../../thongtin/%s/images/anhbaiviet.jpg' %(bv.id,)
                     sidebar_menu_tab = sidebar_menu_tab_.replace('__IMAGE__',photo)
                     sidebar_menu_tab = sidebar_menu_tab.replace('__NAME__',bv.name)
+                    sidebar_menu_tab = sidebar_menu_tab.replace('__DESCRIPTION__',bv.description or '(Chưa cập nhật)')
                     #Giang_0511#sidebar_menu_tab = sidebar_menu_tab.replace('__LINK__','../../../../../../%s'%(bv.link_url))
                     sidebar_menu_tab = sidebar_menu_tab.replace('__LINK__',domain + '/%s/'%(bv.link_url))
                     all_sidebar_menu_tab += sidebar_menu_tab 
@@ -762,6 +823,44 @@ class yhoc_trangchu(osv.osv):
             fw = codecs.open(path_luu_xuong +'/baivietnoibac.html','w','utf-8')
             fw.write(str(all_sidebar_menu_tab))
             fw.close()
+            
+    def capnhat_dsbacsiotrangchu(self, cr, uid, context=None):
+        duongdan = self.pool.get('hlv.property')._get_value_project_property_by_name(cr, uid, 'path of template')
+        domain = self.pool.get('hlv.property')._get_value_project_property_by_name(cr, uid, 'Domain') or '../..'
+        sql = '''select id
+                from     (select h.id, count(t.id) as sobaiviet from hr_employee h, yhoc_thongtin t
+                    where h.id = t.nguoidich
+                    group by h.id
+                    order by sobaiviet desc
+                    limit 20
+                    ) as kq
+                
+                '''
+        cr.execute(sql)
+        dsbacsi = cr.fetchall()
+        if len(dsbacsi)>10:
+            import random
+            dsbacsi = random.sample(dsbacsi, 10)
+        else:
+            dsbacsi = dsbacsi
+        
+        dsbacsi = self.pool.get('hr.employee').browse(cr,uid,[x[0] for x in dsbacsi],context={})
+        kq = ''
+        for i in range(0,len(dsbacsi)):
+            if i%2 == 0:
+                temp = '<li>'
+                temp += self.pool.get('hr.employee').profile_otrangchu(cr, uid, [dsbacsi[i].id], context=context)
+            elif i%2 == 1:
+                temp += self.pool.get('hr.employee').profile_otrangchu(cr, uid, [dsbacsi[i].id], context=context)
+                temp += '</li>'
+                kq += temp
+                
+        
+        import codecs
+        fw = codecs.open(duongdan +'/trangchu/vi/dsbacsiotrangchu.html','w','utf-8')
+        fw.write(kq)
+        fw.close()
+        return True
     
     def capnhat_thungo(self,cr,uid,thungo,duongdan,domain,kieufile,context=None):
         folder_trangchu = duongdan + '/trangchu/vi'
@@ -852,7 +951,7 @@ class yhoc_trangchu(osv.osv):
         muctieu = trangchu.muctieu
         
         chudecha = self.pool.get('yhoc_chude').search(cr, uid, [('parent_id','=',False)])
-        noidung_header = self.capnhat_header(cr, uid, chudecha, duongdan, domain, folder_trangchu, context=None)
+        noidung_header = self.capnhat_header(cr, uid, [1], chudecha, duongdan, domain, folder_trangchu, context=None)
         #Giang_0511#noidung_footer = self.capnhat_footer(cr, uid, chudecha, duongdan, folder_trangchu,context=context)
         noidung_footer = self.capnhat_footer(cr, uid, chudecha, duongdan, domain, folder_trangchu,context=context)
         
@@ -875,6 +974,13 @@ class yhoc_trangchu(osv.osv):
         
 #Cap nhât trang y tuong va muc tieu
         self.capnhat_muctieu(cr, uid,muctieu,duongdan,domain,kieufile,context=context)
+
+#Cap nhât danh sach bac si noi bac o trang chu        
+        self.capnhat_dsbacsiotrangchu(cr, uid, context)
+        
+#Cap nhât danh sach các từ khóa         
+        list_tag = self.capnhat_tukhoa_trangchu(cr, uid, context)
+        template = template.replace('__LIST_TAGS__', list_tag)
         
 
 #Cap nhat anh trang chu        
@@ -903,14 +1009,30 @@ class yhoc_trangchu(osv.osv):
 
 #cập nhật dự án hoàn chỉnh (bên phải)
         all_chudenoibac = ''
+        fr = open(duongdan+'/template/trangchu/loatbai_tab.html', 'r')
+        loatbai_tab_ = fr.read()
+        fr.close()
         import random 
-        duanhoanthanh = random.sample(duanhoanthanh, 8)
+        duanhoanthanh = random.sample(duanhoanthanh, 6)
         for nb in duanhoanthanh:
-            chudenoibac_tab = '''<li><a href="__LINK__"><strong>__NAME__</strong></a></li>'''
-            #Giang_0511#chudenoibac_tab = chudenoibac_tab.replace('__LINK__', '../../../../../../%s/'%(nb.link_url)) 
-            chudenoibac_tab = chudenoibac_tab.replace('__LINK__', domain + '/%s/'%(nb.link_url))
-            chudenoibac_tab = chudenoibac_tab.replace('__NAME__', nb.name)
-            all_chudenoibac += chudenoibac_tab
+#            chudenoibac_tab = '''<li><a href="__LINK__"><strong>__NAME__</strong></a></li>'''
+            #Giang_0511#chudenoibac_tab = chudenoibac_tab.replace('__LINK__', '../../../../../../%s/'%(nb.link_url))
+            name_url = self.pool.get('yhoc_trangchu').parser_url(nb.name)
+            picture = domain + '/images/duan/%s-duan-%s.jpg'%(str(nb.id),name_url)
+            
+            if not os.path.exists(duongdan+'/images/duan/%s-duan-%s.jpg'%(str(nb.id),name_url)):
+				if nb.photo:
+					folder_hinh_thongtin = duongdan+'/images/duan'
+					filename = str(nb.id) + '-duan-' + name_url
+					self.pool.get('yhoc_thongtin').ghihinhxuong(folder_hinh_thongtin, filename, nb.photo, 135, 105, context=context)
+					
+            loatbai_tab = loatbai_tab_.replace('__LINK__', domain + '/%s/'%(nb.link_url))
+            loatbai_tab = loatbai_tab.replace('__NAME__', nb.name)
+            loatbai_tab = loatbai_tab.replace('__PHOTO__', picture)
+            loatbai_tab = loatbai_tab.replace('__DESCRIPTION__', nb.description or '(Chưa cập nhật)')
+            loatbai_tab = loatbai_tab.replace('__ICON__', domain + '/images/multi_document.png')
+            loatbai_tab = loatbai_tab.replace('__SOLUONGBAIVIET__', str(nb.soluongbaiviet))
+            all_chudenoibac += loatbai_tab
         
         import codecs
         fw = codecs.open(folder_trangchu +'/duanhoanthanh.html','w','utf-8')

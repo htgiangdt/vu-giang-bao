@@ -256,9 +256,9 @@ class yhoc_keyword(osv.osv):
             template = template_.replace('__TAGNAME__', t.name)
             template = template.replace('__ID_TAG__', str(t.id))
             baivietnoibac = t.baivietnoibac
-            self.pool.get('yhoc_trangchu').capnhat_baivietnoibac(cr,uid, baivietnoibac, folder_tags, domain, kieufile, context=context)
-            template = template.replace('__SIDEBARMENU__', '''<?php include("%s/tags/%s/baivietnoibac.html")?>'''%(domain,name))
-            template = template.replace('__CHUDENOIBAC__', '''<?php include("../../trangchu/vi/duanhoanthanh.html")?>''')
+            #self.pool.get('yhoc_trangchu').capnhat_baivietnoibac(cr,uid, baivietnoibac, folder_tags, domain, kieufile, context=context)
+            #template = template.replace('__SIDEBARMENU__', '''<?php include("%s/tags/%s/baivietnoibac.html")?>'''%(domain,name))
+            #template = template.replace('__CHUDENOIBAC__', '''<?php include("../../trangchu/vi/duanhoanthanh.html")?>''')
             import codecs  
             fw = codecs.open(folder_tags +'/tag_item.html','w','utf-8')
             fw.write(tag_item_)

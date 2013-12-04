@@ -333,8 +333,10 @@ class yhoc_thongtin(osv.osv):
         if tv:
 ##################################################
             template = template.replace('__TUADETHONGTIN__', tuade_thongtin)
-            template = template.replace('__NGAYTAO__', date)
+            date_default = datetime.strptime(date, '%Y-%m-%d %H:%M:%S')
+            template = template.replace('__NGAYTAO__', date_default.strftime('%d/%m/%Y %H:%M'))
             template = template.replace('__NOIDUNG_THONGTIN__', thongtin.noidung or '')
+            template = template.replace('__MOTANGAN__', thongtin.motangan or '')
             
     #Cập nhật tittle       
             fr = open(duongdan + '/template/trangchu/tittle.html', 'r')
@@ -406,6 +408,7 @@ class yhoc_thongtin(osv.osv):
 #            else:
 #                template = template.replace('__CHUYENNGANH__',tv.chuyennganh or '')
         template = template.replace('__DOMAIN__',domain)
+        template = template.replace('__URL__',domain + '/%s/'%link_url)
         template = template.replace('__DANHXUNGNT__',tv.danhxung or '')
         template = template.replace('__NGUOIDICH__',tv.name)
         if tv.google_plus_acc:
@@ -422,7 +425,9 @@ class yhoc_thongtin(osv.osv):
         #Giang_1811# Author box
         template = template.replace('__AUTHORBOX__',duongdan + '/profile/%s/author_box.html' %str(tv.link_url))            
         
-        template = template.replace('__CHUDE__', thongtin.duan.name or '') 
+        template = template.replace('__DUAN__', thongtin.duan.name or '')
+        template = template.replace('__LINKDUAN__', domain + '/%s/'%thongtin.duan.link_url or '#')
+        template = template.replace('__SOLUONGBAIVIET__', str(thongtin.duan.soluongbaiviet))
         
         template = template.replace('__NGUONBAIVIET__', thongtin.nguonbaiviet or '')
         
@@ -434,32 +439,35 @@ class yhoc_thongtin(osv.osv):
 
 
 #    ####################################################################
-        temp_ = '''<a href="__LINK__">__NAME__</a>'''
-        linktree = []
-        res = ''
-        treechude = []
-        treechude = self.pool.get('yhoc_chude').dequy(treechude, thongtin.duan.chude_id)
-        treechude.insert(0,thongtin.duan.chude_id)
-        
-        for i in range(len(treechude)):
-            temp = temp_.replace('__LINK__', treechude[len(treechude)-i-1].link or '#')
-            temp = temp.replace('__NAME__', treechude[len(treechude)-i-1].name)
-            linktree.append(temp)
-        #Giang_0511#linktree.insert(0,'''<a href="../../../../../../trangchu/vi/">Trang chủ</a>''')
-        linktree.insert(0,'''<a href="http://yhoccongdong.com">Trang chủ</a>''')
-        temp = temp_.replace('__LINK__', thongtin.duan.link or '#')
-        temp = temp.replace('__NAME__', thongtin.duan.name)
-        linktree.append(temp)
-        
-#        temp = temp_.replace('__LINK__', thongtin.link or '#')
-#        temp = temp.replace('__NAME__', thongtin.name)
+        #Giang_0112# Cập nhật link tree trong bài viết
+        self.pool.get('yhoc_duan').capnhat_linktree(cr, uid, [thongtin.duan.id], context)
+#        temp_ = '''<a href="__LINK__">__NAME__</a>'''
+#        linktree = []
+#        res = ''
+#        treechude = []
+#        treechude = self.pool.get('yhoc_chude').dequy(treechude, thongtin.duan.chude_id)
+#        treechude.insert(0,thongtin.duan.chude_id)
+#        
+#        for i in range(len(treechude)):
+#            temp = temp_.replace('__LINK__', treechude[len(treechude)-i-1].link or '#')
+#            temp = temp.replace('__NAME__', treechude[len(treechude)-i-1].name)
+#            linktree.append(temp)
+#        #Giang_0511#linktree.insert(0,'''<a href="../../../../../../trangchu/vi/">Trang chủ</a>''')
+#        linktree.insert(0,'''<a href="http://yhoccongdong.com">Trang chủ</a>''')
+#        temp = temp_.replace('__LINK__', thongtin.duan.link or '#')
+#        temp = temp.replace('__NAME__', thongtin.duan.name)
 #        linktree.append(temp)
-            
-        res = " > ".join(linktree)
-#            context.update({'from_update':True})
-        self.write(cr,uid,[thongtin.id],{'link_tree':res}, context=context)
+#        
+##        temp = temp_.replace('__LINK__', thongtin.link or '#')
+##        temp = temp.replace('__NAME__', thongtin.name)
+##        linktree.append(temp)
+#            
+#        res = " > ".join(linktree)
+##            context.update({'from_update':True})
+#        self.write(cr,uid,[thongtin.id],{'link_tree':res}, context=context)
         
-        template = template.replace('__LINKTREE__', res)
+        
+        template = template.replace('__LINKTREE__', duongdan + '/%s/linktree_trongbaiviet.html'%thongtin.duan.link_url or '#')
         template = template.replace('__HINHBAIVIET__', photo)
         template = template.replace('__MOTA__', thongtin.motangan or thongtin.name)
         
@@ -478,19 +486,21 @@ class yhoc_thongtin(osv.osv):
 #                cungchude_tab = cungchude_tab.replace('__TENBAIVIET__', ccdr.name)
 #                all_cungchude += cungchude_tab
 #
-        self.pool.get('yhoc_duan').capnhat_baivietcungduantrongbaiviet(cr, uid, [thongtin.duan.id], context)
+        self.pool.get('yhoc_duan').capnhat_baivietcungduantrongbaiviet(cr, uid, [thongtin.duan.id], thongtin.id, context)
         template = template.replace('__BAIVIET_CUNGCHUDE__', duongdan + '/%s/baivietcungduantrongbaiviet.php' %str(thongtin.duan.link_url))
         
         cungchude = self.search(cr, uid, [('duan.id', '=',thongtin.duan.id),('state','=','done')], order='sequence', context=context)
         cungchude = self.browse(cr, uid, cungchude, context)
         path = duongdan + '/' + link_url +'/baivietcungduantrongbaiviet_end.html'
+        context.update({'ten_template':'baivietmoi_tab_new'})
         self.pool.get('yhoc_trangchu').capnhat_baivietmoi(cr, uid, cungchude, path, context)
         
 #Cap nhat tag        
         self.pool.get('yhoc_keyword').capnhat_tag(cr, uid, thongtin.keyword_ids, thongtin.id, context=context)
         tags = thongtin.keyword_ids
         list_tag = ''
-        temp_ = '''<a href="__LINKTAG__"><span style="font-size:14px;">__NAMETAG__</span></a>,&nbsp;'''
+        temp_ = '''<a href="__LINKTAG__" class="HeaderTagCloud">__NAMETAG__</a>
+		'''
         for t in tags:
             temp = ''
             name = self.pool.get('yhoc_trangchu').parser_url(t.name)
@@ -767,6 +777,64 @@ class yhoc_thongtin(osv.osv):
         fw = codecs.open(folder_tags +'/index.%s'%kieufile,'w','utf-8')
         fw.write(template)
         fw.close()
+        return True
+
+    def tao_mucluc(self, cr, uid, ids, context=None):
+        duongdan = self.pool.get('hlv.property')._get_value_project_property_by_name(cr, uid, 'path of template')
+        domain = self.pool.get('hlv.property')._get_value_project_property_by_name(cr, uid, 'Domain') or '../..'
+        kieufile = self.pool.get('hlv.property')._get_value_project_property_by_name(cr, uid, 'Kiểu lưu file') or 'html'
+        thongtin = self.browse(cr,uid,ids[0],context)
+        
+        if thongtin.url_thongtin:
+            name_url = thongtin.url_thongtin
+        else:
+            name_url = self.pool.get('yhoc_trangchu').parser_url(str(thongtin.name))
+        noidung = thongtin.noidung
+        
+        from bs4 import BeautifulSoup
+        soup = BeautifulSoup(noidung)        
+        #print(soup.prettify())
+        all_h2 = soup.find_all("h2")
+#        a['id']='abc'
+        menu = '<ul>'
+        link = domain + '/thongtin/'+name_url
+        temp_ = '<li><a href=__LINK__>__NAME__</a></li>'
+        for tag in all_h2:
+            temp = ''
+            if tag.string:
+                name = tag.string
+                name_url = self.pool.get('yhoc_trangchu').parser_url(tag.string)
+            strong = tag.find_all('strong')
+            for i in strong:
+                if i.string:
+                    name = i.string
+                    name_url = self.pool.get('yhoc_trangchu').parser_url(i.string)
+                    break
+            span = tag.find_all('span')
+            for i in span:
+                if i.string:
+                    name = i.string
+                    name_url = self.pool.get('yhoc_trangchu').parser_url(i.string)
+                    break
+#                        name_url = self.pool.get('yhoc_trangchu').parser_url(c.string)
+            temp = temp_.replace('__LINK__', link + '/#' + name_url)
+            temp = temp.replace('__NAME__', name)
+            menu += temp
+            kw = self.pool.get('yhoc_keyword').search(cr, uid, ['|',('name','=',name),('khongdau','=',name_url)],context=context)
+            if kw:
+                vals = {
+                        'name':name,
+                        'khongdau':name_url,
+                        'loai_tukhoa':'theh2',
+                        }
+                self.pool.get('yhoc_keyword').create(cr, uid, vals, context=context)
+            tag['id'] = name_url
+#        print(soup.prettify())
+        menu += '</ul>'
+        menu += soup.prettify()
+        vals = {'noidung':menu}
+        self.write(cr, uid, ids, vals, context=context)
+        
         return True
 yhoc_thongtin()
 

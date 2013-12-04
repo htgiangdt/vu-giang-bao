@@ -194,14 +194,14 @@ class yhoc_employee(osv.osv):
 			
 			#Giang_2011# Kiểm tra, nếu có thông tin thì hiển thị,không thì loại bỏ
             description =''
-            if chuyenmon:
-                description += chuyenmon
+#            if chuyenmon:
+#                description += chuyenmon
             if tv.nganh:
-                description += '</br>%s' %tv.nganh.name
+                description += '<span>%s</span>' %tv.nganh.name
             if tv.chuyennganh:
-                description += '</br>%s' %tv.chuyennganh
+                description += '<span>%s</span>' %tv.chuyennganh
             if tv.noilamviec_id.name:
-                description += '</br>%s' %tv.noilamviec_id.name
+                description += '<span>%s</span>' %tv.noilamviec_id.name
             
             template = template.replace('__DESCRIPTION__',description)
 
@@ -241,6 +241,79 @@ class yhoc_employee(osv.osv):
         fw.write(template)
         fw.close()
         return True
+    
+    def profile_otrangchu(self, cr, uid, ids, context=None):
+        duongdan = self.pool.get('hlv.property')._get_value_project_property_by_name(cr, uid, 'path of template')
+        domain = self.pool.get('hlv.property')._get_value_project_property_by_name(cr, uid, 'Domain') or '../..'
+        kieufile = self.pool.get('hlv.property')._get_value_project_property_by_name(cr, uid, 'Kiểu lưu file') or 'html'
+        tv = self.browse(cr,uid,ids[0])
+        name_url = self.pool.get('yhoc_trangchu').parser_url(str(tv.name))
+        folder_profile = duongdan + '/profile/%s' %name_url
+#        if not os.path.exists(folder_profile):
+#            os.makedirs(folder_profile)
+            
+        if os.path.exists(duongdan+'/template/trangchu/bacsi_tab.html'):
+            fr = open(duongdan+'/template/trangchu/bacsi_tab.html', 'r')
+            profile_tab_ = fr.read()
+            fr.close()
+        else:
+            profile_tab_ = ''
+                
+        if tv:
+            photo = ''
+            if tv.image:
+                if not os.path.exists(duongdan + '/images/profile'):
+                    os.makedirs(duongdan + '/images/profile')
+                filename = str(tv.id) + '-profile-' + name_url
+                folder_hinh_profile = duongdan + '/images/profile'
+                self.pool.get('yhoc_thongtin').ghihinhxuong(folder_hinh_profile, filename, tv.image, 150, 150, context=context)
+                photo = domain + '/images/profile/%s.jpg' %(filename)
+        
+            template = profile_tab_.replace('__PHOTO__', photo)
+            
+            capbac = tv.capbac or ''
+            trinhdo = self.pool.get('hlv.property')._get_value_project_property_by_name(cr, uid, 'Trình độ chuyên môn') or '[]'
+            chuyenmon = ''
+            for r in eval(trinhdo):
+                if r[0] == capbac:
+                    chuyenmon = r[1]
+                    break
+            #Giang_2011# Chỉnh sửa thông tin dưới profile trong bài viết
+            template = template.replace('__DANHXUNGNT__',tv.danhxung or '')
+            template = template.replace('__NAME__',tv.name)
+            template = template.replace('__CHUYENNGANH__',tv.chuyennganh or '')
+            template = template.replace('__TRINHDOCHUYENMON__',chuyenmon)
+            template = template.replace('__LINK__',tv.link or '#')
+            
+                        
+            link_item_ = '<a href="__LINK__" title="__TIITLELINK__"><img src="__IMAGELINK__"></a>'
+            
+            alllink_item_ = ''
+            if tv.work_email:
+                link_item = link_item_.replace('__LINK__', 'mailto:' + tv.work_email)
+                link_item = link_item.replace('__TIITLELINK__', 'Gửi email cho tác giả')
+                link_item = link_item.replace('__IMAGELINK__', domain + '/images/icon/email.png')
+                alllink_item_ += link_item
+            if tv.facebook_acc:
+                link_item = link_item_.replace('__LINK__', tv.facebook_acc)
+                link_item = link_item.replace('__TIITLELINK__', 'Facebook')
+                link_item = link_item.replace('__IMAGELINK__', domain + '/images/icon/facebook.png')
+                alllink_item_ += link_item
+            if tv.google_plus_acc:
+                link_item = link_item_.replace('__LINK__', tv.google_plus_acc)
+                link_item = link_item.replace('__TIITLELINK__', 'Google+')
+                link_item = link_item.replace('__IMAGELINK__', domain + '/images/icon/google_plus.png')
+                alllink_item_ += link_item
+            if os.path.exists(duongdan+'/tags/' + name_url):
+                link_item = link_item_.replace('__LINK__', domain + '/tags/' + name_url + '/')
+                link_item = link_item.replace('__TIITLELINK__', 'Những đóng góp của tác giả')
+                link_item = link_item.replace('__IMAGELINK__', domain + '/images/icon/yhoccongdong.png')
+                alllink_item_ += link_item
+
+            template = template.replace('__PROFILEITEM__', alllink_item_)    
+            
+        return template
+        
 
 	#Giang_2011#Cập nhật button follow tác giả
     def capnhat_authorfollow(self, cr, uid, ids, context=None):
