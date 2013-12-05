@@ -1,18 +1,42 @@
-﻿<?php include("__DUONGDAN__/trangchu/vi/header1.html")?>
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:fb="https://www.facebook.com/2008/fbml" xmlns:og="http://ogp.me/ns#" itemscope itemtype="http://schema.org/__ITEMTYPE__" >
+
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+	<link rel="shortcut icon" href="http://yhoccongdong.com/images/Yhoccongdong.ico" type="image/x-icon"/>
+	<meta name="description" content="__MOTANGAN__" />	
+	<title>__TUADETHONGTIN__</title>	
+	<meta name="google-site-verification" content="hOscgIY8rgaYMJfzp5AbEjPBimZ2uKazVOj721vELc4" />
+	<meta name="robots" content="index,follow,noodp" />
+	<link rel="canonical" href="__URL__"/>
+	<meta name="copyright" content="Copyright © 2012 by YHocCongDong.com" />
+	<meta name="distribution" content="Global" />	
+	<meta property="fb:admins" content="100005119690063" />
+	<meta property="og:title" itemprop="headline" content="__TUADETHONGTIN__"/>
+	<meta property="og:url" itemprop="url"  content="__URL__"/>
+	<meta property="og:description" itemprop="description" content="__MOTANGAN__"/>
+    <meta property="og:locale" itemprop="inLanguage" content="vi_VN" />
+	<meta property="og:site_name" content="YHocCongDong.com"/>
+	<meta property="twitter:creator" content="@yhoccongdong">
+	<meta property="twitter:site" content="@yhoccongdong">
+	<meta property="twitter:url" content="__URL__">
+
+<?php include("__DUONGDAN__/trangchu/vi/header1.html")?>
 
 <!-- MENU END-->
 <script type="text/javascript" src="__DOMAIN__/js/printpage.js"></script>
 <script language="javascript" type="text/javascript" src="__DOMAIN__/js/ts-fab.js"></script>
-<div id="fb-root"></div>
 <!--Script button Like-->
+<div id="fb-root"></div>
 <script>
 	(function(d, s, id) {
-		  var js, fjs = d.getElementsByTagName(s)[0];
-		  if (d.getElementById(id)) return;
-		  js = d.createElement(s); js.id = id;
-		  js.src = "//connect.facebook.net/vi_VN/all.js#xfbml=1&appId=546475572029540";
-		  fjs.parentNode.insertBefore(js, fjs);
-		}(document, 'script', 'facebook-jssdk'));
+	  var js, fjs = d.getElementsByTagName(s)[0];
+	  if (d.getElementById(id)) return;
+	  js = d.createElement(s); js.id = id;
+	  js.src = "//connect.facebook.net/vi_VN/all.js#xfbml=1";
+	  fjs.parentNode.insertBefore(js, fjs);
+	}(document, 'script', 'facebook-jssdk'));
 </script>
 <!--Script button G+-->	
 	<script type="text/javascript">
@@ -42,9 +66,9 @@
 				</br>
 				<header class="secondary-header">
 					<a href="__LINKDUAN__"><strong style="padding-left: 10px; ">__DUAN__</strong>
-						<p style="text-align:right;  font-style:italic;">
+						<p style="text-align:right;  font-style:italic; padding-right: 5px;;">
 							<img src="http://yhoccongdong.com/images/multi_document.png" />
-							__SOLUONGBAIVIET__ bài
+							__SOLUONGBAIVIET__ 
 						</p>
 					</a>
 				</header>
@@ -83,13 +107,9 @@
 					<strong style="font-style:italic">Tóm tắt: </strong>
 					<em>__MOTANGAN__</em>
 				</div>
-				<div id="mucluc">
-					<div id="toctitle">
-						<strong class="footermenutitle" style="padding-bottom: 10px;">Mục lục</strong>
-					</div>
-					<ul style="display: block;">
-					</ul>
-				</div>
+				
+				<?php include("menu.html")?>
+				
 				<div style="padding-top:15px; line-height: 25px; max-width:700px; display;block; clear: both;" itemprop="articleBody">	
 					__NOIDUNG_THONGTIN__
 					<p>&nbsp;</p>
@@ -126,6 +146,13 @@
 					<header class="secondary-header">
 						<strong style="padding-left: 10px;">Các bài viết liên quan</strong>
 					</header>
+					<div class="boxChuyentrang">
+						<div id="mpfZone_8" class="column">
+							<div>
+								<iframe marginwidth="0" marginheight="0" allowtransparency="no" src="__BAIVIETCUNGDUAN_END__" frameborder="0" height="240px" scrolling="no" width="100%"></iframe>
+							</div>
+						</div>
+					</div>
 				</div>
 				<div class="social_block">
 					<header class="secondary-header">
