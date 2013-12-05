@@ -328,11 +328,11 @@ class yhoc_trangchu(osv.osv):
             #Giang_1711#
             header_template = header_template.replace('__DOMAIN__', domain)
 			#Giang_2911#
-            trangchu = self.browse(cr, uid, ids[0], context=context)
-            header_template = header_template.replace('__ITEMTYPE__', 'WebPage')
-            header_template = header_template.replace('__DESCRIPTION__', trangchu.description)
-            header_template = header_template.replace('__TITLE__', trangchu.title)
-            header_template = header_template.replace('__URL__', domain)			
+#            trangchu = self.browse(cr, uid, ids[0], context=context)
+#            header_template = header_template.replace('__ITEMTYPE__', 'WebPage')
+#            header_template = header_template.replace('__DESCRIPTION__', trangchu.description)
+#            header_template = header_template.replace('__TITLE__', trangchu.title)
+#            header_template = header_template.replace('__URL__', domain)			
             
             #Cap nhat link cong dong bac si
             dsnganh = self.pool.get('yhoc_nganh').search(cr, uid, [('name','!=','Công nghệ thông tin'),('link','!=',False)], limit=1, context=context)
@@ -1078,12 +1078,16 @@ class yhoc_trangchu(osv.osv):
         #=======================================================================
         
         #Cập nhật tittle       
-        fr = open(duongdan + '/template/trangchu/tittle.html', 'r')
-        noidung_tittle = fr.read()
-        fr.close()
-        noidung_tittle = noidung_tittle.replace('__TITLE__','Y học cộng đồng - Trang chủ')
-        template = template.replace('__TITLE__',noidung_tittle)
+#        fr = open(duongdan + '/template/trangchu/tittle.html', 'r')
+#        noidung_tittle = fr.read()
+#        fr.close()
+#        noidung_tittle = noidung_tittle.replace('__TITLE__','Y học cộng đồng - Trang chủ')
+#        template = template.replace('__TITLE__',noidung_tittle)
         template = template.replace('__DUONGDAN__',duongdan)
+        template = template.replace('__ITEMTYPE__', 'WebPage')
+        template = template.replace('__DESCRIPTION__', trangchu.description)
+        template = template.replace('__TITLE__', trangchu.title)
+        template = template.replace('__URL__', domain)        
         
         import codecs  
         fw = codecs.open(folder_trangchu +'/index.' + kieufile,'w','utf-8')

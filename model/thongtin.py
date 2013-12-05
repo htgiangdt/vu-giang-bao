@@ -340,12 +340,12 @@ class yhoc_thongtin(osv.osv):
             template = template.replace('__MOTANGAN__', thongtin.motangan or '')
             
     #Cập nhật tittle       
-            fr = open(duongdan + '/template/trangchu/tittle.html', 'r')
-            noidung_tittle = fr.read()
-            fr.close()
-            noidung_tittle = noidung_tittle.replace('__TITLE__',thongtin.name)
-            template = template.replace('__TITLE__',noidung_tittle)
-            template = template.replace('__TITLE_BV__',thongtin.name)
+#            fr = open(duongdan + '/template/trangchu/tittle.html', 'r')
+#            noidung_tittle = fr.read()
+#            fr.close()
+#            noidung_tittle = noidung_tittle.replace('__TITLE__',thongtin.name)
+#            template = template.replace('__TITLE__',noidung_tittle)
+#            template = template.replace('__TITLE_BV__',thongtin.name)
             
     #Ghi anh bai viet 
         photo = ''
@@ -410,6 +410,7 @@ class yhoc_thongtin(osv.osv):
 #                template = template.replace('__CHUYENNGANH__',tv.chuyennganh or '')
         template = template.replace('__DOMAIN__',domain)
         template = template.replace('__URL__',domain + '/%s/'%link_url)
+        template = template.replace('__ITEMTYPE__','NewsArticle')
         template = template.replace('__DANHXUNGNT__',tv.danhxung or '')
         template = template.replace('__NGUOIDICH__',tv.name)
         if tv.google_plus_acc:
@@ -470,7 +471,7 @@ class yhoc_thongtin(osv.osv):
         
         template = template.replace('__LINKTREE__', duongdan + '/%s/linktree_trongbaiviet.html'%thongtin.duan.link_url or '#')
         template = template.replace('__HINHBAIVIET__', photo)
-        template = template.replace('__MOTA__', thongtin.motangan or thongtin.name)
+        #template = template.replace('__MOTA__', thongtin.motangan or thongtin.name)
         
         link_xemnhanh = domain + '/%s/'%link_url
         super(yhoc_thongtin,self).write(cr,uid,ids,{'link':link_xemnhanh,
@@ -487,8 +488,10 @@ class yhoc_thongtin(osv.osv):
 #                cungchude_tab = cungchude_tab.replace('__TENBAIVIET__', ccdr.name)
 #                all_cungchude += cungchude_tab
 #
-        self.pool.get('yhoc_duan').capnhat_baivietcungduantrongbaiviet(cr, uid, [thongtin.duan.id], thongtin.id, context)
+        self.pool.get('yhoc_duan').capnhat_baivietcungduantrongbaiviet(cr, uid, [thongtin.duan.id], context)
         template = template.replace('__BAIVIET_CUNGCHUDE__', duongdan + '/%s/baivietcungduantrongbaiviet.php' %str(thongtin.duan.link_url))
+        self.pool.get('yhoc_duan').capnhat_baivietcungduantrongbaiviet_end(cr, uid, [thongtin.duan.id], context)
+        template = template.replace('__BAIVIETCUNGDUAN_END__', domain + '/%s/baivietcungduantrongbaiviet_end.html' %str(thongtin.duan.link_url))
         
         cungchude = self.search(cr, uid, [('duan.id', '=',thongtin.duan.id),('state','=','done')], order='sequence', context=context)
         cungchude = self.browse(cr, uid, cungchude, context)
@@ -531,6 +534,7 @@ class yhoc_thongtin(osv.osv):
         self.capnhat_sharebutton(cr, uid, thongtin.id, context=context)
 #Tao trang Blog
         self.taotrangblog(cr, uid, context)
+        
 #cap nhat tong hieu dinh va tong dong gop
 #        self.capnhat_tonghieudinh_donggop(cr, uid, [tv.id], context)
 
@@ -715,6 +719,7 @@ class yhoc_thongtin(osv.osv):
         fw.write(template)
         fw.close()     
         return True
+    
     def taotrangblog(self,cr,uid,context=None):
         dsbaivietmoi = self.pool.get('yhoc_thongtin').search(cr, uid, [('state','=','done')], limit=15, order='date desc', context=context)
         duongdan = self.pool.get('hlv.property')._get_value_project_property_by_name(cr, uid, 'path of template')
@@ -782,25 +787,34 @@ class yhoc_thongtin(osv.osv):
 
 
     def tao_mucluc(self, cr, uid, ids, context=None):
+#        self.replace_tukhoa(cr, uid, ids, context=context)
         duongdan = self.pool.get('hlv.property')._get_value_project_property_by_name(cr, uid, 'path of template')
         domain = self.pool.get('hlv.property')._get_value_project_property_by_name(cr, uid, 'Domain') or '../..'
         kieufile = self.pool.get('hlv.property')._get_value_project_property_by_name(cr, uid, 'Kiểu lưu file') or 'html'
         thongtin = self.browse(cr,uid,ids[0],context)
         
         if thongtin.url_thongtin:
-            name_url = thongtin.url_thongtin
+            name_url_thongtin = thongtin.url_thongtin
         else:
-            name_url = self.pool.get('yhoc_trangchu').parser_url(str(thongtin.name))
+            name_url_thongtin = self.pool.get('yhoc_trangchu').parser_url(str(thongtin.name))
         noidung = thongtin.noidung
+        
+        if os.path.exists(duongdan+'/template/thongtin/menu.html'):
+            fr = open(duongdan+'/template/thongtin/menu.html', 'r')
+            template_ = fr.read()
+            fr.close()
+        else:
+            template_ = ''
+        
+        temp_ = '''<li><a href="__LINK__"><span>__NAME__</span></a></li>'''
         
         from bs4 import BeautifulSoup
         soup = BeautifulSoup(noidung)        
         #print(soup.prettify())
         all_h2 = soup.find_all("h2")
 #        a['id']='abc'
-        menu = '<ul>'
-        link = domain + '/thongtin/'+name_url
-        temp_ = '<li><a href=__LINK__>__NAME__</a></li>'
+        menu = ''
+        link = domain + '/thongtin/'+name_url_thongtin
         for tag in all_h2:
             temp = ''
             if tag.string:
@@ -823,7 +837,7 @@ class yhoc_thongtin(osv.osv):
             temp = temp.replace('__NAME__', name)
             menu += temp
             kw = self.pool.get('yhoc_keyword').search(cr, uid, ['|',('name','=',name),('khongdau','=',name_url)],context=context)
-            if kw:
+            if not kw:
                 vals = {
                         'name':name,
                         'khongdau':name_url,
@@ -831,12 +845,59 @@ class yhoc_thongtin(osv.osv):
                         }
                 self.pool.get('yhoc_keyword').create(cr, uid, vals, context=context)
             tag['id'] = name_url
+        template_ = template_.replace('__MENU_ITEM__', menu)
+        import codecs  
+        fw = codecs.open(duongdan +'/thongtin/%s/menu.html'%name_url_thongtin,'w','utf-8')
+        fw.write(template_)
+        fw.close()
 #        print(soup.prettify())
-        menu += '</ul>'
-        menu += soup.prettify()
-        vals = {'noidung':menu}
+#        menu += soup.prettify()
+        vals = {'noidung':soup.prettify()}
         self.write(cr, uid, ids, vals, context=context)
+        self.xuatban_thongtin(cr, uid, ids, context=context)
+        return True
+    
+    def replace_tukhoa(self, cr, uid, ids, context=None):
+        duongdan = self.pool.get('hlv.property')._get_value_project_property_by_name(cr, uid, 'path of template')
+        domain = self.pool.get('hlv.property')._get_value_project_property_by_name(cr, uid, 'Domain') or '../..'
+        kieufile = self.pool.get('hlv.property')._get_value_project_property_by_name(cr, uid, 'Kiểu lưu file') or 'html'
+        thongtin = self.browse(cr,uid,ids[0],context)
+        noidung = thongtin.noidung
         
+        keys = self.pool.get('yhoc_keyword').search(cr, uid, [('loai_tukhoa','=',False)], context=context)
+        list = []
+        i = 0
+        for record in keys:
+            i=i+1
+            record = self.pool.get('yhoc_keyword').browse(cr, uid, record, context=context)
+            dp_1 = self.pool.get('yhoc_keyword').search(cr,uid,[('name','ilike','%'+record.name+'%'),('name','!=',record.name)])
+            if dp_1:
+                for rc in dp_1:
+                    i=i+1
+                    rc = self.pool.get('yhoc_keyword').browse(cr, uid, rc, context=context)
+                    find = noidung.count(rc.name)
+                    if find:
+                        noidung = noidung.replace(rc.name,'__K_%s__'%i)
+                        list.append({'id':'__K_%s__'%i,'key':rc.name})
+            else:
+                find = noidung.count(record.name)
+                if find:
+                    noidung = noidung.replace(record.name,'__K_%s__'%i)
+                    list.append({'id':'__K_%s__'%i,'key':record.name})
+#                noidung = noidung.lower()
+#                find = noidung.count((t.name).lower())
+        for l in list:
+            key = self.pool.get('yhoc_keyword').search(cr,uid,[('name','=',l['key'])], context=context)
+            if key:
+                tt = self.search(cr, uid, [('keyword_ids','=',key[0])], context=context)
+                key = self.pool.get('yhoc_keyword').browse(cr,uid,key[0],context=context)
+                name = self.pool.get('yhoc_trangchu').parser_url(key.name)
+                if tt:
+                    noidung = noidung.replace(l['id'],'<a href="%s/tags/%s">%s</a>'%(domain,name,key.name))
+                else:
+                    noidung = noidung.replace(l['id'],key.name)
+        vals = {'noidung':noidung}
+        self.write(cr, uid, ids, vals, context=context)
         return True
 
 yhoc_thongtin()

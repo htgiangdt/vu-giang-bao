@@ -323,17 +323,17 @@ class yhoc_employee(osv.osv):
         tv = self.browse(cr,uid,ids[0])
         name_url = self.pool.get('yhoc_trangchu').parser_url(str(tv.name))
         import codecs
-        if tv.facebook_acc:
-            if os.path.exists(duongdan+'/template/profile/follow_facebook.html'):
-                fr = open(duongdan+'/template/profile/follow_facebook.html', 'r')
-                template_ = fr.read()
-                fr.close()
-            else:
-                template_ = ''
-            template = template_.replace('__FACEBOOK__', tv.facebook_acc)
-            fw = codecs.open(duongdan +'/profile/%s/follow_facebook.html'%(name_url),'w','utf-8')
-            fw.write(template)
-            fw.close()
+#        if tv.facebook_acc:
+#            if os.path.exists(duongdan+'/template/profile/follow_facebook.html'):
+#                fr = open(duongdan+'/template/profile/follow_facebook.html', 'r')
+#                template_ = fr.read()
+#                fr.close()
+#            else:
+#                template_ = ''
+#            template = template_.replace('__FACEBOOK__', tv.facebook_acc)
+#            fw = codecs.open(duongdan +'/profile/%s/follow_facebook.html'%(name_url),'w','utf-8')
+#            fw.write(template)
+#            fw.close()
         
         if tv.google_plus_acc:
             if os.path.exists(duongdan+'/template/profile/follow_googleplus.html'):
@@ -427,7 +427,7 @@ class yhoc_employee(osv.osv):
                 item = item.replace('__LINK__', tv.facebook_acc)
                 item = item.replace('__HINH__', photo)
                 item = item.replace('__NAME__', tv.name)
-                item = item.replace('__FOLLOW_AUTHOR__','<?php include("' + duongdan + '/profile/%s/follow_facebook.html'%name_url + '"); ?>')
+#                item = item.replace('__FOLLOW_AUTHOR__','<?php include("' + duongdan + '/profile/%s/follow_facebook.html'%name_url + '"); ?>')
                 template = template.replace('<!--__FACEBOOK_FOLLOW__-->',item)
 
             if tv.google_plus_acc:

@@ -105,7 +105,7 @@ class yhoc_duan(osv.osv):
         return True
     
     
-    def capnhat_baivietcungduantrongbaiviet(self, cr, uid, ids, thongtin_id, context=None):
+    def capnhat_baivietcungduantrongbaiviet(self, cr, uid, ids, context=None):
         duongdan = self.pool.get('hlv.property')._get_value_project_property_by_name(cr, uid, 'path of template')
         domain = self.pool.get('hlv.property')._get_value_project_property_by_name(cr, uid, 'Domain') or '../..'
         kieufile = self.pool.get('hlv.property')._get_value_project_property_by_name(cr, uid, 'Kiểu lưu file') or 'html'
@@ -113,26 +113,79 @@ class yhoc_duan(osv.osv):
         folder_duan = duongdan + '/%s/' %str(duan.link_url)
         if not os.path.exists(folder_duan):
             os.makedirs(folder_duan)
-        cungchude = self.pool.get('yhoc_thongtin').search(cr, uid, [('duan.id', '=',duan.id)], order='sequence', context=context)
+        cungchude = self.pool.get('yhoc_thongtin').search(cr, uid, [('duan.id', '=',duan.id),('state','=','done')], order='sequence', context=context)
         #Giang_0112#
 #        cungchude_tab_ = '''<li><a href="__LINKBAIVIET__">__TENBAIVIET__</a></li>'''
-        cungchude_tab_ = '''<li> <img class="thongtinleftimg" src="__HINHDUAN__"/><a href="__LINKBAIVIET__">__TENBAIVIET__</a></li>'''
+        cungchude_tab_ = '''<li> <img class="thongtinleftimg" src="__HINHDUAN__"/><a href="__LINKBAIVIET__">__TENBAIVIET__</a></li>
+        '''
         all_cungchude = '' 
         for ccd in cungchude:
-            if ccd <> thongtin_id: 
-                ccdr = self.pool.get('yhoc_thongtin').browse(cr, uid, ccd, context=context)
-                if ccdr.state == 'done':
-                    cungchude_tab = cungchude_tab_.replace('__LINKBAIVIET__', domain + '/%s/'%(ccdr.link_url))
+            ccdr = self.pool.get('yhoc_thongtin').browse(cr, uid, ccd, context=context)
+            cungchude_tab = cungchude_tab_.replace('__LINKBAIVIET__', domain + '/%s/'%(ccdr.link_url))
 #                else:
 #                    cungchude_tab = cungchude_tab_.replace('__LINKBAIVIET__', '#')
-                    cungchude_tab = cungchude_tab.replace('__TENBAIVIET__', ccdr.name)
-                    ten_url = self.pool.get('yhoc_trangchu').parser_url(ccdr.name)
-                    cungchude_tab = cungchude_tab.replace('__HINHDUAN__', domain + '/images/thongtin/%s-thongtin-%s.jpg'%(str(ccdr.id),ccdr.url_thongtin))
-                    all_cungchude += cungchude_tab
+            cungchude_tab = cungchude_tab.replace('__TENBAIVIET__', ccdr.name)
+            ten_url = self.pool.get('yhoc_trangchu').parser_url(ccdr.name)
+            cungchude_tab = cungchude_tab.replace('__HINHDUAN__', domain + '/images/thongtin/%s-thongtin-%s.jpg'%(str(ccdr.id),ccdr.url_thongtin))
+            all_cungchude += cungchude_tab
         
         import codecs  
         fw= codecs.open(folder_duan+'/baivietcungduantrongbaiviet.' + kieufile,'w','utf-8')
         fw.write(all_cungchude)
+        fw.close()  
+        return True
+
+    def capnhat_baivietcungduantrongbaiviet_end(self, cr, uid, ids, context=None):
+        duongdan = self.pool.get('hlv.property')._get_value_project_property_by_name(cr, uid, 'path of template')
+        domain = self.pool.get('hlv.property')._get_value_project_property_by_name(cr, uid, 'Domain') or '../..'
+        kieufile = self.pool.get('hlv.property')._get_value_project_property_by_name(cr, uid, 'Kiểu lưu file') or 'html'
+        duan = self.browse(cr, uid, ids[0], context=context)
+        folder_duan = duongdan + '/%s/' %str(duan.link_url)
+        if not os.path.exists(folder_duan):
+            os.makedirs(folder_duan)
+        if os.path.exists(duongdan+'/template/duan/baivietcungduan_trongbaiviet.html'):
+            fr = open(duongdan+'/template/duan/baivietcungduan_trongbaiviet.html', 'r')
+            template_ = fr.read()
+            fr.close()
+        else:
+            template_ = ''
+        
+        if os.path.exists(duongdan+'/template/duan/baivietcungduan_item.html'):
+            fr = open(duongdan+'/template/duan/baivietcungduan_item.html', 'r')
+            item_ = fr.read()
+            fr.close()
+        else:
+            item_ = ''
+            
+        cungduan = self.pool.get('yhoc_thongtin').search(cr, uid, [('duan.id', '=',duan.id),('state','=','done')], order='sequence', context=context)
+        all_item_ = '' 
+        for i in range(0,len(cungduan)):
+            cdar = self.pool.get('yhoc_thongtin').browse(cr, uid, cungduan[i], context=context)
+            item = item_.replace('__LINKBAIVIET__', domain + '/%s/'%(cdar.link_url))
+            item = item.replace('__TENBAIVIET__', cdar.name)
+            ten_url = self.pool.get('yhoc_trangchu').parser_url(cdar.name)
+            item = item.replace('__HINHBAIVIET__', domain + '/images/thongtin/%s-thongtin-%s.jpg'%(str(cdar.id),cdar.url_thongtin))
+            if i%4 == 0:
+                item = item.replace('<!--<li class="cloned">-->', '<li class="cloned">')
+                item = item.replace('<!--</li>-->', '')
+                all_item_ += item
+            elif i%4 == 3:
+                item = item.replace('<!--<li class="cloned">-->', '')
+                item = item.replace('<!--</li>-->', '</li>')
+                all_item_ += item
+            else:
+                item = item.replace('<!--<li class="cloned">-->', '')
+                item = item.replace('<!--</li>-->', '')
+                all_item_ += item
+        if len(cungduan)%4 <> 3:
+            all_item_ += '</li>'
+            
+        template = template_.replace('__BAIVIETCUNGDUAN_ITEM__', all_item_)
+        template = template.replace('__DOMAIN__', domain)
+        
+        import codecs  
+        fw= codecs.open(folder_duan+'/baivietcungduantrongbaiviet_end.html','w','utf-8')
+        fw.write(template)
         fw.close()  
         return True
     
