@@ -428,6 +428,7 @@ class yhoc_employee(osv.osv):
                 item = item.replace('__HINH__', photo)
                 item = item.replace('__NAME__', tv.name)
 #                item = item.replace('__FOLLOW_AUTHOR__','<?php include("' + duongdan + '/profile/%s/follow_facebook.html'%name_url + '"); ?>')
+                item = item.replace('__FOLLOW_AUTHOR__','<!---->')
                 template = template.replace('<!--__FACEBOOK_FOLLOW__-->',item)
 
             if tv.google_plus_acc:
