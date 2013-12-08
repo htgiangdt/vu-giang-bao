@@ -189,6 +189,101 @@ class yhoc_duan(osv.osv):
         fw.close()  
         return True
     
+    def capnhat_thanhvienthamgia_trongduan(self, cr, uid, ids, context=None):
+        duongdan = self.pool.get('hlv.property')._get_value_project_property_by_name(cr, uid, 'path of template')
+        domain = self.pool.get('hlv.property')._get_value_project_property_by_name(cr, uid, 'Domain') or '../..'
+        kieufile = self.pool.get('hlv.property')._get_value_project_property_by_name(cr, uid, 'Kiểu lưu file') or 'html'
+        duan = self.browse(cr, uid, ids[0], context=context)
+        folder_duan = duongdan + '/%s/' %str(duan.link_url)
+        
+        if os.path.exists(duongdan+'/template/duan/thanhvienthamgia_trongduan.html'):
+            fr = open(duongdan+'/template/duan/thanhvienthamgia_trongduan.html', 'r')
+            template_ = fr.read()
+            fr.close()
+        else:
+            template_ = ''
+        
+        if os.path.exists(duongdan+'/template/duan/thanhvienthamgia_item.html'):
+            fr = open(duongdan+'/template/duan/thanhvienthamgia_item.html', 'r')
+            item_ = fr.read()
+            fr.close()
+        else:
+            item_ = ''
+        all_item_ = ''
+        tv_ids = duan.thanhvienthamgia
+        for i in range(0,len(tv_ids)):
+            tv = tv_ids[i].nhanvien
+            #tv = self.pool.get('hr.employee').browse(cr, uid, tv_ids[i].id, context=context)
+            name_url = self.pool.get('yhoc_trangchu').parser_url(str(tv.name))
+            if tv:
+                photo = ''
+                if tv.image:
+                    filename = str(tv.id) + '-profile-' + name_url
+                    photo = domain + '/images/profile/%s.jpg' %(filename)
+
+                capbac = tv.capbac or ''
+                trinhdo = self.pool.get('hlv.property')._get_value_project_property_by_name(cr, uid, 'Trình độ chuyên môn') or '[]'
+                chuyenmon = ''
+                for r in eval(trinhdo):
+                    if r[0] == capbac:
+                        chuyenmon = r[1]
+                        break
+                item = item_.replace('__DANHXUNG__', tv.danhxung or '')
+                item = item.replace('__TENTHANHVIEN__', str(tv.name))
+                item = item.replace('__HINHTHANHVIEN__', photo)
+                item = item.replace('__LINKTHANHVIEN__', domain + '/profile/%s/'%(tv.link_url))
+                item = item.replace('__CHUYENNGANH__',tv.chuyennganh or '')
+                item = item.replace('__TRINHDOCHUYENMON__',chuyenmon)
+                
+                link_item_ = '''<a href="__LINK__" title="__TIITLELINK__"><img src="__IMAGELINK__"></a>
+                '''
+                alllink_item_ = ''
+                if tv.work_email:
+                    link_item = link_item_.replace('__LINK__', 'mailto:' + tv.work_email)
+                    link_item = link_item.replace('__TIITLELINK__', 'Gửi email cho tác giả')
+                    link_item = link_item.replace('__IMAGELINK__', domain + '/images/icon/email.png')
+                    alllink_item_ += link_item
+                if tv.facebook_acc:
+                    link_item = link_item_.replace('__LINK__', tv.facebook_acc)
+                    link_item = link_item.replace('__TIITLELINK__', 'Facebook')
+                    link_item = link_item.replace('__IMAGELINK__', domain + '/images/icon/facebook.png')
+                    alllink_item_ += link_item
+                if tv.google_plus_acc:
+                    link_item = link_item_.replace('__LINK__', tv.google_plus_acc)
+                    link_item = link_item.replace('__TIITLELINK__', 'Google+')
+                    link_item = link_item.replace('__IMAGELINK__', domain + '/images/icon/google_plus.png')
+                    alllink_item_ += link_item
+                if os.path.exists(duongdan+'/tags/' + name_url):
+                    link_item = link_item_.replace('__LINK__', domain + '/tags/' + name_url + '/')
+                    link_item = link_item.replace('__TIITLELINK__', 'Những đóng góp của tác giả')
+                    link_item = link_item.replace('__IMAGELINK__', domain + '/images/icon/yhoccongdong.png')
+                    alllink_item_ += link_item
+                item = item.replace('__PROFILEITEM__', alllink_item_)
+                                
+                if i%4 == 0:
+                    item = item.replace('<!--<li class="cloned">-->', '<li class="cloned">')
+                    item = item.replace('<!--</li>-->', '')
+                    all_item_ += item
+                elif i%4 == 3:
+                    item = item.replace('<!--<li class="cloned">-->', '')
+                    item = item.replace('<!--</li>-->', '</li>')
+                    all_item_ += item
+                else:
+                    item = item.replace('<!--<li class="cloned">-->', '')
+                    item = item.replace('<!--</li>-->', '')
+                    all_item_ += item
+        if len(tv_ids)%4 <> 3:
+            all_item_ += '</li>'
+            
+        template = template_.replace('__THANHVIENTHAMGIA_ITEM__', all_item_)
+        template = template.replace('__DOMAIN__', domain)
+        
+        import codecs  
+        fw= codecs.open(folder_duan+'/thanhvienthamgia_trongduan.html','w','utf-8')
+        fw.write(template)
+        fw.close()  
+        return True
+    
     def capnhat_thanhvien(self, cr, uid, duan, folder_duan, context=None):
         kieufile = self.pool.get('hlv.property')._get_value_project_property_by_name(cr, uid, 'Kiểu lưu file') or 'html'
         duongdan = self.pool.get('hlv.property')._get_value_project_property_by_name(cr, uid, 'path of template')
@@ -327,7 +422,11 @@ class yhoc_duan(osv.osv):
         self.capnhat_baivietcungduan(cr, uid, duan, folder_duan, context)
             
 #Cập nhật thanhf vien tham gia
-        self.capnhat_thanhvien(cr, uid, duan, folder_duan, context)
+        #self.capnhat_thanhvien(cr, uid, duan, folder_duan, context)
+        self.capnhat_thanhvienthamgia_trongduan(cr, uid, ids, context)
+
+#Giang_0812#
+        self.capnhat_sharebutton(cr, uid, duan.id, context=context)
         
 #Cap nhật noi dung co ban
         template = template.replace('__TENDUAN__', tenduan)
@@ -424,4 +523,28 @@ class yhoc_duan(osv.osv):
         fw.write(template)
         fw.close()
         return True
+    
+    def capnhat_sharebutton(self, cr, uid, ids, context=None):
+        duongdan = self.pool.get('hlv.property')._get_value_project_property_by_name(cr, uid, 'path of template')
+        domain = self.pool.get('hlv.property')._get_value_project_property_by_name(cr, uid, 'Domain') or '../..'
+        duan = self.browse(cr,uid,ids)
+        if os.path.exists(duongdan+'/template/duan/share_social_button.html'):
+            fr = open(duongdan+'/template/duan/share_social_button.html', 'r')
+            template_ = fr.read()
+            fr.close()
+        else:
+            template_ = ''
+        template = template_.replace('__DOMAIN__', domain)
+        template = template.replace('__URL__', domain + '/%s/'%duan.link_url)
+        template = template.replace('__TITLE__', duan.name)
+        template = template.replace('__DESCRIPTION__', str(duan.description))
+        name_url = self.pool.get('yhoc_trangchu').parser_url(str(duan.name))
+        photo = domain + '/images/duan/%s-duan-%s.jpg'%(str(duan.id),name_url)
+        template = template.replace('__IMAGE__', photo)
+        import codecs  
+        fw = codecs.open(duongdan + '/%s/share_social_button.html'%duan.link_url,'w','utf-8')
+        fw.write(template)
+        fw.close()
+        return True
+    
 yhoc_duan()
