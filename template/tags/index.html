@@ -1,100 +1,75 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html xmlns="http://www.w3.org/1999/xhtml" itemscope itemtype="http://schema.org/__ITEMTYPE__">
 
 <head>
-
-	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-	<link rel="shortcut icon" href="http://yhoccongdong.com/images/Yhoccongdong.ico" type="image/x-icon">
-	<meta name="description" content="Tổng hợp thông tin và lời khuyên của bác sĩ về __TAGNAME__" />	
-	<title>__TAGNAME__ - Lời khuyên bác sĩ</title>	
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+	<link rel="shortcut icon" href="http://yhoccongdong.com/images/Yhoccongdong.ico" type="image/x-icon"/>
+	<meta name="description" content="__DESCRIPTION__" />	
+	<title>__TITLE__</title>	
+	<meta name="google-site-verification" content="hOscgIY8rgaYMJfzp5AbEjPBimZ2uKazVOj721vELc4" />
 	<meta name="robots" content="index,follow,noodp" />
-	<link rel="canonical" href="<?php echo curPageURL(); ?>">
+	<link rel="canonical" href="__URL__"/>
 	<meta name="copyright" content="Copyright © 2012 by YHocCongDong.com" />
 	<meta name="distribution" content="Global" />	
 	<meta property="fb:admins" content="100005119690063" />
-	<meta property="og:title" itemprop="headline" content="__TAGNAME__ - Lời khuyên bác sĩ"/>
-	<meta property="og:url" itemprop="url"  content="<?php echo curPageURL(); ?>"/>
-	<meta property="og:description" itemprop="description" content="Tổng hợp thông tin và lời khuyên của bác sĩ về __TAGNAME__"/>
+	<meta property="og:title" itemprop="headline" content="__TITLE__"/>
+	<meta property="og:url" itemprop="url"  content="__URL__"/>
+	<meta property="og:description" itemprop="description" content="__DESCRIPTION__"/>
     <meta property="og:locale" itemprop="inLanguage" content="vi_VN" />
 	<meta property="og:site_name" content="YHocCongDong.com"/>
-
-<?php include("../../trangchu/vi/header.html")?>
-<!-- MENU END-->
-	<?php
-	function curPageURL() {
-	 $pageURL = 'http';
-	 if ($_SERVER["HTTPS"] == "on") {$pageURL .= "s";}
-	 $pageURL .= "://";
-	 if ($_SERVER["SERVER_PORT"] != "80") {
-	  $pageURL .= $_SERVER["SERVER_NAME"].":".$_SERVER["SERVER_PORT"].$_SERVER["REQUEST_URI"];
-	 } else {
-	  $pageURL .= $_SERVER["SERVER_NAME"].$_SERVER["REQUEST_URI"];
-	 }
-	 return $pageURL;
-	}
-	?>
+	<meta property="twitter:creator" content="@yhoccongdong">
+	<meta property="twitter:site" content="@yhoccongdong">
+	<meta property="twitter:url" content="__URL__">
 	
-	<!-- <div id="breadcrumb">
-		<span class="current-time">Thứ Tư, ngày 13 tháng 12, 2012</span>Bạn đang ở<span class="home"></span> trang chủ<br clear="all" />
-	</div> -->
-	
-	<div>
-		<div id="content">
-			<div id="banner">
-      <!------------------------------------- IMAGE START ------------------------------------------------->
-				
-<!------------------------------------- IMAGE END ------------------------------------------------->
-     
-      
-      
-			</div>
-<!------------------------------------- BÀI MỚI START ------------------------------------------------->
-			<?php include("/opt/openpg_70/website/yhoccongdong/count.php");
-				update_viewer_tags(__ID_TAG__);
-			?>
-			<div id="timhieudaitrang1">   
-				<h4>__TAGNAME__</h4>
-				<div>
-					<ul style="margin: 0px; padding: 0px; position: relative; list-style-type: none; z-index: 1;">
-						<?php include("tag_item.html")?>
-					</ul>
-					<br clear="all" />
-				</div>
-			</div>
-<!------------------------------------- BÀI MỚI END ------------------------------------------------->
-		</div>
+	<?php include("../../trangchu/vi/header1.html")?>
 
-<!------------------------------------- SIDEBAR START------------------------------------------------->		
-		<div id="sidebar">
-		<!------------------------------------- 6 MENU START------------------------------------------------->		
-			<!--div class="rowsidebar">
-				<strong><a href="#">Các bài viết nổi bật</a></strong>
-				<div class="content_side">
-					__SIDEBARMENU__	
-					<br clear="all" />					
-				</div>
-			</div-->
-		<!------------------------------------- 6 MENU END------------------------------------------------->		
-		
-		
-		<!------------------------------------- CHỦ ĐỀ NỔI BẬC START------------------------------------------------->		
-			
-			
-			<!--div class="rowsidebar">
-				<strong><a href="#">Một số dự án đã hoàn thành</a></strong>
-				<div class="content_side">
-				    __CHUDENOIBAC__
-					<br clear="all" />				  
-				
-				</div>
-			</div-->
-			<br clear="all" /> 
+	<article id="top">
+	
+	<!-- include("/opt/openpg_70/website/yhoccongdong/count.php");
+		update_viewer_tags(__ID_TAG__);
+	-->
+	<div style="float: left; width:640px; margin-top: 35px; text-align: left;">
+		<a href ="#"><img width="16" height="16" src="__DOMAIN__/images/quote-opening.png"/>
+			<span class="search_title">__TAGNAME__</span>
+			<img width="16" height="16" src="__DOMAIN__/images/quote-closing.png"/>
+		</a>
+		</br>
+		<header class="secondary-header" style="margin-top: 20px;">
+			<h1>từ khóa cho sức khỏe liên quan đến __TAGNAME__</h1>
+		</header>
+		<div style="margin: 0 auto; margin-bottom:0px; margin-top:10px;"> 
+			__TUKHOALQ__
 		</div>
-		<!------------------------------------- CHỦ ĐỀ NỔI BẬC END------------------------------------------------->		
-<!------------------------------------- SIDEBAR END------------------------------------------------->		
-		<br clear="all" />
+		
+		<section id="content_center">
+			<header class="secondary-header" style="margin-top: 20px;">
+				<h1>các bài viết liên quan đến __TAGNAME__</h1>
+			</header>
+			<?php include("tag_item.html")?>
+		</section>
 	</div>
-</div>
+		
+		<section id="rightslide">
+			<div class="img_news">
+				<div class="titlemodule">
+					<div class="titlespan">
+						Loạt bài nổi bật
+					</div>
+				</div>
+				__DUANNOIBAC__
+			</div>
+			
+			<div class="titlemodule">
+				<div class="titlespan">
+					Các bác sĩ liên quan
+				</div>
+			</div>
 
-<?php include("../../trangchu/vi/footer.html")?>
+			<div style="margin: 0 auto; margin-top: 10px;"> 
+				<iframe marginwidth="0" marginheight="0" allowtransparency="no" src="dsbacsi.html" frameborder="0" height="470" scrolling="no" width="100%"></iframe>
+			</div>
+
+		</section>
+	</article>
+<?php include("../../trangchu/vi/footer1.html")?>

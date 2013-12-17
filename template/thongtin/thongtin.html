@@ -16,6 +16,8 @@
 	<meta property="og:title" itemprop="headline" content="__TUADETHONGTIN__"/>
 	<meta property="og:url" itemprop="url"  content="__URL__"/>
 	<meta property="og:description" itemprop="description" content="__MOTANGAN__"/>
+	<meta property="og:image" content="__HINHBAIVIET__"/>
+	<meta property="og:type" content="website" />
     <meta property="og:locale" itemprop="inLanguage" content="vi_VN" />
 	<meta property="og:site_name" content="YHocCongDong.com"/>
 	<meta property="twitter:creator" content="@yhoccongdong">
@@ -58,7 +60,6 @@
 		(document, 'script', 'twitter-wjs');
 	</script>
 <!--Google Analytics Social Button Tracking -->
-	<script type="text/javascript" src="https://code.google.com/p/analytics-api-samples/source/browse/trunk/src/tracking/javascript/v5/social/ga_social_tracking.js"></script>
 <!--#Giang_end#-->
 	<article class="thongtin" style="margin-top: 35px;margin-bottom: 35px;">
 		<section class="thongtinleft">
@@ -66,7 +67,7 @@
 				</br>
 				<header class="secondary-header">
 					<a href="__LINKDUAN__"><strong style="padding-left: 10px; ">__DUAN__</strong>
-						<p style="text-align:right;  font-style:italic; padding-right: 5px;;">
+						<p style="text-align:right;  font-style:italic; padding-right: 5px;clear: left;">
 							<img src="http://yhoccongdong.com/images/multi_document.png" />
 							__SOLUONGBAIVIET__ 
 						</p>
@@ -110,7 +111,7 @@
 				
 				<?php include("menu.html")?>
 				
-				<div style="padding-top:15px; line-height: 25px; max-width:700px; display;block; clear: both;" itemprop="articleBody">	
+				<div id="noidungthongtin" style="padding-top:15px; line-height: 25px; max-width:700px; display;block; clear: both;" itemprop="articleBody">	
 					__NOIDUNG_THONGTIN__
 					<p>&nbsp;</p>
 				</div>
@@ -133,9 +134,9 @@
 					<div style="width:430px;float:left;">					
 						<div style="padding:5px 0px 10px; font-weight: bold; color: rgb(15, 73, 114);">Theo dõi Y Học Cộng Đồng trên mạng xã hội</div>
 						<div class="fb-like" data-href="https://www.facebook.com/yhoccongdong" data-layout="button_count" data-action="like" data-show-faces="false" data-share="false"></div>
-						<div class="fb-follow" data-href="http://www.facebook.com/yhoccongdong.quanly" data-colorscheme="light" data-layout="button_count" data-show-faces="false"></div>
-						<div class="g-follow" data-annotation="bubble" data-height="20" data-href="https://plus.google.com/+Yhoccongdong" data-rel="publisher"></div>
-						<div class="g-plusone" data-size="medium" data-href="https://plus.google.com/+Yhoccongdong"></div>
+						<div class="fb-follow" data-href="http://www.facebook.com/yhoccongdong.quanly" data-colorscheme="light" data-layout="button" data-show-faces="false"></div>
+						<div class="g-follow" data-annotation="none" data-height="20" data-href="https://plus.google.com/+yhoccongdong" data-rel="publisher"></div>
+						<div class="g-plusone" data-size="medium" data-href="https://plus.google.com/+yhoccongdong"></div>
 					</div>
 				</div>
 			</div>
@@ -174,5 +175,4 @@
 				</div>
 		</div>
 	</article>
-<script>_ga.trackSocial();</script>
 <?php include("__DUONGDAN__/trangchu/vi/footer1.html")?>

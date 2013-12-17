@@ -1,65 +1,96 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:fb="https://www.facebook.com/2008/fbml" xmlns:og="http://ogp.me/ns#" itemscope itemtype="http://schema.org/WebPage" >
 
 <head>
-	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-	<link rel="shortcut icon" href="http://yhoccongdong.com/images/Yhoccongdong.ico" type="image/x-icon">
-	<meta name="description" content="Kênh tin RSS Yhoccongdong.com cập nhật những thông tin sức khỏe mới nhất"/>	
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+	<link rel="shortcut icon" href="http://yhoccongdong.com/images/Yhoccongdong.ico" type="image/x-icon"/>
+	<meta name="description" content="Kênh tin RSS Yhoccongdong.com cập nhật những thông tin sức khỏe mới nhất" />	
 	<title>Kênh tin RSS Y Học Cộng Đồng</title>	
+	<meta name="google-site-verification" content="hOscgIY8rgaYMJfzp5AbEjPBimZ2uKazVOj721vELc4" />
 	<meta name="robots" content="index,follow,noodp" />
-	<link rel="canonical" href="<?php echo curPageURL(); ?>">
+	<link rel="canonical" href="yhoccongdong.com/rss/"/>
 	<meta name="copyright" content="Copyright © 2012 by YHocCongDong.com" />
 	<meta name="distribution" content="Global" />	
 	<meta property="fb:admins" content="100005119690063" />
 	<meta property="og:title" itemprop="headline" content="Kênh tin RSS Y Học Cộng Đồng"/>
-	<meta property="og:url" itemprop="url"  content="<?php echo curPageURL(); ?>"/>
+	<meta property="og:url" itemprop="url"  content="http://yhoccongdong.com/rss/"/>
 	<meta property="og:description" itemprop="description" content="Kênh tin RSS Yhoccongdong.com cập nhật những thông tin sức khỏe mới nhất"/>
+	<meta property="og:image" content="http://yhoccongdong.com/images/logo_.png"/>
+	<meta property="og:type" content="website" />
     <meta property="og:locale" itemprop="inLanguage" content="vi_VN" />
-	<meta property="og:site_name" content="YHocCongDong.com/rss/"/>
-	
-	
-<?php include("../trangchu/vi/header.html")?>
-<!-- MENU END-->
-	<?php
-	function curPageURL() {
-	 $pageURL = 'http';
-	 #Giang#if ($_SERVER["HTTPS"] == "on") {$pageURL .= "s";}
-	 if (!empty($_SERVER['HTTPS'])) {$pageURL .= "s";}  
-	 $pageURL .= "://";
-	 if ($_SERVER["SERVER_PORT"] != "80") {
-	  $pageURL .= $_SERVER["SERVER_NAME"].":".$_SERVER["SERVER_PORT"].$_SERVER["REQUEST_URI"];
-	 } else {
-	  $pageURL .= $_SERVER["SERVER_NAME"].$_SERVER["REQUEST_URI"];
-	 }
-	 return $pageURL;
-	}
-	?>
-	
-	<div>
-		<div style="margin:0 auto; background:#FFF" >
-<!------------------------------------- BÀI MỚI START ------------------------------------------------->
-			<div style="padding: 10px 20px 10px 20px;">   
-				<h1 align="left" style="text-align: center"><font size="4" face="Arial">Kênh tin RSS của Y Học Cộng Đồng</font></h1>
-				</br>
-				<h2 align="left"><font size="2.5" face="Arial">RSS là gì ?</font></h2>
-				<p>
-            	RSS (viết tắt từ Really Simple Syndication) là một tiêu chuẩn định dạng tài liệu dựa trên XML nhằm giúp người sử dụng dễ dàng cập nhật và tra cứu thông tin một cách nhanh chóng và thuận tiện nhất bằng cách tóm lược thông tin vào trong một đoạn dữ liệu ngắn gọn, hợp chuẩn. Dữ liệu này được các chương trình đọc tin chuyên biệt (gọi là News reader) phân tích và hiển thị trên máy tính của người sử dụng. Trên trình đọc tin này, người sử dụng có thể thấy những tin chính mới nhất, tiêu đề, tóm tắt và cả đường link để xem tòan bộ tin.
-				</p>
-				<h2 align="left"><font size="2.5" face="Arial">Các kênh tin RSS do YHocCongDong.com cung cấp</font></h2>
-				<div>
-					<table border="0" style="margin: 0px; padding: 0px;">
-                    <tbody>
-						<?php include("rss_item.html")?>					
-					</tbody>
-					</table>
-					<br clear="all" />
+	<meta property="og:site_name" content="yhoccongdong.com/rss/"/>
+	<meta property="twitter:creator" content="@yhoccongdong">
+	<meta property="twitter:site" content="@yhoccongdong">
+	<meta property="twitter:url" content="http://yhoccongdong.com/rss/">
+	<link rel="stylesheet" type="text/css" href="__DOMAIN__/css_/rss_css.css" />
+
+<?php include("__DUONGDAN__/trangchu/vi/header1.html")?>
+	<article id="top">
+		<div style="float: left; width:97%; margin-top: 35px; text-align: center; padding: 0 10px 10px 10px">
+			<h1>
+				<span class="search_title" style="font-style: normal; font-size: 1.5em;color: #327539;">Yhoccongdong.com và các kênh tin RSS Feeds</span>
+			</h1>
+		</div>
+		<div style="clear:both;font-size: 14px; line-height:22px; padding-top: 10px; text-align:left;">
+			<h2>
+				<strong style="font-size: 15px; color: #327539;">RSS là gì? </strong>
+			</h2>
+			<span style="display:block; margin-top:10px; text-indent:30px;">RSS (viết tắt từ Really Simple Syndication) là một tiêu chuẩn định dạng tài liệu dựa trên XML 
+				nhằm giúp người sử dụng dễ dàng cập nhật và tra cứu thông tin một cách nhanh chóng và thuận tiện nhất 
+				bằng cách tóm lược thông tin vào trong một đoạn dữ liệu ngắn gọn, hợp chuẩn. Dữ liệu này được các chương trình 
+				đọc tin chuyên biệt (gọi là News reader) phân tích và hiển thị trên máy tính của người sử dụng. 
+				Trên trình đọc tin này, người sử dụng có thể thấy những tin chính mới nhất, 
+				tiêu đề, tóm tắt và cả đường link để xem tòan bộ tin.
+			</span>
+
+			<span style="display:block; margin-top:10px; text-indent:30px;">
+				Dành cho việc phân tán và khai thác nội dung thông tin Web từ xa (ví dụ như các tiêu đề, tin tức). 
+				Sử dụng RSS, các nhà cung cấp nội dung Web có thể dễ dàng tạo và phổ biến các nguồn dữ liệu 
+				ví dụ như các link tin tức, tiêu đề, và tóm tắt.
+
+				Một cách sử dụng nguồn kênh tin RSS được nhiều người ưa thích là kết hợp nội dung vào các nhật trình Web (weblogs, hay "blogs"). 
+				Blogs là những trang web mang tính các nhân và bao gồm các mẩu tin và liên kết ngắn, thường xuyên cập nhật.
+			</span>
+			</br>
+			<h2>
+				<strong style="font-size: 15px; color: #327539;">Danh mục tin RSS mà <a href="http://yhoccongdong.com">Yhoccongdong.com</a> cung cấp</strong>
+			</h2>
+			<span style="display:block; margin-top:10px; text-indent:30px;">Dantri.com.vn hiện tại cung cấp các nguồn kênh dữ liệu dưới đây theo định dạng chuẩn mới nhất RSS 2.0. Các nguồn kênh tin này là miễn phí cho việc sử dụng dưới mục đích cá nhân và phi lợi nhuận. Bạn chỉ việc copy và dán các địa chỉ URL này vào 
+				những trang web hoặc phần mềm hỗ trợ đọc tin từ RSS Feeds hoặc kéo thả biểu tượng RSS dưới đây vào các phần mềm hỗ trợ RSS là được.
+			</span>
+			
+			</br>
+			
+			<div align="center" style="margin-bottom: 20px; width: 100%; height:auto; display: inline-block;">
+				<div id="rss">
+					<?php include("__RSS_ITEMS__")?>
 				</div>
 			</div>
-<!------------------------------------- BÀI MỚI END ------------------------------------------------->
+			</br>
+			<h2>
+				<strong style="font-size: 15px; color: #327539;">Sử dụng RSS như thế nào?</strong>
+			</h2>
+			<span style="display:block; margin-top:10px; text-indent:30px;">
+				Rss Reader là phần mềm có chức năng tự động lấy tin tức đã được cấu trúc theo định dạng RSS. 
+				Một số phần mềm đọc RSS cho phép bạn lập lịch cập nhật tin tức. 
+				Với chương trình đọc RSS, bạn có thể nhấn chuột vào tiêu đề của 1 tin để đọc phần tóm tắt của 
+				hoặc mở ra nội dung của toàn bộ tin trong một cửa sổ trình duyệt mặc định.
+			</span>
+			</br>
+			<h2>
+				<strong style="font-size: 15px; color: #327539;">Các giới hạn sử dụng</strong>
+			</h2>
+			<span style="display:block; margin-top:10px; text-indent:30px;">
+				Các nguồn kênh tin được cung cấp miễn phí cho các cá nhân và các tổ chức phi lợi nhuận. 
+				Chúng tôi yêu cầu bạn cung cấp rõ các thông tin cần thiết khi bạn sử dụng các nguồn kênh tin này từ 
+				<a href="http://yhoccongdong.com">Yhoccongdong.com</a>.
+			</span>
+			<span style="display:block; margin-top:10px; text-indent:30px;">
+			Nếu bạn định ghi dưới dạng văn bản, hãy ghi: <a href="http://yhoccongdong.com">Yhoccongdong.com</a>. 
+			Nếu bạn định ghi dưới dạng đồ họa, hãy sử dụng biểu tượng của <a href="http://yhoccongdong.com">Yhoccongdong.com</a> đi kèm trong mỗi nguồn tin
+			<a href="http://yhoccongdong.com">Yhoccongdong.com</a> hoàn toàn có quyền yêu cầu bạn ngừng cung cấp và phân tán thông tin dưới dạng này ở bất kỳ thời điểm nào và với bất kỳ lý do nào.
+			</span>
 		</div>
-		<br clear="all" />
-	</div>
-</div>
-
-<?php include("../trangchu/vi/footer.html")?>
+	</article>
+<?php include("__DUONGDAN__/trangchu/vi/footer1.html")?>
