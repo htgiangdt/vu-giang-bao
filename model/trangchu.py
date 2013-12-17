@@ -118,81 +118,18 @@ class yhoc_trangchu(osv.osv):
         self.auto_capnhat(cr, uid)
         return super(yhoc_trangchu,self).write(cr, uid, ids, vals, context=context)
     
-    def capnhat_alltag(self, cr, uid, ids, context=None):
-        duongdan = self.pool.get('hlv.property')._get_value_project_property_by_name(cr, uid, 'path of template')
-        domain = self.pool.get('hlv.property')._get_value_project_property_by_name(cr, uid, 'Domain') or '../..'
-        kieufile = self.pool.get('hlv.property')._get_value_project_property_by_name(cr, uid, 'Kiểu lưu file') or 'html'
-        all_tag = self.pool.get('yhoc_keyword').search(cr, uid, [], context=context)
-        for t in all_tag:
-            t = self.pool.get('yhoc_keyword').browse(cr, uid, t, context=context)
-            if t.thongtin_ids:
-                
-                name = self.pool.get('yhoc_trangchu').parser_url(t.name)
-                
-                if os.path.exists(duongdan+'/template/tags/index.html'):
-                    fr = open(duongdan+'/template/tags/index.html', 'r')
-                    template_ = fr.read()
-                    fr.close()
-                else:
-                    template_ = ''
-                    
-                folder_tags = duongdan + '/tags/%s' %str(name)
-                if not os.path.exists(folder_tags):
-                    os.makedirs(folder_tags)                
-                if os.path.exists(folder_tags +'/tag_item.html'):
-                    os.remove(folder_tags +'/tag_item.html')
-                
-                
-                import codecs  
-                fw = codecs.open(folder_tags +'/tag_item.html','w','utf-8')
-                fw.write('<!--NEWITEM-->')
-                fw.close()
-                
-                fr = open(folder_tags+'/tag_item.html', 'r')
-                tag_item_ = fr.read()
-                fr.close()
-                
-                if os.path.exists(duongdan+'/template/tags/tag_item.html'):
-                    fr = open(duongdan+'/template/tags/tag_item.html', 'r')
-                    item_ = fr.read()
-                    fr.close()
-                else:
-                    item_ = ''
-            
-                for thongtin in t.thongtin_ids:
-                    item = item_.replace('__NGUOIHIEUDINH__', thongtin.nguoihieudinh.name or '')
-                    item = item.replace('__LINKNGUOIHIEUDINH__', thongtin.nguoihieudinh.link or '#')
-                    item = item.replace('__DANHXUNGHD__', thongtin.nguoihieudinh.danhxung or '')
-                    
-                    item = item.replace('__DANHXUNGNT__',thongtin.nguoidich.danhxung or '')
-                    item = item.replace('__NGUOIDICH__',thongtin.nguoidich.name)
-                    item = item.replace('__LINKNGUOIDICH__',thongtin.nguoidich.link or '#')
-                    
-                    item = item.replace('__NAME__',thongtin.name or '')
-                    item = item.replace('__NGAYTAO__',thongtin.date or '')
-                    item = item.replace('__MOTANGAN__',thongtin.motangan or '(Chưa cập nhật)')
-                    #Giang_0511#item = item.replace('__LINK__','../../../../../../%s'%(thongtin.link_url))
-                    item = item.replace('__LINK__',domain + '/%s/'%(thongtin.link_url))
-                    name_url = self.pool.get('yhoc_trangchu').parser_url(str(thongtin.name))
-                    item = item.replace('__IMAGE__',domain + '/images/thongtin/%s-thongtin-%s.jpg'%(str(thongtin.id),name_url))
-                    
-                    tag_item_ = tag_item_.replace('<!--NEWITEM-->',item)
-        
-                    
-                    
-                template = template_.replace('__TAGNAME__', t.name)
-                template = template.replace('__ID_TAG__', str(t.id))
-                template = template.replace('__SIDEBARMENU__', '''<?php include("../../trangchu/vi/baivietnoibac.html")?>''')
-                template = template.replace('__CHUDENOIBAC__', '''<?php include("../../trangchu/vi/duanhoanthanh.html")?>''')
-                import codecs  
-                fw = codecs.open(folder_tags +'/tag_item.html','w','utf-8')
-                fw.write(tag_item_)
-                fw.close()
-
-                fw = codecs.open(folder_tags +'/index.%s'%kieufile,'w','utf-8')
-                fw.write(template)
-                fw.close()
-
+    def capnhat_alltag(self,cr, uid, ids, context=None):
+        all_tags = self.pool.get('yhoc_keyword').search(cr, uid, [('baiviet_ids','!=',False)], context=context)
+        for t in all_tags:
+            self.pool.get('yhoc_keyword').capnhat_toanbotrangtag(cr, uid, [t], context=context)
+        return True
+    
+    def capnhat_tuakhoalienquan(self,cr, uid, ids, context=None):
+        all_tags = self.pool.get('yhoc_keyword').search(cr, uid, [('baiviet_ids','!=',False)], context=context)
+        for t in all_tags:
+            self.pool.get('yhoc_keyword').capnhat_kwlienquan(cr, uid, [t], context=context)
+        return True
+    
                 
     def capnhat_allduan(self, cr, uid, ids=None, context=None):
         duan = self.pool.get('yhoc_duan').search(cr, uid, [])
@@ -200,13 +137,28 @@ class yhoc_trangchu(osv.osv):
             self.pool.get('yhoc_duan').capnhat_thongtin(cr,uid,[da], context)
         return True
     
+    def capnhat_thanhvienthamgiaduan(self, cr, uid, ids=None, context=None):
+        duan = self.pool.get('yhoc_duan').search(cr, uid, [])
+        for da in duan:
+            self.pool.get('yhoc_duan').capnhat_thanhvienthamgia(cr, uid, [da], context=context)
+        return True
+    
+    def capnhat_tagschoduan(self, cr, uid, ids=None, context=None):
+        duan = self.pool.get('yhoc_duan').search(cr, uid, [])
+        for da in duan:
+            self.pool.get('yhoc_duan').auto_tags(cr, uid, [da], context=context)
+        return True
+    
     def capnhat_allchude(self, cr, uid, ids=None, context=None):
-        chude = self.pool.get('yhoc_chude').search(cr, uid, [])
+        chude = self.pool.get('yhoc_chude').search(cr, uid, [('parent_id.name','!=','Trang chủ'),('link','!=',False)] )
         for cd in chude:
             self.pool.get('yhoc_chude').capnhat_thongtin(cr,uid,[cd],context)
-            #Giang#0911- Cap Nhat RSS Chu De
-            self.pool.get('yhoc_chude').capnhat_rsschude(cr,uid,[cd],context)
-        self.pool.get('yhoc_chude').taotrangrss(cr, uid, context)
+        return True
+    
+    def capnhat_tagschochude(self, cr, uid, ids=None, context=None):
+        chude = self.pool.get('yhoc_chude').search(cr, uid, [('parent_id.name','!=','Trang chủ'),('link','!=',False)] )
+        for cd in chude:
+            self.pool.get('yhoc_chude').auto_tags(cr, uid, [cd], context=context)
         return True
     
     def capnhat_allthanhvien(self, cr, uid, ids=None, context=None):
@@ -221,12 +173,26 @@ class yhoc_trangchu(osv.osv):
             self.pool.get('yhoc_thongtin').xuatban_thongtin(cr,uid,[tt])
         return True
     
+    def capnhat_tukhoachinhvaodstukhoa(self, cr, uid, ids=None, context=None):
+        tintuc = self.pool.get('yhoc_thongtin').search(cr, uid, [('state','=','done')])
+        for tt in tintuc:
+            self.pool.get('yhoc_thongtin').capnhattukhoachinhchobaiviet(cr,uid,[tt],context=context)
+        return True
+    
+    
     def capnhat_allnganh(self, cr, uid, ids=None, context=None):
         nganh = self.pool.get('yhoc_nganh').search(cr, uid, [])
         for tt in nganh:
             self.pool.get('yhoc_nganh').capnhat_thongtin(cr,uid,[tt])
         return True
     
+    def capnhat_tin_nhanh(self, cr, uid, ids=None, context=None):
+        tintuc = self.pool.get('yhoc_thongtin').search(cr, uid, [('state','=','done')])
+        for tt in tintuc:
+            if tt % 10 == context['phan']:
+                self.pool.get('yhoc_thongtin').xuatban_thongtin(cr,uid,[tt])
+        return True
+	
     def auto_capnhat(self,cr, uid):
         duongdan = self.pool.get('hlv.property')._get_value_project_property_by_name(cr, uid, 'path of template')
         obj = ['yhoc_thongtin', 'yhoc_duan', 'yhoc_chude', 'hr.employee', 'yhoc_nganh']
@@ -280,6 +246,7 @@ class yhoc_trangchu(osv.osv):
             all_sidebar_menu_tab = ''      
             for chude in chudecha:
                 chude = self.pool.get('yhoc_chude').browse(cr, uid, chude, context=context)
+                
                 if chude.link:
                     root_menu_tab = '''<li><a href="__LINK__" rel="__REL__" __TRIGGER__>__TENMENU__</a></li>'''
                     #Giang_0511#root_menu_tab = root_menu_tab.replace('__LINK__', '../../../../../../%s/'%(chude.link_url))
@@ -327,13 +294,7 @@ class yhoc_trangchu(osv.osv):
             header_template = header_template.replace('__SUBMENU__', all_sub_menu)
             #Giang_1711#
             header_template = header_template.replace('__DOMAIN__', domain)
-			#Giang_2911#
-#            trangchu = self.browse(cr, uid, ids[0], context=context)
-#            header_template = header_template.replace('__ITEMTYPE__', 'WebPage')
-#            header_template = header_template.replace('__DESCRIPTION__', trangchu.description)
-#            header_template = header_template.replace('__TITLE__', trangchu.title)
-#            header_template = header_template.replace('__URL__', domain)			
-            
+
             #Cap nhat link cong dong bac si
             dsnganh = self.pool.get('yhoc_nganh').search(cr, uid, [('name','!=','Công nghệ thông tin'),('link','!=',False)], limit=1, context=context)
             if dsnganh:
@@ -501,30 +462,6 @@ class yhoc_trangchu(osv.osv):
     
     def capnhat_thongtin(self,cr,uid,ids=None,context=None):
         self.capnhat_trangchu(cr, uid, [1], context=context)
-        
-#        chude = self.pool.get('yhoc_chude').search(cr, uid, [], context=context)
-#        for cd in chude:
-#            self.pool.get('yhoc_chude').capnhat_thongtin(cr, uid, [cd], context=context)
-#            
-#        duan = self.pool.get('yhoc_duan').search(cr, uid, [], context=context)
-#        for da in duan:
-#            self.pool.get('yhoc_duan').capnhat_thongtin(cr, uid, [da], context=context)
-#            
-#        baiviet = self.pool.get('yhoc_thongtin').search(cr, uid, [('state','=','done')], context=context)
-#        for bv in baiviet:
-#            self.pool.get('hlv_thongtin').xuatban_thongtin(cr, uid, [bv], context=context)
-#            
-#        user = self.pool.get('hr.employee').search(cr, uid, [], context=context)
-#        for u in user:
-#            self.pool.get('hr.employee').capnhat_thongtin(cr, uid, [u], context=context)
-#            
-#        cus = self.pool.get('res.partner').search(cr, uid, [], context=context)
-#        for c in cus:
-#            self.pool.get('res.partner').capnhat_thongtin(cr, uid, [c], context=context)
-#            
-#        nganh = self.pool.get('yhoc_nganh').search(cr, uid, [], context=context)
-#        for n in nganh:
-#            self.pool.get('yhoc_nganh').capnhat_thongtin(cr, uid, [n], context=context)
         return True
         
     def capnhat_menu_nganh(self, cr, uid, folder_trangchu, context=None):
@@ -881,6 +818,7 @@ class yhoc_trangchu(osv.osv):
         noidung_tittle = noidung_tittle.replace('__TITLE__','Thư ngỏ')
         template_thungo = template_thungo.replace('__TITLE__',noidung_tittle)
         template_thungo = template_thungo.replace('__DUONGDAN__',duongdan)
+        template_thungo = template_thungo.replace('__DOMAIN__',domain)
         
         import codecs  
         fw = codecs.open(folder_trangchu +'/thungo.' + kieufile,'w','utf-8')
@@ -924,6 +862,47 @@ class yhoc_trangchu(osv.osv):
         fw = codecs.open(folder_trangchu +'/muctieuytuong.' + kieufile,'w','utf-8')
         fw.write(template_muctieu)
         fw.close()
+        
+    def capnhat_duannoibac(self, cr, uid, duongdan_luufile, dsda, soduan, context=None):
+        duongdan = self.pool.get('hlv.property')._get_value_project_property_by_name(cr, uid, 'path of template')
+        domain = self.pool.get('hlv.property')._get_value_project_property_by_name(cr, uid, 'Domain') or '../..'
+        kieufile = self.pool.get('hlv.property')._get_value_project_property_by_name(cr, uid, 'Kiểu lưu file') or 'html'
+        all_chudenoibac = ''
+        fr = open(duongdan+'/template/trangchu/loatbai_tab.html', 'r')
+        loatbai_tab_ = fr.read()
+        fr.close()
+        import random 
+        if len(dsda)>soduan:
+            duanhoanthanh = random.sample(dsda, soduan)
+        else:
+            duanhoanthanh = dsda
+        for nb in duanhoanthanh:
+
+#            chudenoibac_tab = '''<li><a href="__LINK__"><strong>__NAME__</strong></a></li>'''
+            #Giang_0511#chudenoibac_tab = chudenoibac_tab.replace('__LINK__', '../../../../../../%s/'%(nb.link_url))
+            name_url = self.pool.get('yhoc_trangchu').parser_url(nb.name)
+            picture = domain + '/images/duan/%s-duan-%s.jpg'%(str(nb.id),name_url)
+            
+            if not os.path.exists(duongdan+'/images/duan/%s-duan-%s.jpg'%(str(nb.id),name_url)):
+                if nb.photo:
+                    folder_hinh_thongtin = duongdan+'/images/duan'
+                    filename = str(nb.id) + '-duan-' + name_url
+                    self.pool.get('yhoc_thongtin').ghihinhxuong(folder_hinh_thongtin, filename, nb.photo, 135, 105, context=context)
+                    
+            loatbai_tab = loatbai_tab_.replace('__LINK__', domain + '/%s/'%(nb.link_url))
+            loatbai_tab = loatbai_tab.replace('__NAME__', nb.name)
+            loatbai_tab = loatbai_tab.replace('__PHOTO__', picture)
+            loatbai_tab = loatbai_tab.replace('__DESCRIPTION__', nb.description or '(Chưa cập nhật)')
+            loatbai_tab = loatbai_tab.replace('__ICON__', domain + '/images/multi_document.png')
+            loatbai_tab = loatbai_tab.replace('__SOLUONGBAIVIET__', str(nb.soluongbaiviet))
+            all_chudenoibac += loatbai_tab
+
+        
+        import codecs
+        fw = codecs.open(duongdan_luufile +'/duanhoanthanh.html','w','utf-8')
+        fw.write(str(all_chudenoibac))
+        fw.close()
+        return True
     
     def capnhat_trangchu(self,cr,uid,ids,context):
         trangchu = self.browse(cr, uid, ids[0], context=context)
@@ -952,7 +931,8 @@ class yhoc_trangchu(osv.osv):
         duanhoanthanh = trangchu.duanhoanthanh
         muctieu = trangchu.muctieu
         
-        chudecha = self.pool.get('yhoc_chude').search(cr, uid, [('parent_id','=',False)])
+#        chudecha = self.pool.get('yhoc_chude').search(cr, uid, [('parent_id','=',False)])
+        chudecha = self.pool.get('yhoc_chude').search(cr, uid, [('parent_id.name','=','Trang chủ')])
         noidung_header = self.capnhat_header(cr, uid, [1], chudecha, duongdan, domain, folder_trangchu, context=None)
         #Giang_0511#noidung_footer = self.capnhat_footer(cr, uid, chudecha, duongdan, folder_trangchu,context=context)
         noidung_footer = self.capnhat_footer(cr, uid, chudecha, duongdan, domain, folder_trangchu,context=context)
@@ -1010,38 +990,39 @@ class yhoc_trangchu(osv.osv):
         template = template.replace('__ANHTRANGCHU__',all_anhtrangchu)
 
 #cập nhật dự án hoàn chỉnh (bên phải)
-        all_chudenoibac = ''
-        fr = open(duongdan+'/template/trangchu/loatbai_tab.html', 'r')
-        loatbai_tab_ = fr.read()
-        fr.close()
-        import random 
-        duanhoanthanh = random.sample(duanhoanthanh, 6)
-        for nb in duanhoanthanh:
-
-#            chudenoibac_tab = '''<li><a href="__LINK__"><strong>__NAME__</strong></a></li>'''
-            #Giang_0511#chudenoibac_tab = chudenoibac_tab.replace('__LINK__', '../../../../../../%s/'%(nb.link_url))
-            name_url = self.pool.get('yhoc_trangchu').parser_url(nb.name)
-            picture = domain + '/images/duan/%s-duan-%s.jpg'%(str(nb.id),name_url)
-            
-            if not os.path.exists(duongdan+'/images/duan/%s-duan-%s.jpg'%(str(nb.id),name_url)):
-                if nb.photo:
-                    folder_hinh_thongtin = duongdan+'/images/duan'
-                    filename = str(nb.id) + '-duan-' + name_url
-                    self.pool.get('yhoc_thongtin').ghihinhxuong(folder_hinh_thongtin, filename, nb.photo, 135, 105, context=context)
-					
-            loatbai_tab = loatbai_tab_.replace('__LINK__', domain + '/%s/'%(nb.link_url))
-            loatbai_tab = loatbai_tab.replace('__NAME__', nb.name)
-            loatbai_tab = loatbai_tab.replace('__PHOTO__', picture)
-            loatbai_tab = loatbai_tab.replace('__DESCRIPTION__', nb.description or '(Chưa cập nhật)')
-            loatbai_tab = loatbai_tab.replace('__ICON__', domain + '/images/multi_document.png')
-            loatbai_tab = loatbai_tab.replace('__SOLUONGBAIVIET__', str(nb.soluongbaiviet))
-            all_chudenoibac += loatbai_tab
-
-        
-        import codecs
-        fw = codecs.open(folder_trangchu +'/duanhoanthanh.html','w','utf-8')
-        fw.write(str(all_chudenoibac))
-        fw.close()
+#        all_chudenoibac = ''
+#        fr = open(duongdan+'/template/trangchu/loatbai_tab.html', 'r')
+#        loatbai_tab_ = fr.read()
+#        fr.close()
+#        import random 
+#        duanhoanthanh = random.sample(duanhoanthanh, 6)
+#        for nb in duanhoanthanh:
+#
+##            chudenoibac_tab = '''<li><a href="__LINK__"><strong>__NAME__</strong></a></li>'''
+#            #Giang_0511#chudenoibac_tab = chudenoibac_tab.replace('__LINK__', '../../../../../../%s/'%(nb.link_url))
+#            name_url = self.pool.get('yhoc_trangchu').parser_url(nb.name)
+#            picture = domain + '/images/duan/%s-duan-%s.jpg'%(str(nb.id),name_url)
+#            
+#            if not os.path.exists(duongdan+'/images/duan/%s-duan-%s.jpg'%(str(nb.id),name_url)):
+#                if nb.photo:
+#                    folder_hinh_thongtin = duongdan+'/images/duan'
+#                    filename = str(nb.id) + '-duan-' + name_url
+#                    self.pool.get('yhoc_thongtin').ghihinhxuong(folder_hinh_thongtin, filename, nb.photo, 135, 105, context=context)
+#					
+#            loatbai_tab = loatbai_tab_.replace('__LINK__', domain + '/%s/'%(nb.link_url))
+#            loatbai_tab = loatbai_tab.replace('__NAME__', nb.name)
+#            loatbai_tab = loatbai_tab.replace('__PHOTO__', picture)
+#            loatbai_tab = loatbai_tab.replace('__DESCRIPTION__', nb.description or '(Chưa cập nhật)')
+#            loatbai_tab = loatbai_tab.replace('__ICON__', domain + '/images/multi_document.png')
+#            loatbai_tab = loatbai_tab.replace('__SOLUONGBAIVIET__', str(nb.soluongbaiviet))
+#            all_chudenoibac += loatbai_tab
+#
+#        
+#        import codecs
+#        fw = codecs.open(folder_trangchu +'/duanhoanthanh.html','w','utf-8')
+#        fw.write(str(all_chudenoibac))
+#        fw.close()
+        self.capnhat_duannoibac(cr, uid, folder_trangchu, duanhoanthanh, 6, context=context)
         template = template.replace('__CHUDENOIBAC__', '''<?php include("../../trangchu/vi/duanhoanthanh.html")?>''')
 #        template = template.replace('__CHUDENOIBAC__', all_chudenoibac)
         
@@ -1085,8 +1066,8 @@ class yhoc_trangchu(osv.osv):
 #        template = template.replace('__TITLE__',noidung_tittle)
         template = template.replace('__DUONGDAN__',duongdan)
         template = template.replace('__ITEMTYPE__', 'WebPage')
-        template = template.replace('__DESCRIPTION__', trangchu.description)
-        template = template.replace('__TITLE__', trangchu.title)
+        template = template.replace('__DESCRIPTION__', trangchu.description or '')
+        template = template.replace('__TITLE__', trangchu.title or '')
         template = template.replace('__URL__', domain)        
         
         import codecs  

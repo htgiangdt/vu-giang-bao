@@ -727,6 +727,96 @@ class yhoc_employee(osv.osv):
         
         return template,duongdan,domain
     
+    def bacsilienquan(self, cr, uid, duongdan_ghifile, dsbs, context=None):
+        '''Chèn vào các bác sĩ ở trang chủ và các trang có template giống trang chủ'''
+        
+        duongdan = self.pool.get('hlv.property')._get_value_project_property_by_name(cr, uid, 'path of template')
+        domain = self.pool.get('hlv.property')._get_value_project_property_by_name(cr, uid, 'Domain') or '../..'
+        kieufile = self.pool.get('hlv.property')._get_value_project_property_by_name(cr, uid, 'Kiểu lưu file') or 'html'
+        if os.path.exists(duongdan+'/template/profile/bacsilienquan.html'):
+            fr = open(duongdan+'/template/profile/bacsilienquan.html', 'r')
+            template_ = fr.read()
+            fr.close()
+        else:
+            template_ = ''
+            
+        if os.path.exists(duongdan+'/template/profile/bacsilienquan_tab.html'):
+            fr = open(duongdan+'/template/profile/bacsilienquan_tab.html', 'r')
+            item_ = fr.read()
+            fr.close()
+        else:
+            item_ = ''
+        
+        danhsachbacsi = '' 
+        for i in range(0,len(dsbs)):
+            if i%3 == 0:
+                item = '<li class="cloned">'
+            else:
+                item = ''
+                
+            name_url = self.pool.get('yhoc_trangchu').parser_url(str(dsbs[i].name))
+            photo = ''
+            if dsbs[i].image:
+                if not os.path.exists(duongdan + '/images/profile'):
+                    os.makedirs(duongdan + '/images/profile')
+                filename = str(dsbs[i].id) + '-profile-' + name_url
+                folder_hinh_profile = duongdan + '/images/profile'
+                self.pool.get('yhoc_thongtin').ghihinhxuong(folder_hinh_profile, filename, dsbs[i].image, 150, 150, context=context)
+                photo = domain + '/images/profile/%s.jpg' %(filename)
+        
+            item += item_.replace('__PHOTO__', photo)
+            
+            capbac = dsbs[i].capbac or ''
+            trinhdo = self.pool.get('hlv.property')._get_value_project_property_by_name(cr, uid, 'Trình độ chuyên môn') or '[]'
+            chuyenmon = ''
+            for r in eval(trinhdo):
+                if r[0] == capbac:
+                    chuyenmon = r[1]
+                    break
+            #Giang_2011# Chỉnh sửa thông tin dưới profile trong bài viết
+            item = item.replace('__DANHXUNG__',dsbs[i].danhxung or '')
+            item = item.replace('__NAME__',dsbs[i].name)
+            item = item.replace('__CHUYENNGANH__',dsbs[i].chuyennganh or '')
+            item = item.replace('__TRINHDOCHUYENMON__',chuyenmon)
+            item = item.replace('__LINK__',dsbs[i].link or '#')
+            
+                        
+            link_item_ = '<a href="__LINK__" target="_blank" title="__TIITLELINK__"><img src="__IMAGELINK__"></a>'
+            
+            alllink_item_ = ''
+            if dsbs[i].work_email:
+                link_item = link_item_.replace('__LINK__', 'mailto:' + dsbs[i].work_email)
+                link_item = link_item.replace('__TIITLELINK__', 'Gửi email cho tác giả')
+                link_item = link_item.replace('__IMAGELINK__', domain + '/images/icon/email.png')
+                alllink_item_ += link_item
+            if dsbs[i].facebook_acc:
+                link_item = link_item_.replace('__LINK__', dsbs[i].facebook_acc)
+                link_item = link_item.replace('__TIITLELINK__', 'Facebook')
+                link_item = link_item.replace('__IMAGELINK__', domain + '/images/icon/facebook.png')
+                alllink_item_ += link_item
+            if dsbs[i].google_plus_acc:
+                link_item = link_item_.replace('__LINK__', dsbs[i].google_plus_acc)
+                link_item = link_item.replace('__TIITLELINK__', 'Google+')
+                link_item = link_item.replace('__IMAGELINK__', domain + '/images/icon/google_plus.png')
+                alllink_item_ += link_item
+            if os.path.exists(duongdan+'/tags/' + name_url):
+                link_item = link_item_.replace('__LINK__', domain + '/tags/' + name_url + '/')
+                link_item = link_item.replace('__TIITLELINK__', 'Những đóng góp của tác giả')
+                link_item = link_item.replace('__IMAGELINK__', domain + '/images/icon/yhoccongdong.png')
+                alllink_item_ += link_item
+
+            item = item.replace('__PROFILEITEM__', alllink_item_)
+            if i%3 == 2:
+                item += '</li>'
+            danhsachbacsi += item
+        template_ = template_.replace('__DSBACSI__', danhsachbacsi)
+        template_ = template_.replace('__DOMAIN__', domain)
+        
+        import codecs
+        fw = codecs.open(duongdan_ghifile +'/dsbacsi.html','w','utf-8')
+        fw.write(template_)
+        fw.close()
+        return True
 yhoc_employee()
 
 

@@ -3,6 +3,7 @@ from osv import fields,osv
 from tools.translate import _
 import time
 from datetime import datetime, date
+from email.Utils import formatdate
 import base64,os,re
 
 
@@ -52,7 +53,8 @@ class yhoc_duan(osv.osv):
                 'link_tree':fields.char('Link tree',size=1000),
                 'sequence': fields.integer('Thứ tự'),
                 'truongduan':fields.many2one('hr.employee', 'Trưởng dự án',required='1'),
-                'thanhvienthamgia':fields.one2many('hlv_vaitro', 'duan_id', string='Thành viên tham gia'),
+                #'thanhvienthamgia':fields.one2many('hlv_vaitro', 'duan_id', string='Thành viên tham gia'),
+                'thanhvienthamgia':fields.many2many('hr.employee', 'duan_thanhvien_rel', 'duan_id', 'thanhvien_id', 'Thành viên tham gia'),
                 'thongtin':fields.one2many('yhoc_thongtin', 'duan', string='Bài viết'),
                 'soluongxem': fields.integer("Số lượng người xem"),
                 'is_done': fields.function(_kiemtra_hoanthanh, method=True, string='Is Done', type="boolean", store={
@@ -71,7 +73,22 @@ class yhoc_duan(osv.osv):
     _defaults = {
                  'is_done':False
                  }
-    
+
+    def capnhat_thanhvienthamgia(self, cr, uid, ids, context=None):
+        for id in ids:
+            kq = [] 
+            tt = self.pool.get('yhoc_thongtin').search(cr, uid, [('duan','=',id)],context=context)
+            for t in tt:
+                t = self.pool.get('yhoc_thongtin').browse(cr, uid, t, context=context)
+                if t.nguoidich:
+                    kq.append(t.nguoidich.id)
+                if t.nguoihieudinh:
+                    kq.append(t.nguoihieudinh.id)
+            vals = {'thanhvienthamgia': [[6, False, list(set(kq))]]}
+            self.write(cr, uid, [id], vals, context=context)
+        return True
+
+
     def capnhat_duantrongprofile(self, cr, uid, nhanvien_ids, context=None):
         duongdan = self.pool.get('hlv.property')._get_value_project_property_by_name(cr, uid, 'path of template')
         domain = self.pool.get('hlv.property')._get_value_project_property_by_name(cr, uid, 'Domain') or '../..'
@@ -92,7 +109,7 @@ class yhoc_duan(osv.osv):
         for da in duan:
             duan_tab =''
             for m in da.thanhvienthamgia:
-                if m.nhanvien.id == nhanvien.id:
+                if m.id == nhanvien.id:
                     duan_tab = duan_tab_.replace('__LINK__', domain + '/%s/'%(da.link_url))
                     duan_tab = duan_tab.replace('__COL1__', da.name)
                     duan_tab = duan_tab.replace('__COL2__', m.name)
@@ -212,7 +229,7 @@ class yhoc_duan(osv.osv):
         all_item_ = ''
         tv_ids = duan.thanhvienthamgia
         for i in range(0,len(tv_ids)):
-            tv = tv_ids[i].nhanvien
+            tv = tv_ids[i]
             #tv = self.pool.get('hr.employee').browse(cr, uid, tv_ids[i].id, context=context)
             name_url = self.pool.get('yhoc_trangchu').parser_url(str(tv.name))
             if tv:
@@ -235,27 +252,27 @@ class yhoc_duan(osv.osv):
                 item = item.replace('__CHUYENNGANH__',tv.chuyennganh or '')
                 item = item.replace('__TRINHDOCHUYENMON__',chuyenmon)
                 
-                link_item_ = '''<a href="__LINK__" title="__TIITLELINK__"><img src="__IMAGELINK__"></a>
+                link_item_ = '''<a href="__LINK__" title="__TITLELINK__" target="_blank"><img src="__IMAGELINK__"></a>
                 '''
                 alllink_item_ = ''
                 if tv.work_email:
                     link_item = link_item_.replace('__LINK__', 'mailto:' + tv.work_email)
-                    link_item = link_item.replace('__TIITLELINK__', 'Gửi email cho tác giả')
+                    link_item = link_item.replace('__TITLELINK__', 'Gửi email cho tác giả')
                     link_item = link_item.replace('__IMAGELINK__', domain + '/images/icon/email.png')
                     alllink_item_ += link_item
                 if tv.facebook_acc:
                     link_item = link_item_.replace('__LINK__', tv.facebook_acc)
-                    link_item = link_item.replace('__TIITLELINK__', 'Facebook')
+                    link_item = link_item.replace('__TITLELINK__', 'Facebook')
                     link_item = link_item.replace('__IMAGELINK__', domain + '/images/icon/facebook.png')
                     alllink_item_ += link_item
                 if tv.google_plus_acc:
                     link_item = link_item_.replace('__LINK__', tv.google_plus_acc)
-                    link_item = link_item.replace('__TIITLELINK__', 'Google+')
+                    link_item = link_item.replace('__TITLELINK__', 'Google+')
                     link_item = link_item.replace('__IMAGELINK__', domain + '/images/icon/google_plus.png')
                     alllink_item_ += link_item
                 if os.path.exists(duongdan+'/tags/' + name_url):
                     link_item = link_item_.replace('__LINK__', domain + '/tags/' + name_url + '/')
-                    link_item = link_item.replace('__TIITLELINK__', 'Những đóng góp của tác giả')
+                    link_item = link_item.replace('__TITLELINK__', 'Những đóng góp của tác giả')
                     link_item = link_item.replace('__IMAGELINK__', domain + '/images/icon/yhoccongdong.png')
                     alllink_item_ += link_item
                 item = item.replace('__PROFILEITEM__', alllink_item_)
@@ -354,27 +371,99 @@ class yhoc_duan(osv.osv):
         kieufile = self.pool.get('hlv.property')._get_value_project_property_by_name(cr, uid, 'Kiểu lưu file') or 'html'
         domain = self.pool.get('hlv.property')._get_value_project_property_by_name(cr, uid, 'Domain') or '../..'
         duongdan = self.pool.get('hlv.property')._get_value_project_property_by_name(cr, uid, 'path of template')
-        cungduan = self.pool.get('yhoc_thongtin').search(cr, uid, [('duan.id', '=',duan.id)], order='sequence', context=context)
-        cungduan_tab_ = '''<a href="__LINKBAIVIETDUAN__">__TENBAIVIETDUAN__</a></br>'''
+        cungduan = self.pool.get('yhoc_thongtin').search(cr, uid, [('state', '=','done'),('duan.id', '=',duan.id)], order='sequence', context=context)
+        if os.path.exists(duongdan+'/template/duan/baivietcungduan_tab.html'):
+            fr = open(duongdan+'/template/duan/baivietcungduan_tab.html', 'r')
+            cungduan_tab_ = fr.read()
+            fr.close()
+        else:
+            cungduan_tab_ = ''
+        
+        if os.path.exists(duongdan+'/template/duan/duan_mucluc.html'):
+            fr = open(duongdan+'/template/duan/duan_mucluc.html', 'r')
+            mucluc_ = fr.read()
+            fr.close()
+        else:
+            mucluc_ = ''
+        menu_duan_ = '''<li><a href="#__NAMEURL__"><span>__STT__. </span><span>__TENBAIVIETDUAN__</span></a></li>'''
         #Giang_3011# Số lượng bài viết trong dự án
         super(yhoc_duan,self).write(cr,uid,[duan.id],{'soluongbaiviet':len(cungduan)}, context=context)
-        all_cungduan = '' 
+        all_cungduan = ''
+        all_menuduan = ''
+        STT = 1
         for cda in cungduan:
             cungduan_tab = ''
+            menu_duan = ''
             cdar = self.pool.get('yhoc_thongtin').browse(cr, uid, cda, context=context)
+            name_url = self.pool.get('yhoc_trangchu').parser_url(cdar.name)
+            
+            #Cap nhat phan menu cua du an
+            menu_duan = menu_duan_.replace('__NAMEURL__', name_url)
+            menu_duan = menu_duan.replace('__STT__', str(STT))
+            menu_duan = menu_duan.replace('__TENBAIVIETDUAN__', cdar.name)
+            all_menuduan += menu_duan
+            ##########################
+            
+            date = ''
+            photo = ''
+            if cdar.hinhdaidien:
+                if not os.path.exists(duongdan + '/images/thongtin'):
+                    os.makedirs(duongdan + '/images/thongtin')
+                path_hinh_ghixuong = duongdan + '/images/thongtin' + '/%s-thongtin-%s.jpg' %(str(cdar.id),name_url)
+                fw = open(path_hinh_ghixuong,'wb')
+                fw.write(base64.decodestring(cdar.hinhdaidien))
+                fw.close()
+                photo = domain + '/images/thongtin/%s-thongtin-%s.jpg' %(str(cdar.id),name_url)
             if cdar.state != 'done':
                 cungduan_tab = cungduan_tab_.replace('__LINKBAIVIETDUAN__', '#')
-                cungduan_tab = cungduan_tab.replace('__TENBAIVIETDUAN__', str(cdar.sequence) + '. ' +cdar.name + ' (Chưa dịch)')
+                cungduan_tab = cungduan_tab.replace('__STT__', str(STT))
+                cungduan_tab = cungduan_tab.replace('__TENBAIVIETDUAN__', cdar.name + ' (Chưa dịch)')
             else:
                 cungduan_tab = cungduan_tab_.replace('__LINKBAIVIETDUAN__', domain + '/%s/'%(cdar.link_url))
-                cungduan_tab = cungduan_tab.replace('__TENBAIVIETDUAN__', str(cdar.sequence) + '. ' +cdar.name)
+                cungduan_tab = cungduan_tab.replace('__STT__', str(STT))
+                cungduan_tab = cungduan_tab.replace('__TENBAIVIETDUAN__', cdar.name)
+                date_default = datetime.strptime(cdar.date, '%Y-%m-%d %H:%M:%S')
+                date = date_default.strftime('%d/%m/%Y')
+                
+            STT += 1            
+            cungduan_tab = cungduan_tab.replace('__PHOTO__', photo)
+            cungduan_tab = cungduan_tab.replace('__DESCRIPTION__', cdar.motangan or '(Chưa cập nhật mô tả)')
+            cungduan_tab = cungduan_tab.replace('__URLNAME__', name_url)
+            cungduan_tab = cungduan_tab.replace('__NGAYDANG__', date)
+            cungduan_tab = cungduan_tab.replace('__SOLUONGXEM__', str(cdar.soluongxem))
+            cungduan_tab = cungduan_tab.replace('__MUCLUC__', '''<?php include("../../thongtin/%s/menu.html")?>'''%name_url)
+            
+            
+            if cdar.nguoidich:
+                cungduan_tab = cungduan_tab.replace('__DANHXUNGNT__',cdar.nguoidich.danhxung or '')
+                cungduan_tab = cungduan_tab.replace('__NGUOIDICH__',cdar.nguoidich.name)
+                cungduan_tab = cungduan_tab.replace('__LINKNGUOIDICH__',cdar.nguoidich.link or '#')
+            else:
+                cungduan_tab = cungduan_tab.replace('__DANHXUNGNT__','(Chưa phân công)')
+                cungduan_tab = cungduan_tab.replace('__NGUOIDICH__','')
+                cungduan_tab = cungduan_tab.replace('__LINKNGUOIDICH__','#')
+                
+            if cdar.nguoihieudinh:
+                cungduan_tab = cungduan_tab.replace('__NGUOIHIEUDINH__', cdar.nguoihieudinh.name or '')
+                cungduan_tab = cungduan_tab.replace('__LINKNGUOIHIEUDINH__', cdar.nguoihieudinh.link or '#')
+                cungduan_tab = cungduan_tab.replace('__DANHXUNGHD__', cdar.nguoihieudinh.danhxung or '')
+            else:
+                cungduan_tab = cungduan_tab.replace('__NGUOIHIEUDINH__', '(Chưa phân công)')
+                cungduan_tab = cungduan_tab.replace('__LINKNGUOIHIEUDINH__', '#')
+                cungduan_tab = cungduan_tab.replace('__DANHXUNGHD__', '')
+                
             all_cungduan += cungduan_tab
         
+        mucluc_ = mucluc_.replace('__MUCLUC_ITEM__', all_menuduan)
         if not os.path.exists(folder_duan+'/data'):
             os.makedirs(folder_duan+'/data')
         import codecs
         fw = codecs.open(folder_duan+'/data/danhsachbaiviet.html','w','utf-8')
         fw.write(str(all_cungduan))
+        fw.close()
+        
+        fw = codecs.open(folder_duan+'/data/menuduan.html','w','utf-8')
+        fw.write(str(mucluc_))
         fw.close()
         return  True
     
@@ -383,6 +472,8 @@ class yhoc_duan(osv.osv):
         duongdan = self.pool.get('hlv.property')._get_value_project_property_by_name(cr, uid, 'path of template')
         domain = self.pool.get('hlv.property')._get_value_project_property_by_name(cr, uid, 'Domain') or '../..'
         kieufile = self.pool.get('hlv.property')._get_value_project_property_by_name(cr, uid, 'Kiểu lưu file') or 'html'
+        self.capnhat_thanhvienthamgia(cr, uid, ids, context)
+        
         duan = self.browse(cr, uid, ids[0], context=context)
         ten_url = self.pool.get('yhoc_trangchu').parser_url(duan.name)
 #        link_url = duan.chude_id.link_url + '/%s' %(ten_url)
@@ -413,6 +504,7 @@ class yhoc_duan(osv.osv):
         template = template.replace('__TITLE__',noidung_tittle)
         template = template.replace('__DUONGDAN__',duongdan)
         template = template.replace('__ID__', str(duan.id))
+        template = template.replace('__URL__', domain + '/%s/'%link_url)
         
 #Lấy du an cùng chủ đề:
         self.pool.get('yhoc_chude').capnhat_chudetrongtrangduan(cr, uid, duan.chude_id, context)
@@ -441,6 +533,9 @@ class yhoc_duan(osv.osv):
         noidung_tittle = noidung_tittle.replace('__TITLE__','Dự án ' + tenduan)
         template = template.replace('__TITLE__',noidung_tittle)
         
+#Cap nhat RSS du an
+        if duan.chude_id.parent_id.name == 'Trang chủ':
+			self.capnhat_rssduan(cr, uid, duan, context)
 ##set profile_link
         super(yhoc_duan,self).write(cr,uid,[duan.id],{'link':domain + '/%s/'%link_url,
                                                       'link_url': link_url}, context=context)
@@ -465,10 +560,36 @@ class yhoc_duan(osv.osv):
 #        res = ''
 #        res = " > ".join(linktree)
 #        super(yhoc_duan,self).write(cr,uid,[duan.id],{'link_tree':res}, context=context)
+        sql = '''select write_date from yhoc_duan where id=%s'''%str(duan.id)
+        cr.execute(sql)
+        write_date = cr.fetchone()[0]
+        write_date = write_date.split('.')
         template = template.replace('__LINKTREE__', str(duan.link_tree))
         template = template.replace('__TUADEDUAN__', duan.name)
         template = template.replace('__MOTA__', str(duan.description) or '')
+        template = template.replace('__DANHXUNG__', duan.truongduan.danhxung or '')
+        template = template.replace('__TRUONGDUAN__', duan.truongduan.name or '')
+        template = template.replace('__LINKTRUONGDA__', duan.truongduan.link or '')
+        template = template.replace('__LASTUPDATE__', write_date[0])
+        
+        
+        chudecon_da = self.pool.get('yhoc_duan').search(cr, uid, [('chude_id','=',duan.chude_id.id),('link','!=',False)])
+        chudecon_cd = self.pool.get('yhoc_chude').search(cr, uid, [('parent_id','=',duan.chude_id.id),('link','!=',False)])
+        chudecon = chudecon_cd + chudecon_da
+        template = template.replace('__SODUANLIENQUAN__', str(len(chudecon)))
         template = template.replace('__HINHDUAN__', domain + '/images/%s-duan-%s.jpg' %(str(duan.id),ten_url))
+        
+        truongda_name_url = self.pool.get('yhoc_trangchu').parser_url(duan.truongduan.name)
+        if os.path.exists(duongdan+'/profile/%s/profiletrongtrangbaiviet.html'%truongda_name_url):
+            template = template.replace('__PROFILETRUONGDA__', '''<?php include("../../profile/%s/profiletrongtrangbaiviet.html")?>'''%truongda_name_url)
+        else:
+            self.pool.get('hr.employee').capnhat_profiletrongtrangbaiviet(cr, uid, [duan.truongduan.id], context=context)
+            template = template.replace('__PROFILETRUONGDA__', '''<?php include("../../profile/%s/profiletrongtrangbaiviet.html")?>'''%truongda_name_url)
+        template = template.replace('__THANHVIEN_THAMGIA__', domain + '/%s/thanhvienthamgia_trongduan.html'%link_url)
+
+        tags = duan.keyword_ids
+        list_tag = self.pool.get('yhoc_keyword').capnhat_listtag_ophiacuoi(cr, uid, tags, context=context)
+        template = template.replace('__LIST_TAGS__', list_tag)
         
         import codecs  
         fw= codecs.open(folder_duan+'/index.' + kieufile,'w','utf-8')
@@ -524,12 +645,65 @@ class yhoc_duan(osv.osv):
         fw.close()
         return True
     
+    def capnhat_rssduan(self, cr, uid, duan, context=None):
+        duongdan = self.pool.get('hlv.property')._get_value_project_property_by_name(cr, uid, 'path of template')
+        domain = self.pool.get('hlv.property')._get_value_project_property_by_name(cr, uid, 'Domain') or '../..'
+        if os.path.exists(duongdan+'/template/rss/rss_template.rss'):
+            fr = open(duongdan+'/template/rss/rss_template.rss', 'r')
+            template_ = fr.read()
+            fr.close()
+        else:
+            template_ = ''
+            
+        if os.path.exists(duongdan+'/template/rss/rss_item.rss'):
+            fr = open(duongdan+'/template/rss/rss_item.rss', 'r')
+            rss_item_ = fr.read()
+            fr.close()
+        else:
+            rss_item_ = ''
+                
+        name = self.pool.get('yhoc_trangchu').parser_url(duan.name)
+        template = template_.replace('__TITLECHANNEL__', duan.name)
+        template = template.replace('__MOTACHANNEL__', duan.description or 'Đang Cập Nhật')
+        template = template.replace('__LINKCHANNEL__', domain +'/rss/%s.rss'%(name))
+        template = template.replace('__HINHCHANNEL__', domain + '/images/%s-duan-%s.jpg' %(str(duan.id),name))
+        
+        cungduan = self.pool.get('yhoc_thongtin').search(cr, uid, [('state','=','done'),('duan', '=',duan.id)], limit=10, order='date desc', context=context)
+
+        allrss_item_ = ''
+        for cda in cungduan:
+            thongtin = self.pool.get('yhoc_thongtin').browse(cr, uid, cda, context=context)
+            rss_item = rss_item_.replace('__TITLEITEM__', thongtin.name or '')
+            rss_item = rss_item.replace('__MOTAITEM__', thongtin.motangan or '(Chưa cập nhật)')
+            rss_item = rss_item.replace('__LINKITEM__', thongtin.link + '/' or '#')
+            date = thongtin.date.split('.')
+            date = datetime.strptime(date[0], '%Y-%m-%d %H:%M:%S')
+            date_rfc822 = formatdate(time.mktime(date.timetuple()))
+            rss_item = rss_item.replace('__DATEITEM__', date_rfc822)
+            if thongtin.url_thongtin:
+                name_url = thongtin.url_thongtin
+            else:
+                name_url = self.pool.get('yhoc_trangchu').parser_url(str(thongtin.name))
+            rss_item = rss_item.replace('__IMAGEITEM__', domain + '/images/thongtin/%s-thongtin-%s.jpg'%(str(thongtin.id),name_url))
+            allrss_item_ += rss_item
+                    
+        template = template.replace('__RSSITEM__', allrss_item_)
+        
+        import codecs
+        if not os.path.exists(duongdan +'/%s/'%duan.link_url):
+            os.makedirs(duongdan +'/%s/'%duan.link_url)
+            
+        fw = codecs.open(duongdan +'/rss/%s.rss'%(name),'w','utf-8')
+        fw.write(template)
+        fw.close()     
+        return True
+    
     def capnhat_sharebutton(self, cr, uid, ids, context=None):
         duongdan = self.pool.get('hlv.property')._get_value_project_property_by_name(cr, uid, 'path of template')
         domain = self.pool.get('hlv.property')._get_value_project_property_by_name(cr, uid, 'Domain') or '../..'
         duan = self.browse(cr,uid,ids)
-        if os.path.exists(duongdan+'/template/duan/share_social_button.html'):
-            fr = open(duongdan+'/template/duan/share_social_button.html', 'r')
+        if os.path.exists(duongdan+'/template/duan/share_button.html'):
+            fr = open(duongdan+'/template/duan/share_button.html', 'r')
             template_ = fr.read()
             fr.close()
         else:
@@ -537,14 +711,30 @@ class yhoc_duan(osv.osv):
         template = template_.replace('__DOMAIN__', domain)
         template = template.replace('__URL__', domain + '/%s/'%duan.link_url)
         template = template.replace('__TITLE__', duan.name)
-        template = template.replace('__DESCRIPTION__', str(duan.description))
-        name_url = self.pool.get('yhoc_trangchu').parser_url(str(duan.name))
-        photo = domain + '/images/duan/%s-duan-%s.jpg'%(str(duan.id),name_url)
-        template = template.replace('__IMAGE__', photo)
         import codecs  
-        fw = codecs.open(duongdan + '/%s/share_social_button.html'%duan.link_url,'w','utf-8')
+        fw = codecs.open(duongdan + '/%s/share_button.html'%duan.link_url,'w','utf-8')
         fw.write(template)
         fw.close()
         return True
-    
+
+    def auto_tags(self,cr, uid, ids, context=None):
+        kq = []
+        duan = self.browse(cr, uid, ids[0], context=context)
+        tt = self.pool.get('yhoc_thongtin').search(cr, uid, [('duan','=',ids[0])], context=context)
+        for t in tt:
+            t = self.pool.get('yhoc_thongtin').browse(cr, uid, t, context=context) 
+            if t.main_key:
+                kq.append(t.main_key.id)
+        for bv in duan.thanhvienthamgia:
+            bs_tag = self.pool.get('yhoc_keyword').search(cr, uid, [('name','=',bv.name)],context=context)
+            if bs_tag:
+                kq.append(bs_tag[0])
+            elif not bs_tag:
+                bs_tag = self.pool.get('yhoc_keyword').create(cr, uid, {'name':bv.name}, context=context)
+                if bs_tag not in kq:
+                    kq.append(bs_tag)
+                    
+        vals = {'keyword_ids': [[6, False, list(set(kq))]]}
+        self.write(cr, uid, ids, vals, context=context)
+        return True
 yhoc_duan()
