@@ -71,7 +71,7 @@ class yhoc_thongtin(osv.osv):
                 'link_tree':fields.char('Link tree',size=1000),
                 'nguoihieudinh':fields.many2one('hr.employee', 'Người hiệu đính', required="1"),
 #                'help': fields.function(_get_help_information, method=True, string='Help', type="text"),
-                'comment': fields.one2many('yhoc_comment', 'baiviet_id', 'Commnents'),
+#                'comment': fields.one2many('yhoc_comment', 'baiviet_id', 'Commnents'),
                 'state': fields.selection(_STATE_THONGTIN, 'State'),
                 'nguoidich':fields.many2one('hr.employee', 'Người dịch'),
                 'soluongxem': fields.integer("Số lượng người xem"),
@@ -321,9 +321,11 @@ class yhoc_thongtin(osv.osv):
         
 #Tao folder cho thongtin
         folder_thongtin = duongdan + '/thongtin/%s'%(name_url)
+        folder_thongtin_data = folder_thongtin + '/data/'
         if not os.path.exists(folder_thongtin):
             os.makedirs(folder_thongtin)
-            
+        if not os.path.exists(folder_thongtin_data):
+            os.makedirs(folder_thongtin_data)
             
 #Lay thong tin chung
         tuade_thongtin = thongtin.name
@@ -370,7 +372,7 @@ class yhoc_thongtin(osv.osv):
         template = template.replace('__URL__',domain + '/%s/'%link_url)
         template = template.replace('__ITEMTYPE__','NewsArticle')
         template = template.replace('__DANHXUNGNT__',tv.danhxung or '')
-        template = template.replace('__NGUOIDICH__',tv.name)
+        template = template.replace('__NGUOIDICH__',str(tv.name))
         if tv.google_plus_acc:
             template = template.replace('__LINKNGUOIDICH__',tv.google_plus_acc +'?rel=author')
         else:
@@ -400,10 +402,10 @@ class yhoc_thongtin(osv.osv):
 
 #    ####################################################################
         #Giang_0112# Cập nhật link tree trong bài viết
-        self.pool.get('yhoc_duan').capnhat_linktree(cr, uid, [thongtin.duan.id], context)
+        self.capnhat_linktree_trongbaiviet(cr, uid, thongtin, duongdan, domain, folder_thongtin_data, context)
         
         
-        template = template.replace('__LINKTREE__', duongdan + '/%s/linktree_trongbaiviet.html'%thongtin.duan.link_url or '#')
+        
         template = template.replace('__HINHBAIVIET__', photo)
         #template = template.replace('__MOTA__', thongtin.motangan or thongtin.name)
         
@@ -800,7 +802,6 @@ class yhoc_thongtin(osv.osv):
     
     def replace_tukhoa(self, cr, uid, ids, context=None):
         '''Hàm này dùng để thay thế các từ trong bài viết thành các đường link trỏ tới trang tags (giống wikipedia)'''
-        
         duongdan = self.pool.get('hlv.property')._get_value_project_property_by_name(cr, uid, 'path of template')
         domain = self.pool.get('hlv.property')._get_value_project_property_by_name(cr, uid, 'Domain') or '../..'
         kieufile = self.pool.get('hlv.property')._get_value_project_property_by_name(cr, uid, 'Kiểu lưu file') or 'html'
@@ -842,7 +843,7 @@ class yhoc_thongtin(osv.osv):
         vals = {'noidung':noidung}
         self.write(cr, uid, ids, vals, context=context)
         return True
-    
+
     def capnhattukhoachinhchobaiviet(self, cr, uid, ids, context=None):
         '''Hàm này dùng để cập nhật từ khóa chính của bài viết vào danh sách các từ khóa, tránh sai sot link trong dự án'''
         kq = []
@@ -854,6 +855,52 @@ class yhoc_thongtin(osv.osv):
         vals = {'keyword_ids': [[6, False, list(set(kq))]]}
         self.write(cr, uid, ids, vals, context=context)
         return True
+
+    def capnhat_linktree_trongbaiviet(self, cr, uid, thongtin, duongdan, domain, folder_thongtin_data, context=None):
+        if os.path.exists(duongdan+'/template/thongtin/linktree.html'):
+            fr = open(duongdan+'/template/thongtin/linktree.html', 'r')
+            template_ = fr.read()
+            fr.close()
+        else:
+            template_ = ''
+            
+        if os.path.exists(duongdan+'/template/thongtin/linktree_item.html'):
+            fr = open(duongdan+'/template/thongtin/linktree_item.html', 'r')
+            item_ = fr.read()
+            fr.close()
+        else:
+            item_ = ''
+            
+        all_item_=''
+        item = item_.replace('__LINK__', domain)
+        item = item.replace('__NAME__', 'Trang chủ')
+        all_item_ += item
+
+        linktree = []
+        treechude = []
+        treechude = self.pool.get('yhoc_chude').dequy(treechude, thongtin.duan.chude_id)
+        treechude.insert(0,thongtin.duan.chude_id)
+        for i in range(len(treechude)):
+            item = item_.replace('__LINK__', domain + '/%s/'%(treechude[len(treechude)-i-1].link_url))
+            item = item.replace('__NAME__', treechude[len(treechude)-i-1].name)
+            linktree.append(item)
+            all_item_ += item
+        item = item_.replace('__LINK__', thongtin.duan.link or '#')
+        item = item.replace('__NAME__', thongtin.duan.name)
+        linktree.append(item)
+        all_item_ += item
+        res = ''
+        res = " > ".join(linktree)
+        super(yhoc_thongtin,self).write(cr,uid,[thongtin.id],{'link_tree':res}, context=context)
+        template = template_.replace('__LINKTREEITEM__', all_item_)
+
+        import codecs  
+        fw= codecs.open(folder_thongtin_data + 'linktree.html','w','utf-8')
+        fw.write(template)
+        fw.close()
+        return True
+
+
 yhoc_thongtin()
 
 

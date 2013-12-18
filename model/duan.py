@@ -379,29 +379,36 @@ class yhoc_duan(osv.osv):
         else:
             cungduan_tab_ = ''
         
-        if os.path.exists(duongdan+'/template/duan/duan_mucluc.html'):
-            fr = open(duongdan+'/template/duan/duan_mucluc.html', 'r')
+        if os.path.exists(duongdan + '/template/duan/mucluc.html'):
+            fr = open(duongdan + '/template/duan/mucluc.html', 'r')
             mucluc_ = fr.read()
             fr.close()
         else:
             mucluc_ = ''
-        menu_duan_ = '''<li><a href="#__NAMEURL__"><span>__STT__. </span><span>__TENBAIVIETDUAN__</span></a></li>'''
+            
+        if os.path.exists(duongdan + '/template/duan/mucluc_item.html'):
+            fr = open(duongdan + '/template/duan/mucluc_item.html', 'r')
+            mucluc_item_ = fr.read()
+            fr.close()
+        else:
+            mucluc_item_ = ''
+                
         #Giang_3011# Số lượng bài viết trong dự án
         super(yhoc_duan,self).write(cr,uid,[duan.id],{'soluongbaiviet':len(cungduan)}, context=context)
         all_cungduan = ''
-        all_menuduan = ''
+        all_mucluc_ = ''
+        all_mucluc_inculde_ = ''
         STT = 1
         for cda in cungduan:
             cungduan_tab = ''
-            menu_duan = ''
             cdar = self.pool.get('yhoc_thongtin').browse(cr, uid, cda, context=context)
             name_url = self.pool.get('yhoc_trangchu').parser_url(cdar.name)
             
-            #Cap nhat phan menu cua du an
-            menu_duan = menu_duan_.replace('__NAMEURL__', name_url)
-            menu_duan = menu_duan.replace('__STT__', str(STT))
-            menu_duan = menu_duan.replace('__TENBAIVIETDUAN__', cdar.name)
-            all_menuduan += menu_duan
+            # Mục lục item của dự án
+            mucluc_item = mucluc_item_.replace('__TEN_MUCLUC__', cdar.name)
+            mucluc_item = mucluc_item.replace('__LINK_MUCLUC__', cdar.duan.link + '#%s'%name_url)
+            mucluc_item = mucluc_item.replace('__STT__', str(STT))
+            all_mucluc_ += mucluc_item
             ##########################
             
             date = ''
@@ -454,7 +461,10 @@ class yhoc_duan(osv.osv):
                 
             all_cungduan += cungduan_tab
         
-        mucluc_ = mucluc_.replace('__MUCLUC_ITEM__', all_menuduan)
+        #Mục lục duan
+        mucluc = mucluc_.replace('__MUCLUC_ITEM__', all_mucluc_)
+        mucluc = mucluc.replace('__MUCLUC_TITLE__', 'Nội dung chính')
+        
         if not os.path.exists(folder_duan+'/data'):
             os.makedirs(folder_duan+'/data')
         import codecs
@@ -462,9 +472,10 @@ class yhoc_duan(osv.osv):
         fw.write(str(all_cungduan))
         fw.close()
         
-        fw = codecs.open(folder_duan+'/data/menuduan.html','w','utf-8')
-        fw.write(str(mucluc_))
+        fw = codecs.open(folder_duan+'/data/mucluc.html','w','utf-8')
+        fw.write(str(mucluc))
         fw.close()
+        
         return  True
     
     def capnhat_thongtin(self,cr,uid,ids,context=None):
@@ -476,7 +487,6 @@ class yhoc_duan(osv.osv):
         
         duan = self.browse(cr, uid, ids[0], context=context)
         ten_url = self.pool.get('yhoc_trangchu').parser_url(duan.name)
-#        link_url = duan.chude_id.link_url + '/%s' %(ten_url)
         link_url = 'duan/%s'%(ten_url)
         #Doc file
         if os.path.exists(duongdan + '/template/duan/duan.html'):
@@ -487,22 +497,22 @@ class yhoc_duan(osv.osv):
             template = ''
         
         folder_duan = duongdan + '/duan/%s'%(ten_url)
+        folder_duan_data = folder_duan + '/data/'
         if not os.path.exists(folder_duan):
             os.makedirs(folder_duan)
+        if not os.path.exists(folder_duan_data):
+            os.makedirs(folder_duan_data)
 
 #Lay thong tin co ban
         gioithieu = duan.description
         tenduan = duan.name
         chude = duan.chude_id.name
+        chude_link = duan.chude_id.link
         
         
-#Cập nhật tittle       
-        fr = open(duongdan + '/template/trangchu/tittle.html', 'r')
-        noidung_tittle = fr.read()
-        fr.close()
-        noidung_tittle = noidung_tittle.replace('__TITLE__','Dự án ' + duan.name)
-        template = template.replace('__TITLE__',noidung_tittle)
+#Cập nhật tittle
         template = template.replace('__DUONGDAN__',duongdan)
+        template = template.replace('__DOMAIN__',domain)
         template = template.replace('__ID__', str(duan.id))
         template = template.replace('__URL__', domain + '/%s/'%link_url)
         
@@ -518,13 +528,13 @@ class yhoc_duan(osv.osv):
         self.capnhat_thanhvienthamgia_trongduan(cr, uid, ids, context)
 
 #Giang_0812#
-        self.capnhat_sharebutton(cr, uid, duan.id, context=context)
+        self.capnhat_sharebutton(cr, uid, duan, duongdan, domain, folder_duan_data, context)
         
 #Cap nhật noi dung co ban
         template = template.replace('__TENDUAN__', tenduan)
         template = template.replace('__GIOITHIEU__', gioithieu or '(Chưa cập nhật)')
         template = template.replace('__CHUDE__', chude or '')
-        
+        template = template.replace('__LINKCHUDE__', chude_link or '#')
                 
 #Ghi file
         fr = open(duongdan + '/template/trangchu/tittle.html', 'r')
@@ -539,32 +549,14 @@ class yhoc_duan(osv.osv):
 ##set profile_link
         super(yhoc_duan,self).write(cr,uid,[duan.id],{'link':domain + '/%s/'%link_url,
                                                       'link_url': link_url}, context=context)
-        #Giang_0112# Cập nhật link tree trong bai viết
-        self.capnhat_linktree(cr, uid, ids, context)
-#        temp_ = '''<a href="__LINK__">__NAME__</a>'''
-#        
-#        linktree = []
-#        treechude = []
-#        treechude = self.pool.get('yhoc_chude').dequy(treechude, duan.chude_id)
-#        treechude.insert(0,duan.chude_id)
-#        for i in range(len(treechude)):
-#            temp = temp_.replace('__LINK__', domain + '/%s/'%(treechude[len(treechude)-i-1].link_url))
-#            temp = temp.replace('__NAME__', treechude[len(treechude)-i-1].name)
-#            linktree.append(temp)
-#        linktree.insert(0,'''<a href="http://yhoccongdong.com">Trang chủ</a>''')
-#        
-#        temp = temp_.replace('__LINK__', duan.link or '#')
-#        temp = temp.replace('__NAME__', duan.name)
-#        linktree.append(temp)
         
-#        res = ''
-#        res = " > ".join(linktree)
-#        super(yhoc_duan,self).write(cr,uid,[duan.id],{'link_tree':res}, context=context)
+        #Giang_0112# Cập nhật link tree trong dự án
+        self.capnhat_linktree_trongduan(cr, uid, duan, duongdan, domain, folder_duan_data, context)
+        
         sql = '''select write_date from yhoc_duan where id=%s'''%str(duan.id)
         cr.execute(sql)
         write_date = cr.fetchone()[0]
         write_date = write_date.split('.')
-        template = template.replace('__LINKTREE__', str(duan.link_tree))
         template = template.replace('__TUADEDUAN__', duan.name)
         template = template.replace('__MOTA__', str(duan.description) or '')
         template = template.replace('__DANHXUNG__', duan.truongduan.danhxung or '')
@@ -587,6 +579,8 @@ class yhoc_duan(osv.osv):
             template = template.replace('__PROFILETRUONGDA__', '''<?php include("../../profile/%s/profiletrongtrangbaiviet.html")?>'''%truongda_name_url)
         template = template.replace('__THANHVIEN_THAMGIA__', domain + '/%s/thanhvienthamgia_trongduan.html'%link_url)
 
+        template = template.replace('__AUTHORBOX__',duongdan + '/profile/%s/author_box.html' %truongda_name_url)            
+
         tags = duan.keyword_ids
         list_tag = self.pool.get('yhoc_keyword').capnhat_listtag_ophiacuoi(cr, uid, tags, context=context)
         template = template.replace('__LIST_TAGS__', list_tag)
@@ -597,14 +591,11 @@ class yhoc_duan(osv.osv):
         fw.close()
         
         self.pool.get('yhoc_chude').capnhat_thongtin(cr, uid, [duan.chude_id.id], context)
-        return template, duongdan, domain
-    
-    def capnhat_linktree(self,cr,uid,ids,context=None):
-        duongdan = self.pool.get('hlv.property')._get_value_project_property_by_name(cr, uid, 'path of template')
-        domain = self.pool.get('hlv.property')._get_value_project_property_by_name(cr, uid, 'Domain') or '../..'
-        kieufile = self.pool.get('hlv.property')._get_value_project_property_by_name(cr, uid, 'Kiểu lưu file') or 'html'
-        if os.path.exists(duongdan+'/template/duan/linktree_trongbaiviet.html'):
-            fr = open(duongdan+'/template/duan//linktree_trongbaiviet.html', 'r')
+        return template, duongdan, domain    
+
+    def capnhat_linktree_trongduan(self, cr, uid, duan, duongdan, domain, folder_duan_data, context=None):
+        if os.path.exists(duongdan+'/template/duan/linktree.html'):
+            fr = open(duongdan+'/template/duan/linktree.html', 'r')
             template_ = fr.read()
             fr.close()
         else:
@@ -620,7 +611,6 @@ class yhoc_duan(osv.osv):
         item = item_.replace('__LINK__', domain)
         item = item.replace('__NAME__', 'Trang chủ')
         all_item_ += item
-        duan = self.browse(cr, uid, ids[0], context=context)
         linktree = []
         treechude = []
         treechude = self.pool.get('yhoc_chude').dequy(treechude, duan.chude_id)
@@ -630,20 +620,17 @@ class yhoc_duan(osv.osv):
             item = item.replace('__NAME__', treechude[len(treechude)-i-1].name)
             linktree.append(item)
             all_item_ += item
-        item = item_.replace('__LINK__', duan.link or '#')
-        item = item.replace('__NAME__', duan.name)
-        linktree.append(item)
-        all_item_ += item
         res = ''
         res = " > ".join(linktree)
         super(yhoc_duan,self).write(cr,uid,[duan.id],{'link_tree':res}, context=context)
         template = template_.replace('__LINKTREEITEM__', all_item_)
-                
+        
         import codecs  
-        fw= codecs.open(duongdan +'/%s/linktree_trongbaiviet.html'%duan.link_url,'w','utf-8')
+        fw= codecs.open(folder_duan_data + 'linktree_duan.html','w','utf-8')
         fw.write(template)
         fw.close()
         return True
+
     
     def capnhat_rssduan(self, cr, uid, duan, context=None):
         duongdan = self.pool.get('hlv.property')._get_value_project_property_by_name(cr, uid, 'path of template')
@@ -697,11 +684,8 @@ class yhoc_duan(osv.osv):
         fw.write(template)
         fw.close()     
         return True
-    
-    def capnhat_sharebutton(self, cr, uid, ids, context=None):
-        duongdan = self.pool.get('hlv.property')._get_value_project_property_by_name(cr, uid, 'path of template')
-        domain = self.pool.get('hlv.property')._get_value_project_property_by_name(cr, uid, 'Domain') or '../..'
-        duan = self.browse(cr,uid,ids)
+      
+    def capnhat_sharebutton(self, cr, uid, duan, duongdan, domain, folder_duan_data, context=None):
         if os.path.exists(duongdan+'/template/duan/share_button.html'):
             fr = open(duongdan+'/template/duan/share_button.html', 'r')
             template_ = fr.read()
@@ -711,11 +695,13 @@ class yhoc_duan(osv.osv):
         template = template_.replace('__DOMAIN__', domain)
         template = template.replace('__URL__', domain + '/%s/'%duan.link_url)
         template = template.replace('__TITLE__', duan.name)
+        if not os.path.exists(folder_duan_data):
+            os.makedirs(folder_duan_data)
         import codecs  
-        fw = codecs.open(duongdan + '/%s/share_button.html'%duan.link_url,'w','utf-8')
+        fw = codecs.open(folder_duan_data + 'share_button.html','w','utf-8')
         fw.write(template)
         fw.close()
-        return True
+        return template
 
     def auto_tags(self,cr, uid, ids, context=None):
         kq = []
