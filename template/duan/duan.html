@@ -23,14 +23,47 @@
 	<meta property="twitter:url" content="__URL__">
 <?php include("__DUONGDAN__/trangchu/vi/header1.html")?>
 
+<script type="text/javascript" src="__DOMAIN__/js/printpage.js"></script>
+<script language="javascript" type="text/javascript" src="__DOMAIN__/js/ts-fab.js"></script>
+<!--Script button Like-->
+<div id="fb-root"></div>
+<script>
+	(function(d, s, id) {
+	  var js, fjs = d.getElementsByTagName(s)[0];
+	  if (d.getElementById(id)) return;
+	  js = d.createElement(s); js.id = id;
+	  js.src = "//connect.facebook.net/vi_VN/all.js#xfbml=1";
+	  fjs.parentNode.insertBefore(js, fjs);
+	}(document, 'script', 'facebook-jssdk'));
+</script>
+<!--Script button G+-->	
+	<script type="text/javascript">
+	  window.___gcfg = {lang: 'vi'};
+
+	  (function() {
+		var po = document.createElement('script'); po.type = 'text/javascript'; po.async = true;
+		po.src = 'https://apis.google.com/js/platform.js';
+		var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(po, s);
+	  })();
+	</script>
+<!--Script button Twitter-->	
+	<script>
+		!function(d,s,id)
+			{var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';
+			if(!d.getElementById(id)){js=d.createElement(s);
+			js.id=id;js.src=p+'://platform.twitter.com/widgets.js';
+			fjs.parentNode.insertBefore(js,fjs);}}
+		(document, 'script', 'twitter-wjs');
+	</script>
+
 	<article class="thongtin" style="margin-top: 35px;margin-bottom: 35px;">
 		<section class="thongtinleft">
 			__PROFILETRUONGDA__
 				<header class="secondary-header">
-					<a href="#"><strong style="padding-left: 10px; ">__CHUDE__</strong>
-						<p style="text-align:right;  font-style:italic;">
-							<img src="images/multi_document.png" />
-							__SODUANLIENQUAN__ dự án
+					<a href="__LINKCHUDE__"><strong style="padding-left: 10px; ">__CHUDE__</strong>
+						<p style="text-align:right;  font-style:italic; padding-right: 5px;clear: left;">
+							<img src="__DOMAIN__/images/topic-icon.png" alt="icon_topic"/>
+							__SODUANLIENQUAN__
 						</p>
 					</a>
 				</header>
@@ -46,7 +79,7 @@
 		
 		<div style="float: right; width:75%; border-left: 1px solid #f1f1f1;">
 			<section class="thongtincenter">
-			__LINKTREE__
+			<?php include("data/linktree_duan.html")?>
 				<div id="print">
 					<h1 itemprop="name">__TUADEDUAN__</h1>	
 					<div class="thongtinhieudinh">
@@ -54,11 +87,7 @@
 						Ngày cập nhật gần nhất: <span itemprop="datePublished">__LASTUPDATE__</span>
 					
 						<div style="width: 160px; clear: both; float: right; margin-top:-20px;">
-							<a rel="nofollow" id="facebook" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=__URL__" onfocus="this.blur();" title="Facebook"> <img src="http://yhoccongdong.com/images/icon/facebook16.gif" alt="Facebook"> </a>
-							<a rel="nofollow" href="https://plus.google.com/share?url=__URL__" onclick="javascript:window.open(this.href,'', 'menubar=no,toolbar=no,resizable=yes,scrollbars=yes,height=600,width=600');return false;">
-								<img src="http://yhoccongdong.com/images/icon/googleplus16.png" alt="Share on Google+"/>
-							</a>
-							<a rel="nofollow" href="https://twitter.com/intent/tweet?text=Depo-provera: __TUADEDUAN__&amp;url=__URL__"><img src="http://yhoccongdong.com/images/icon/twitter16.png" alt="Tweet"></a>
+							<?php include("data/share_button.html")?>
 							<a target="_blank" onclick="printpage('print')">
 									<img alt="print" src="http://yhoccongdong.com/images/icon/print16.gif" style="cursor: pointer;" border="0" align="bottom">
 							</a>
@@ -78,119 +107,50 @@
 						</em>
 					</div>
 
-					<?php include("data/menuduan.html")?>
+					<?php include("data/mucluc.html")?>
 					<!-- Bài viết-->
 					
 					<?php include("data/danhsachbaiviet.html")?>
 			</section>
 			
-			<!--div style="width: 98%; display: inline-block; margin-left: 10px;">
-				
+			<div style="width: 98%; display: inline-block; margin-left: 10px;">
 				<header class="secondary-header">
-					<strong style="padding-left: 10px;">Chia sẻ bài viết</strong>
+					<strong style="padding-left: 10px;">Hãy chia sẻ thông tin hữu ích này đến người thân và bạn bè của bạn</strong>
 				</header>
-					<a rel="nofollow" id="facebook" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=http://yhoccongdong.com/thongtin/cham-soc-rang-mieng-khi-di-du-lich-xa/" onfocus="this.blur();" title="Facebook"> <img src="images/social/facebook(1).png" alt="Facebook"> </a>
-				<a rel="nofollow" href="https://plus.google.com/share?url=http://yhoccongdong.com/thongtin/cham-soc-rang-mieng-khi-di-du-lich-xa/" onclick="javascript:window.open(this.href,&#39;&#39;, &#39;menubar=no,toolbar=no,resizable=yes,scrollbars=yes,height=600,width=600&#39;);return false;">
-					<img src="images/social/google_plus.png" alt="Share on Google+">
+				<a rel="nofollow" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=__URL__" onfocus="this.blur();" title="Facebook"> 
+					<img src="__DOMAIN__/images/icon/facebook.png" alt="Facebook">
 				</a>
-				<a rel="nofollow" href="https://twitter.com/intent/tweet?text=Ch%C4%83m%20s%C3%B3c%20r%C4%83ng%20mi%E1%BB%87ng%20khi%20%C4%91i%20du%20l%E1%BB%8Bch%20xa&url=http://yhoccongdong.com/thongtin/cham-soc-rang-mieng-khi-di-du-lich-xa/"><img src="images/social/twitter(1).png" alt="Tweet"></a>	<a target="_blank" onclick="printpage(&#39;print&#39;)">
-					<img alt="print" src="images/social/print32.png" style="cursor: pointer;" border="0" align="bottom">
+				<a rel="nofollow" href="https://plus.google.com/share?url=__URL__" onclick="javascript:window.open(this.href,'', 'menubar=no,toolbar=no,resizable=yes,scrollbars=yes,height=600,width=600');return false;">
+					<img src="__DOMAIN__/images/icon/google_plus.png" alt="Share on Google+"/>
 				</a>
-				
-				
+				<a rel="nofollow" href="https://twitter.com/intent/tweet?text=__TITLE__&url=__URL__">
+					<img src="__DOMAIN__/images/icon/twitter.png" alt="Tweet" />
+				</a>
+				<a target="_blank" onclick="printpage('print')">
+					<img alt="print" src="__DOMAIN__/images/icon/print32.png" style="cursor: pointer;" border="0" align="bottom"></img>
+				</a>
 				<div class="socialize-containter" style="background-color:#DDE8F4; border: 2px #327539;border-style:solid; padding: 7px 0 10px 0; width:99.5%; display:inline-block; font-size:14px; margin-left: 0px;">
-					<div style="width:240px;border-right:1px solid #336699;float: left;padding-right:10px;margin-right:10px">								
-						<div style="padding:5px 0px 10px; font-weight: bold; color: rgb(15, 73, 114);"> Ủng hộ bài viết trên FB, G+</div>
-						<div class="fb-like fb_edge_widget_with_comment fb_iframe_widget" data-href="http://yhoccongdong.com/thongtin/cham-soc-rang-mieng-khi-di-du-lich-xa/" data-width="60" data-height="20" data-colorscheme="light" data-layout="button_count" data-action="like" data-show-faces="false" data-send="false" fb-xfbml-state="rendered"><span style="height: 20px; width: 83px;"><iframe id="fd2dd2894" name="f348ad22e" scrolling="no" title="Like this content on Facebook." class="fb_ltr" src="./Chăm sóc răng miệng khi đi du lịch xa_files/like.htm" style="border: none; overflow: hidden; height: 20px; width: 83px;"></iframe></span></div>
-						<div id="___plusone_0" style="text-indent: 0px; margin: 0px; padding: 0px; background-color: transparent; border-style: none; float: none; line-height: normal; font-size: 1px; vertical-align: baseline; display: inline-block; width: 90px; height: 20px; background-position: initial initial; background-repeat: initial initial;"><iframe frameborder="0" hspace="0" marginheight="0" marginwidth="0" scrolling="no" style="position: static; top: 0px; width: 90px; margin: 0px; border-style: none; left: 0px; visibility: visible; height: 20px;" tabindex="0" vspace="0" width="100%" id="I0_1385451297143" name="I0_1385451297143" src="./Chăm sóc răng miệng khi đi du lịch xa_files/fastbutton.htm" data-gapiattached="true" title="+1"></iframe></div>
+					<div style="width:210px;border-right:1px solid #336699;float: left;padding-right:10px;margin-right:10px">								
+						<div style="padding:5px 0px 10px; font-weight: bold; color: rgb(15, 73, 114);"> Ủng hộ chủ đề trên FB, G+</div>
+						<div class="fb-like" data-href="__URL__" data-width="60" data-height="20" data-colorscheme="light" data-layout="button_count" data-action="like" data-show-faces="false" data-send="false"></div>
+						<div class="g-plusone" data-size="medium" data-href="__URL__"></div>
 					</div>
 					<div style="width:430px;float:left;">					
 						<div style="padding:5px 0px 10px; font-weight: bold; color: rgb(15, 73, 114);">Theo dõi Y Học Cộng Đồng trên mạng xã hội</div>
-						<div class="fb-like fb_edge_widget_with_comment fb_iframe_widget" data-href="https://www.facebook.com/yhoccongdong" data-layout="button_count" data-action="like" data-show-faces="false" data-share="false" fb-xfbml-state="rendered"><span style="height: 20px; width: 89px;"><iframe id="f1c3d423a8" name="f3b2f6ab8c" scrolling="no" title="Like this content on Facebook." class="fb_ltr" src="./Chăm sóc răng miệng khi đi du lịch xa_files/like(1).htm" style="border: none; overflow: hidden; height: 20px; width: 89px;"></iframe></span></div>
-						<div class="fb-follow fb_iframe_widget" data-href="http://www.facebook.com/yhoccongdong" data-colorscheme="light" data-layout="button_count" data-show-faces="false" fb-xfbml-state="rendered" fb-iframe-plugin-query="app_id=546475572029540&amp;color_scheme=light&amp;href=http%3A%2F%2Fwww.facebook.com%2Fyhoccongdong&amp;layout=button_count&amp;locale=vi_VN&amp;sdk=joey&amp;show_faces=false"><span style="vertical-align: bottom; width: 101px; height: 20px;"><iframe name="f2d727da2c" width="1000px" height="1000px" frameborder="0" allowtransparency="true" scrolling="no" title="fb:follow Facebook Social Plugin" src="./Chăm sóc răng miệng khi đi du lịch xa_files/follow(1).htm" style="border: none; visibility: visible; width: 101px; height: 20px;" class=""></iframe></span></div>
-						<div id="___follow_0" style="text-indent: 0px; margin: 0px; padding: 0px; background-color: transparent; border-style: none; float: none; line-height: normal; font-size: 1px; vertical-align: baseline; display: inline-block; width: 158px; height: 20px; background-position: initial initial; background-repeat: initial initial;"><iframe frameborder="0" hspace="0" marginheight="0" marginwidth="0" scrolling="no" style="position: static; top: 0px; width: 158px; margin: 0px; border-style: none; left: 0px; visibility: visible; height: 20px;" tabindex="0" vspace="0" width="100%" id="I2_1385451297143" name="I2_1385451297143" src="./Chăm sóc răng miệng khi đi du lịch xa_files/follow.htm" data-gapiattached="true"></iframe></div>
-						<div id="___plusone_1" style="text-indent: 0px; margin: 0px; padding: 0px; background-color: transparent; border-style: none; float: none; line-height: normal; font-size: 1px; vertical-align: baseline; display: inline-block; width: 90px; height: 20px; background-position: initial initial; background-repeat: initial initial;"><iframe frameborder="0" hspace="0" marginheight="0" marginwidth="0" scrolling="no" style="position: static; top: 0px; width: 90px; margin: 0px; border-style: none; left: 0px; visibility: visible; height: 20px;" tabindex="0" vspace="0" width="100%" id="I1_1385451297143" name="I1_1385451297143" src="./Chăm sóc răng miệng khi đi du lịch xa_files/fastbutton(1).htm" data-gapiattached="true" title="+1"></iframe></div>
+						<div class="fb-like" data-href="https://www.facebook.com/yhoccongdong" data-layout="button_count" data-action="like" data-show-faces="false" data-share="false"></div>
+						<div class="fb-follow" data-href="http://www.facebook.com/yhoccongdong.quanly" data-colorscheme="light" data-layout="button" data-show-faces="false"></div>
+						<div class="g-follow" data-annotation="none" data-height="20" data-href="https://plus.google.com/+yhoccongdong" data-rel="publisher"></div>
+						<div class="g-plusone" data-size="medium" data-href="https://plus.google.com/+yhoccongdong"></div>
 					</div>
 				</div>
-			</div-->
-			
-			<!--ShareBox_Son_end-->
-	
-			<!-- Thông tin tác giả -->
-			<div style="width: 98%; display: inline-block; margin-left: 10px;">
-				<div id="ts-fab-below" class="ts-fab-wrapper ts-fab-icons-text">
-					<ul class="ts-fab-list">
-						<li class="ts-fab-bio-link active">
-							<a href="#tac-gia">Trưởng dự án</a>
-						</li>
-						<!--__TABFACEBOOK__-->
-						<li class="ts-fab-googleplus-link">
-							<a href="#googleplus">Google+</a>
-						</li>
-						<!--__TABTWITTER__-->
-						<li class="ts-fab-latest-posts-link">
-							<a href="#bai-viet-moi">Bài viết mới của tác giả</a>
-						</li>
-					</ul>
-
-					<div class="ts-fab-tabs">
-						<!--div style="display: block;" class="ts-fab-tab" id="tac-gia">
-							<div class="ts-fab-avatar">
-								<a href="http://yhoccongdong.com/profile/pham-anh-khoa/"><img data-lazy-loaded="true" style="display: block;" src="http://yhoccongdong.com/images/profile/39-profile-pham-anh-khoa.jpg" height="64" width="64"></a>
-							</div>
-							<div class="ts-fab-text">
-								<div class="ts-fab-header">
-									<a href="http://yhoccongdong.com/profile/pham-anh-khoa/">BS. Phạm Anh Khoa</a>
-									<div class="ts-fab-description">
-										<span>Bác sĩ đa khoa<br>Ngành: Nội khoa<br>Chuyên: Hô hấp<br>Công tác tại: Bệnh Viện Chợ Rẫy</span>
-									</div>
-								</div>
-								<div class="ts-fab-content">
-								</div>
-							</div>
-						</div-->
-						<!--__FACEBOOK_FOLLOW__-->
-									<div style="display: none;" class="ts-fab-tab" id="googleplus">
-							<div class="ts-fab-avatar">
-								<a href="https://plus.google.com/114752966145166740144"><img src="http://yhoccongdong.com/images/profile/39-profile-pham-anh-khoa.jpg" height="64" width="64"></a>
-							</div>
-							<div class="ts-fab-text">
-								<div class="ts-fab-header">
-									<a href="https://plus.google.com/114752966145166740144">Phạm Anh Khoa</a>
-								</div>
-								﻿<div id="___follow_1" style="text-indent: 0px; margin: 0px; padding: 0px; background-color: transparent; border-style: none; float: none; line-height: normal; font-size: 1px; vertical-align: baseline; display: inline-block; width: 117px; height: 20px; background-position: initial initial; background-repeat: initial initial;"><iframe frameborder="0" hspace="0" marginheight="0" marginwidth="0" scrolling="no" style="position: static; top: 0px; width: 117px; margin: 0px; border-style: none; left: 0px; visibility: visible; height: 20px;" tabindex="0" vspace="0" width="100%" id="I3_1385974248079" name="I3_1385974248079" src="https://apis.google.com/_/widget/render/follow?usegapi=1&amp;bsv=o&amp;annotation=bubble&amp;height=20&amp;rel=author&amp;hl=vi&amp;origin=http%3A%2F%2Fyhoccongdong.com&amp;url=https%3A%2F%2Fplus.google.com%2F114752966145166740144&amp;gsrc=3p&amp;jsh=m%3B%2F_%2Fscs%2Fapps-static%2F_%2Fjs%2Fk%3Doz.gapi.vi.GJRqmvv1ino.O%2Fm%3D__features__%2Fam%3DEQ%2Frt%3Dj%2Fd%3D1%2Frs%3DAItRSTPWGm_o5HI--MC5i07FP_oyCSzHmA#_methods=onPlusOne%2C_ready%2C_close%2C_open%2C_resizeMe%2C_renderstart%2Concircled%2Cdrefresh%2Cerefresh%2Conload&amp;id=I3_1385974248079&amp;parent=http%3A%2F%2Fyhoccongdong.com&amp;pfname=&amp;rpctoken=87046912" data-gapiattached="true"></iframe></div>				
-							</div>
-						</div>
-						<!--__TWITTER_FOLLOW__-->
-
-						<div style="display: none;" class="ts-fab-tab" id="bai-viet-moi">
-							<div class="ts-fab-avatar">
-								<a href="http://yhoccongdong.com/tags/pham-anh-khoa/"><img src="http://yhoccongdong.com/images/profile/39-profile-pham-anh-khoa.jpg" height="64" width="64"></a>
-							</div>
-							<div class="ts-fab-text">
-								<div class="ts-fab-header">Bài viết mới nhất của <a href="http://yhoccongdong.com/profile/pham-anh-khoa/">Phạm Anh Khoa</a> - (<a href="http://yhoccongdong.com/tags/pham-anh-khoa/">Xem tất cả</a>)</div>
-								<ul class="ts-fab-latest">
-
-									<li>
-										<a href="http://yhoccongdong.com/thongtin/benh-lao/">Bệnh lao</a> <span style="font-size: 12px;">- 04/11/2013</span>
-									</li>
-
-									<li>
-										<a href="http://yhoccongdong.com/thongtin/viem-phe-quan-man-tinh/">Viêm phế quản mạn tính</a> <span style="font-size: 12px;">- 17/09/2013</span>
-									</li>
-
-									<li>
-										<a href="http://yhoccongdong.com/thongtin/viem-phoi/">Viêm phổi</a> <span style="font-size: 12px;">- 17/09/2013</span>
-									</li>
-								</ul>
-							</div>
-						</div>
-					</div>
-				</div>
-			<!-- end of author box-->
 			</div>
 			
-			<!-- Comments -->
+			<div style="width: 98%; display: inline-block; margin-left: 10px;">		
+				<?php include("__AUTHORBOX__")?>
+			</div>
+			
+			</br>			
+			</br>
 			<header class="secondary-header">
 				<strong style="padding-left: 10px;">Thành viên tham gia</strong>
 			</header>
@@ -202,6 +162,16 @@
 				</div>
 			</div>
 			<div class="social_block">
+				<header class="secondary-header">
+					<strong style="padding-left: 10px;">Trao đổi bình luận</strong>
+				</header>
+				</br>
+				<div id="con_comment">
+					<div class="fb-comments" data-href="__URL__" data-width="706" data-num-posts="5">
+					</div>
+				</div>
+			</div>
+						<div class="social_block">
 				<header class="secondary-header">
 					<strong style="padding-left: 10px;">Từ khóa liên quan</strong>
 				</header>

@@ -1,6 +1,6 @@
-﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
-<html xmlns="http://www.w3.org/1999/xhtml" xmlns:fb="https://www.facebook.com/2008/fbml" xmlns:og="http://ogp.me/ns#" itemscope itemtype="http://schema.org/__ITEMTYPE__" >
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:fb="https://www.facebook.com/2008/fbml" xmlns:og="http://ogp.me/ns#" itemscope itemtype="http://schema.org/WebPage" >
 
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
@@ -26,6 +26,8 @@
 	<link rel="stylesheet" type="text/css" href="__DOMAIN__/css_/duan_block_css.css" />
 
 <?php include("__DUONGDAN__/trangchu/vi/header1.html")?>
+<script type="text/javascript" src="__DOMAIN__/js/printpage.js"></script>
+<script language="javascript" type="text/javascript" src="__DOMAIN__/js/ts-fab.js"></script>
 <div id="fb-root"></div>
 <script>
 	(function(d, s, id) {
@@ -56,24 +58,36 @@
 		(document, 'script', 'twitter-wjs');
 	</script>
 	
-	<article class="thongtin" style="margin-top: 35px;margin-bottom: 35px;">	
+	<article class="thongtin" style="margin-top: 35px;margin-bottom: 35px;">
+		<section class="thongtinleft">
+				<header class="secondary-header">
+					<a href="__LINKCHUDECHA__"><strong style="padding-left: 10px; ">__CHUDECHA__</strong>
+						<p style="text-align:right;  font-style:italic;">
+							<img src="__DOMAIN__/images/multi_document.png" />
+							__SOLUONGCHUDE__
+						</p>
+					</a>
+				</header>
+				
+				<div class="thongtinleftmenu">
+					<ul>	
+						__CHUDE_BENTRAI__
+					</ul>
+				</div>
+		</section>
+		
 		<div style="float: right; width:75%; border-left: 1px solid #f1f1f1;">
 			<section class="thongtincenter">
-				<div class="breadBoxTop">
-					<nav>
-						<fieldset class="breadcrumb">
-							<span class="crumbs split-1 split-2">
-								__LINKTREE__
-							</span>
-						</fieldset>
-					</nav>
-				</div>
+				<?php include("data/linktree_chude.html")?>
 				<div id="print">
 					<h1 itemprop="name">__TENCHUDE__</h1>	
 					<div class="thongtinhieudinh">
 						Ngày cập nhật gần nhất: <span itemprop="datePublished">__NGAYCAPNHAT__</span>
 						<div style="width: 160px; clear: both; float: right; margin-top:-20px;">
 							__SHARE_BUTTON__
+							<a target="_blank" onclick="printpage('print')">
+									<img alt="print" src="http://yhoccongdong.com/images/icon/print16.gif" style="cursor: pointer;" border="0" align="bottom">
+							</a>
 							<p style="display:block; font-style: italic; font-size: 11px;">
 							Số lượt xem: <span itemprop="interactionCount">
 											<?php 
@@ -88,15 +102,26 @@
 						<strong style="font-style:italic">Tóm tắt: </strong>
 						<em>__MOTACHUDE__</em>
 					</div>
-				__MUCLUC__
-				__CHUDEDUAN__
+					<?php include("data/mucluc.html")?>
+					<?php include("data/chude_duan.html")?>
 				</div>
 			</section>
 			<div style="width: 98%; display: inline-block; margin-left: 10px;">
 				<header class="secondary-header">
 					<strong style="padding-left: 10px;">Hãy chia sẻ thông tin hữu ích này đến người thân và bạn bè của bạn</strong>
 				</header>
-				__SHARE_BUTTON__
+				<a rel="nofollow" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=__URL__" onfocus="this.blur();" title="Facebook"> 
+					<img src="__DOMAIN__/images/icon/facebook.png" alt="Facebook">
+				</a>
+				<a rel="nofollow" href="https://plus.google.com/share?url=__URL__" onclick="javascript:window.open(this.href,'', 'menubar=no,toolbar=no,resizable=yes,scrollbars=yes,height=600,width=600');return false;">
+					<img src="__DOMAIN__/images/icon/google_plus.png" alt="Share on Google+"/>
+				</a>
+				<a rel="nofollow" href="https://twitter.com/intent/tweet?text=__TITLE__&url=__URL__">
+					<img src="__DOMAIN__/images/icon/twitter.png" alt="Tweet" />
+				</a>
+				<a target="_blank" onclick="printpage('print')">
+					<img alt="print" src="__DOMAIN__/images/icon/print32.png" style="cursor: pointer;" border="0" align="bottom"></img>
+				</a>
 				<div class="socialize-containter" style="background-color:#DDE8F4; border: 2px #327539;border-style:solid; padding: 7px 0 10px 0; width:99.5%; display:inline-block; font-size:14px; margin-left: 0px;">
 					<div style="width:210px;border-right:1px solid #336699;float: left;padding-right:10px;margin-right:10px">								
 						<div style="padding:5px 0px 10px; font-weight: bold; color: rgb(15, 73, 114);"> Ủng hộ chủ đề trên FB, G+</div>
