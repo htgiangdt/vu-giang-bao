@@ -30,8 +30,12 @@ class yhoc_trangchu(osv.osv):
     
     def _get_baivietmoi(self, cr, uid, ids, field_name, arg, context=None):
         result = {}
-        dsbaivietmoi = self.pool.get('yhoc_thongtin').search(cr, uid, [('state','=','done')], limit=8, order='date desc', context=context)  
         for record in self.browse(cr, uid, ids, context=context):
+            if record.id == 1:
+                dsbaivietmoi = self.pool.get('yhoc_thongtin').search(cr, uid, [('state','=','done')], limit=8, order='date desc', context=context)
+            else:
+                thanhvien_id = self.pool.get('hr.employee').search(cr, uid, [('name','=',record.name)], context=context)
+                dsbaivietmoi = self.pool.get('yhoc_thongtin').search(cr, uid, ['&',('state','=','done'),('nguoidich.id','=',thanhvien_id)], limit=8, order='date desc', context=context)
             result[record.id] = []
             for bv in self.pool.get('yhoc_thongtin').browse(cr, uid, dsbaivietmoi, context=context):
                 result[record.id].append(bv.id)
@@ -39,36 +43,41 @@ class yhoc_trangchu(osv.osv):
     
     def _get_chudenoibac(self, cr, uid, ids, field_name, arg, context=None):
         result = {}
-        dsbaiviet = self.pool.get('yhoc_chude').search(cr, uid, [('parent_id','!=',False),('link','!=',False)], limit=10, order='soluongxem desc', context=context)  
         for record in self.browse(cr, uid, ids, context=context):
+            if record.id == 1:
+                dsbaiviet = self.pool.get('yhoc_chude').search(cr, uid, [('parent_id','!=',False),('link','!=',False)], limit=10, order='soluongxem desc', context=context)
+            else:
+                sql = '''select temp.id
+                        from(
+                            select distinct cd.id,cd.soluongxem
+                            from yhoc_chude cd, yhoc_duan da
+                            where chude_id = cd.id
+                            and cd.link is not null
+                            and da.truongduan=%s
+                            order by cd.soluongxem desc
+                            limit 10
+                        ) as temp'''
+                thanhvien_id = self.pool.get('hr.employee').search(cr, uid, [('name','=',record.name)], context=context)
+                cr.execute(sql,(thanhvien_id[0],))
+                dsbaiviet_ = cr.fetchall()
+                dsbaiviet = []
+                for cd in self.pool.get('yhoc_chude').browse(cr,uid,[x[0] for x in dsbaiviet_],context={}):
+                    dsbaiviet.append(cd.id)
+                
             result[record.id] = []
             for bv in self.pool.get('yhoc_chude').browse(cr, uid, dsbaiviet, context=context):
                 result[record.id].append(bv.id)
         return result
     
-    def _get_duanhoanthanh(self, cr, uid, ids, field_name, arg, context=None):
+    def _get_duannoibac(self, cr, uid, ids, field_name, arg, context=None):
         result = {}
-#        sql = '''select duan_done.duan 
-#                 from 
-#                    (select count(t.id) as sobaiviet,t.duan 
-#                        from yhoc_thongtin t, yhoc_duan d 
-#                        where t.duan = d.id
-#                            and state='done'
-#                        group by t.duan) as duan_done,
-#                    
-#                    (select count(t.id) as sobaiviet,t.duan 
-#                    from yhoc_thongtin t, yhoc_duan d 
-#                    where t.duan = d.id
-#                    group by t.duan) as duan_all
-#                where duan_done.duan = duan_all.duan
-#                        and duan_done.sobaiviet= duan_all.sobaiviet
-#                    '''
         sql = '''select duan_done.duan
                  from 
                     (select count(t.id) as sobaiviet,t.duan,d.soluongxem
                     from yhoc_thongtin t, yhoc_duan d 
                     where t.duan = d.id
                         and state='done'
+                        and truongduan in %s
                     group by t.duan,d.soluongxem) as duan_done,
                     
                     (select count(t.id) as tongsobaiviet,t.duan 
@@ -77,13 +86,20 @@ class yhoc_trangchu(osv.osv):
                     group by t.duan) as duan_all
                 where duan_done.duan = duan_all.duan
                 and duan_done.sobaiviet > duan_all.tongsobaiviet/2
-                and duan_all.tongsobaiviet > 5 
+                and duan_all.tongsobaiviet > %s 
                 order by duan_done.soluongxem desc
                 limit 20
                 '''
-        cr.execute(sql)
-        duanhoanchinh = cr.fetchall()
         for record in self.browse(cr, uid, ids, context=context):
+            if record.id == 1:
+                all_thanhvien = self.pool.get('hr.employee').search(cr, uid, [], context=context)
+                cr.execute(sql,(tuple(all_thanhvien),5))
+                duanhoanchinh = cr.fetchall()   
+            else:
+                thanhvien_id = self.pool.get('hr.employee').search(cr, uid, [('name','=',record.name)], context=context)
+                thanhvien_id += [-2,-1]
+                cr.execute(sql,(tuple(thanhvien_id),0))
+                duanhoanchinh = cr.fetchall()
             result[record.id] = []
             for da in self.pool.get('yhoc_duan').browse(cr,uid,[x[0] for x in duanhoanchinh],context={}):
                 result[record.id].append(da.id)
@@ -91,8 +107,12 @@ class yhoc_trangchu(osv.osv):
 
     def _get_baivietbanner(self, cr, uid, ids, field_name, arg, context=None):
         result = {}
-        dsbaiviet = self.pool.get('yhoc_thongtin').search(cr, uid, [('state','=','done'),('hinhlon','!=',False)], limit=30, order='soluongxem desc', context=context)  
         for record in self.browse(cr, uid, ids, context=context):
+            if record.id == 1:
+                dsbaiviet = self.pool.get('yhoc_thongtin').search(cr, uid, [('state','=','done'),('hinhlon','!=',False)], limit=30, order='soluongxem desc', context=context)
+            else:
+                thanhvien_id = self.pool.get('hr.employee').search(cr, uid, [('name','=',record.name)], context=context)
+                dsbaiviet = self.pool.get('yhoc_thongtin').search(cr, uid, ['&',('state','=','done'),'&',('hinhlon','!=',False),'|',('nguoidich.id','=',thanhvien_id),('nguoihieudinh.id','=',thanhvien_id)], limit=8, order='date desc', context=context)
             result[record.id] = []
             for bv in self.pool.get('yhoc_thongtin').browse(cr, uid, dsbaiviet, context=context):
                 result[record.id].append(bv.id)
@@ -100,14 +120,14 @@ class yhoc_trangchu(osv.osv):
         
     _columns = {
                 'name':fields.char("Tên",size=500, required='1'),
-				'title': fields.char("Tên website",size=65, required='1'),
-				'description': fields.char("Mô tả ngắn",size=255, required='1'),
+				'title': fields.char("Tên website",size=65),
+				'description': fields.char("Mô tả ngắn",size=255),
                 'banner': fields.one2many('x_lienket', 'trangchu_id', 'Banner'),
                 'chudenoibac':fields.function(_get_chudenoibac, type='many2many', relation='yhoc_chude', string='Bài viết nổi bậc'),
                 'baivietmoi':fields.function(_get_baivietmoi, type='many2many', relation='yhoc_thongtin', string='Bài viết mới'),
                 'muctieu': fields.text('Ý tưởng và mục tiêu'),
                 'thungo': fields.text('Thư ngỏ'),
-                'duanhoanthanh': fields.function(_get_duanhoanthanh, type='many2many', relation='yhoc_duan', string='Dự án hoàn thành'),
+                'duanhoanthanh': fields.function(_get_duannoibac, type='many2many', relation='yhoc_duan', string='Dự án hoàn thành'),
                 'baivietbanner':fields.function(_get_baivietbanner, type='many2many', relation='yhoc_thongtin', string='Banner'),
                 }
     _defaults={
@@ -380,88 +400,9 @@ class yhoc_trangchu(osv.osv):
         fw.close()
         return footer_template
     
-#    def capnhat_chude(self,cr,uid,ids=None,context=None):
-#        self.capnhat_trangchu(cr, uid, [1], context=context)
-#        chude = self.pool.get('yhoc_chude').search(cr, uid, [], context=context)
-#        for cd in chude:
-#            self.pool.get('yhoc_chude').capnhat_thongtin(cr, uid, [cd], context=context)
-#        
-#        domain = self.pool.get('hlv.property')._get_value_project_property_by_name(cr, uid, 'Domain') or '../..'
-#        duongdan = self.pool.get('hlv.property')._get_value_project_property_by_name(cr, uid, 'path of template')
-#        folder_trangchu = duongdan + '/trangchu/vi'
-#        chudecha = self.pool.get('yhoc_chude').search(cr, uid, [('parent_id','=',False)])
-#        self.capnhat_footer(cr, uid, duongdan, folder_trangchu, context=context)
-#        self.capnhat_header(cr, uid, chudecha, duongdan, domain, folder_trangchu, context=context)
-#        return True
     
-#    def capnhat_duan(self,cr,uid,ids=None,context=None):
-#        self.capnhat_trangchu(cr, uid, [1], context=context)
-#        duan = self.pool.get('yhoc_duan').search(cr, uid, [], context=context)
-#        for da in duan:
-#            self.pool.get('yhoc_duan').capnhat_thongtin(cr, uid, [da], context=context)
-#        
-#        return True
-    
-#    def capnhat_baiviet(self,cr,uid,ids=None,context=None):
-#        self.capnhat_trangchu(cr, uid, [1], context=context)
-#        baiviet = self.pool.get('hlv_thongtin').search(cr, uid, [('state','=','done')], context=context)
-#        
-#        for bv in baiviet:
-#            self.pool.get('hlv_thongtin').xuatban_thongtin(cr, uid, [bv], context=context)
-#        
-#        
-#        duan = self.pool.get('yhoc_duan').search(cr, uid, [], context=context)
-#        for da in duan:
-#            self.pool.get('yhoc_duan').capnhat_thongtin(cr, uid, [da], context=context)
-#        
-#        return True
-    
-#    def capnhat_employee(self,cr,uid,ids=None,context=None):
-#        self.capnhat_trangchu(cr, uid, [1], context=context)
-#        user = self.pool.get('hr.employee').search(cr, uid, [], context=context)
-#        for u in user:
-#            self.pool.get('hr.employee').capnhat_thongtin(cr, uid, [u], context=context)
-#        
-#        self.capnhat_trangchu(cr, uid, [1], context)
-#        return True
-    
-#    def capnhat_partner(self,cr,uid,ids=None,context=None):
-#        self.capnhat_trangchu(cr, uid, [1], context=context)
-#        cus = self.pool.get('res.partner').search(cr, uid, [], context=context)
-#        for c in cus:
-#            self.pool.get('res.partner').capnhat_thongtin(cr, uid, [c], context=context)
-#        
-#        self.capnhat_trangchu(cr, uid, [1], context)
-#        return True
-    
-#    def capnhat_nganh(self,cr,uid,ids=None,context=None):
-#        self.capnhat_trangchu(cr, uid, [1], context=context)
-#        nganh = self.pool.get('yhoc_nganh').search(cr, uid, [], context=context)
-#        for n in nganh:
-#            self.pool.get('yhoc_nganh').capnhat_thongtin(cr, uid, [n], context=context)
-#        
-#        self.capnhat_trangchu(cr, uid, [1], context)
-#        return True
-
-    def capnhat_tukhoa_trangchu(self, cr, uid, context=None):
-        duongdan = self.pool.get('hlv.property')._get_value_project_property_by_name(cr, uid, 'path of template')
-        domain = self.pool.get('hlv.property')._get_value_project_property_by_name(cr, uid, 'Domain') or '../..'
-        kieufile = self.pool.get('hlv.property')._get_value_project_property_by_name(cr, uid, 'Kiểu lưu file') or 'html'
-        all_tag = self.pool.get('yhoc_keyword').search(cr, uid, [('soluongxem','>',0)], limit=15, order='soluongxem desc', context=context)
-        temp_ = '''
-        <a href="__LINK__" class="HeaderTagCloud">__NAME__</a>'''
-        list_tag = '' 
-        for t in all_tag:
-            t = self.pool.get('yhoc_keyword').browse(cr, uid, t, context=context)
-            name = self.pool.get('yhoc_trangchu').parser_url(t.name)
-            temp = temp_.replace('__LINK__',domain+'/tags/'+name)
-            temp = temp.replace('__NAME__',t.name)
-            list_tag += temp
-        return list_tag
-    
-    
-    def capnhat_thongtin(self,cr,uid,ids=None,context=None):
-        self.capnhat_trangchu(cr, uid, [1], context=context)
+    def capnhat_thongtin(self,cr,uid,ids,context=None):
+        self.capnhat_trangchu(cr, uid, ids, context=context)
         return True
         
     def capnhat_menu_nganh(self, cr, uid, folder_trangchu, context=None):
@@ -911,8 +852,13 @@ class yhoc_trangchu(osv.osv):
         kieufile = self.pool.get('hlv.property')._get_value_project_property_by_name(cr, uid, 'Kiểu lưu file') or 'html'
         if not os.path.exists(duongdan):
             os.makedirs(duongdan)
-            
-        folder_trangchu = duongdan + '/trangchu/vi'
+        
+        if trangchu.id == 1:
+            folder_trangchu = duongdan + '/trangchu/vi'
+            tentrang = 'vi'
+        else:
+            tentrang = self.pool.get('yhoc_trangchu').parser_url(str(trangchu.name))
+            folder_trangchu = duongdan + '/trangchu/%s'%tentrang
         if not os.path.exists(folder_trangchu):
             os.makedirs(folder_trangchu) 
             
@@ -931,38 +877,41 @@ class yhoc_trangchu(osv.osv):
         duanhoanthanh = trangchu.duanhoanthanh
         muctieu = trangchu.muctieu
         
-#        chudecha = self.pool.get('yhoc_chude').search(cr, uid, [('parent_id','=',False)])
-        chudecha = self.pool.get('yhoc_chude').search(cr, uid, [('parent_id.name','=','Trang chủ')])
-        noidung_header = self.capnhat_header(cr, uid, [1], chudecha, duongdan, domain, folder_trangchu, context=None)
-        #Giang_0511#noidung_footer = self.capnhat_footer(cr, uid, chudecha, duongdan, folder_trangchu,context=context)
-        noidung_footer = self.capnhat_footer(cr, uid, chudecha, duongdan, domain, folder_trangchu,context=context)
-        
 #Câp nhật menu các bài viết nổi bậc
         self.capnhat_baivietnoibac(cr,uid, chudenoibac, folder_trangchu, domain, kieufile, context=context)
-        template = template.replace('__SIDEBARMENU__', '''<?php include("../../trangchu/vi/baivietnoibac.html")?>''')
-        
-#Tao file menu nganh
-        self.capnhat_menu_nganh(cr, uid, folder_trangchu, context)
-                
-#Cap nhat thành viên phat trien
-        self.capnhat_dieuhanhvaphattrien(cr, uid, duongdan, domain, kieufile, context=context)
-        
-        
-#Cap nhat nha tai tro
-        self.capnhat_nhataitro(cr, uid, duongdan, domain, kieufile, context)                
-        
-#Cap nhât trang thu ngo
-        self.capnhat_thungo(cr, uid, thungo,duongdan, domain,kieufile,context=context)
-        
-#Cap nhât trang y tuong va muc tieu
-        self.capnhat_muctieu(cr, uid,muctieu,duongdan,domain,kieufile,context=context)
+        template = template.replace('__SIDEBARMENU__', '''<?php include("../../trangchu/%s/baivietnoibac.html")?>'''%tentrang)
 
 #Cap nhât danh sach bac si noi bac o trang chu        
         self.capnhat_dsbacsiotrangchu(cr, uid, context)
+                
         
-#Cap nhât danh sach các từ khóa         
-        list_tag = self.capnhat_tukhoa_trangchu(cr, uid, context)
-        template = template.replace('__LIST_TAGS__', list_tag)
+#Cap nhât trang thu ngo và mục tiêu
+        if trangchu.id == 1:
+            self.capnhat_thungo(cr, uid, thungo,duongdan, domain,kieufile,context=context)
+            self.capnhat_muctieu(cr, uid,muctieu,duongdan,domain,kieufile,context=context)
+            chudecha = self.pool.get('yhoc_chude').search(cr, uid, [('parent_id.name','=','Trang chủ')])
+            noidung_header = self.capnhat_header(cr, uid, [1], chudecha, duongdan, domain, folder_trangchu, context=context)
+            noidung_footer = self.capnhat_footer(cr, uid, chudecha, duongdan, domain, folder_trangchu,context=context)
+            #Tao file menu nganh
+            self.capnhat_menu_nganh(cr, uid, folder_trangchu, context)
+            #Cap nhat thành viên phat trien
+            self.capnhat_dieuhanhvaphattrien(cr, uid, duongdan, domain, kieufile, context=context)
+            #Cap nhat nha tai tro
+            self.capnhat_nhataitro(cr, uid, duongdan, domain, kieufile, context)
+            #Cap nhât danh sach các từ khóa         
+            all_tag = self.pool.get('yhoc_keyword').search(cr, uid, [('soluongxem','>',0)], limit=15, order='soluongxem desc', context=context)
+            all_tag = self.pool.get('yhoc_keyword').browse(cr, uid, all_tag, context=context)
+            list_tag = self.pool.get('yhoc_keyword').capnhat_listtag_ophiacuoi(cr, uid, all_tag, context=context)
+            template = template.replace('__LIST_TAGS__', list_tag)
+        else:
+            #Cap nhât danh sach các từ khóa         
+            tag_id = self.pool.get('yhoc_keyword').search(cr, uid, [('name','=',trangchu.name)], context=context)
+            tag_rc = self.pool.get('yhoc_keyword').browse(cr, uid, tag_id[0], context=context)
+            list_tag = self.pool.get('yhoc_keyword').capnhat_listtag_ophiacuoi(cr, uid, tag_rc.kwlienquan_ids, context=context)
+            template = template.replace('__LIST_TAGS__', list_tag)
+
+        
+
         
 
 #Cap nhat anh trang chu        
@@ -989,86 +938,17 @@ class yhoc_trangchu(osv.osv):
             
         template = template.replace('__ANHTRANGCHU__',all_anhtrangchu)
 
-#cập nhật dự án hoàn chỉnh (bên phải)
-#        all_chudenoibac = ''
-#        fr = open(duongdan+'/template/trangchu/loatbai_tab.html', 'r')
-#        loatbai_tab_ = fr.read()
-#        fr.close()
-#        import random 
-#        duanhoanthanh = random.sample(duanhoanthanh, 6)
-#        for nb in duanhoanthanh:
-#
-##            chudenoibac_tab = '''<li><a href="__LINK__"><strong>__NAME__</strong></a></li>'''
-#            #Giang_0511#chudenoibac_tab = chudenoibac_tab.replace('__LINK__', '../../../../../../%s/'%(nb.link_url))
-#            name_url = self.pool.get('yhoc_trangchu').parser_url(nb.name)
-#            picture = domain + '/images/duan/%s-duan-%s.jpg'%(str(nb.id),name_url)
-#            
-#            if not os.path.exists(duongdan+'/images/duan/%s-duan-%s.jpg'%(str(nb.id),name_url)):
-#                if nb.photo:
-#                    folder_hinh_thongtin = duongdan+'/images/duan'
-#                    filename = str(nb.id) + '-duan-' + name_url
-#                    self.pool.get('yhoc_thongtin').ghihinhxuong(folder_hinh_thongtin, filename, nb.photo, 135, 105, context=context)
-#					
-#            loatbai_tab = loatbai_tab_.replace('__LINK__', domain + '/%s/'%(nb.link_url))
-#            loatbai_tab = loatbai_tab.replace('__NAME__', nb.name)
-#            loatbai_tab = loatbai_tab.replace('__PHOTO__', picture)
-#            loatbai_tab = loatbai_tab.replace('__DESCRIPTION__', nb.description or '(Chưa cập nhật)')
-#            loatbai_tab = loatbai_tab.replace('__ICON__', domain + '/images/multi_document.png')
-#            loatbai_tab = loatbai_tab.replace('__SOLUONGBAIVIET__', str(nb.soluongbaiviet))
-#            all_chudenoibac += loatbai_tab
-#
-#        
-#        import codecs
-#        fw = codecs.open(folder_trangchu +'/duanhoanthanh.html','w','utf-8')
-#        fw.write(str(all_chudenoibac))
-#        fw.close()
+#cập nhật dự án nổi bậc (bên phải)
         self.capnhat_duannoibac(cr, uid, folder_trangchu, duanhoanthanh, 6, context=context)
-        template = template.replace('__CHUDENOIBAC__', '''<?php include("../../trangchu/vi/duanhoanthanh.html")?>''')
-#        template = template.replace('__CHUDENOIBAC__', all_chudenoibac)
-        
-                    
-#Cap nhat bai viet moi
-        #=======================================================================
-        # all_baivietmoi = ''
-        # for bv in baivietmoi:
-        #    if bv.duan.photo:
-        #        if not os.path.exists(folder_trangchu + '/images/trangchu'):
-        #            os.makedirs(folder_trangchu + '/images/trangchu')
-        #        path_hinh_ghixuong = folder_trangchu + '/images/trangchu' + '/anhbaivietmoi_%s.jpg' %(bv.id,)
-        #        fw = open(path_hinh_ghixuong,'wb')
-        #        fw.write(base64.decodestring(bv.duan.photo))
-        #        fw.close()
-        #        photo = 'images/trangchu/anhbaivietmoi_%s.jpg' %(bv.id,)
-        #    
-        #    fr = open(duongdan+'/template/trangchu/baivietmoi_tab.html', 'r')
-        #    baivietmoi_tab = fr.read()
-        #    fr.close()
-        #    if bv.hinhdaidien:
-        #        if not os.path.exists(folder_trangchu + '/images/trangchu'):
-        #            os.makedirs(folder_trangchu + '/images/trangchu')
-        #        path_hinh_ghixuong = folder_trangchu + '/images/trangchu' + '/anhbaivietmoi_%s.jpg' %(bv.id,)
-        #        fw = open(path_hinh_ghixuong,'wb')
-        #        fw.write(base64.decodestring(bv.hinhdaidien))
-        #        fw.close()
-        #        photo = 'images/trangchu/anhbaivietmoi_%s.jpg' %(bv.id,)
-        #    baivietmoi_tab = baivietmoi_tab.replace('__LINK__', bv.link or '#')
-        #    baivietmoi_tab = baivietmoi_tab.replace('__NAME__', bv.name)
-        #    baivietmoi_tab = baivietmoi_tab.replace('__IMAGE__', photo)
-        #    all_baivietmoi += baivietmoi_tab
-        # template = template.replace('__BAIVIETMOI__', all_baivietmoi)
-        #=======================================================================
-        
-        #Cập nhật tittle       
-#        fr = open(duongdan + '/template/trangchu/tittle.html', 'r')
-#        noidung_tittle = fr.read()
-#        fr.close()
-#        noidung_tittle = noidung_tittle.replace('__TITLE__','Y học cộng đồng - Trang chủ')
-#        template = template.replace('__TITLE__',noidung_tittle)
+        template = template.replace('__CHUDENOIBAC__', '''<?php include("../../trangchu/%s/duanhoanthanh.html")?>'''%tentrang)
+
+
         template = template.replace('__DUONGDAN__',duongdan)
         template = template.replace('__ITEMTYPE__', 'WebPage')
         template = template.replace('__DESCRIPTION__', trangchu.description or '')
         template = template.replace('__TITLE__', trangchu.title or '')
-        template = template.replace('__URL__', domain)        
+        template = template.replace('__URL__', domain)
+        template = template.replace('__TENTRANG__', tentrang)  
         
         import codecs  
         fw = codecs.open(folder_trangchu +'/index.' + kieufile,'w','utf-8')

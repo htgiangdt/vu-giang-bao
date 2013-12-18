@@ -85,7 +85,7 @@ class yhoc_employee(osv.osv):
             result[record.id] = []
             for da in self.pool.get('yhoc_duan').browse(cr, uid,duan_ids, context=context):
                 for m in da.thanhvienthamgia:
-                    if m.nhanvien.id == record.id:
+                    if m.id == record.id:
                         result[record.id].append(da.id)
                         break
         return result

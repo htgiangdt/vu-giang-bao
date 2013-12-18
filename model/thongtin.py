@@ -448,10 +448,15 @@ class yhoc_thongtin(osv.osv):
         fw.close()
 
 #Cap nhat bai viet moi
-        trangchu_ids = self.pool.get('yhoc_trangchu').search(cr, uid, [], context=context)
-        trangchu_rc = self.pool.get('yhoc_trangchu').browse(cr, uid, trangchu_ids[0], context=context)
-        path = duongdan + '/trangchu/vi/baivietmoi.html'
-        self.pool.get('yhoc_trangchu').capnhat_baivietmoi(cr, uid, trangchu_rc.baivietmoi,path, context)
+        trangchu_ids = self.pool.get('yhoc_trangchu').search(cr, uid, ['|',('name','=',thongtin.nguoidich.name),('id','=',1)], context=context)
+        for tentrang in trangchu_ids:
+            trangchu_rc = self.pool.get('yhoc_trangchu').browse(cr, uid, tentrang, context=context)
+            if trangchu_rc.id == 1:
+                tentrang_url = 'vi'
+            else:
+                tentrang_url = self.pool.get('yhoc_trangchu').parser_url(str(trangchu_rc.name))
+            path = duongdan + '/trangchu/%s/baivietmoi.html'%tentrang_url
+            self.pool.get('yhoc_trangchu').capnhat_baivietmoi(cr, uid, trangchu_rc.baivietmoi,path, context)
             
         self.pool.get('yhoc_duan').capnhat_thongtin(cr,uid,[thongtin.duan.id],context)
 #        self.pool.get('yhoc_chude').capnhat_thongtin(cr,uid,[thongtin.duan.chude_id.id],context)
