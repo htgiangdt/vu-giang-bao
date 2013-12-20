@@ -62,7 +62,7 @@
 				<header class="secondary-header">
 					<a href="__LINKCHUDE__"><strong style="padding-left: 10px; ">__CHUDE__</strong>
 						<p style="text-align:right;  font-style:italic; padding-right: 5px;clear: left;">
-							<img src="__DOMAIN__/images/topic-icon.png" alt="icon_topic"/>
+							<img src="__DOMAIN__/images/topic-icon.png" alt="icon_topic" width="16" height="16"/>
 							__SODUANLIENQUAN__
 						</p>
 					</a>
@@ -86,7 +86,7 @@
 						Trưởng dự án: <a itemprop="author" href="__LINKTRUONGDA__">__DANHXUNG__ __TRUONGDUAN__</a><br>
 						Ngày cập nhật gần nhất: <span itemprop="datePublished">__LASTUPDATE__</span>
 					
-						<div style="width: 160px; clear: both; float: right; margin-top:-20px;">
+						<div style="width: 160px; clear: both; float: right; margin-top:-20px;text-align:center;">
 							<?php include("data/share_button.html")?>
 							<a target="_blank" onclick="printpage('print')">
 									<img alt="print" src="http://yhoccongdong.com/images/icon/print16.gif" style="cursor: pointer;" border="0" align="bottom">
@@ -115,32 +115,30 @@
 			
 			<div style="width: 98%; display: inline-block; margin-left: 10px;">
 				<header class="secondary-header">
+					<img style="float:left" src="http://yhoccongdong.com/images/bullet-header.png"/>
 					<strong style="padding-left: 10px;">Hãy chia sẻ thông tin hữu ích này đến người thân và bạn bè của bạn</strong>
 				</header>
-				<a rel="nofollow" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=__URL__" onfocus="this.blur();" title="Facebook"> 
-					<img src="__DOMAIN__/images/icon/facebook.png" alt="Facebook">
-				</a>
-				<a rel="nofollow" href="https://plus.google.com/share?url=__URL__" onclick="javascript:window.open(this.href,'', 'menubar=no,toolbar=no,resizable=yes,scrollbars=yes,height=600,width=600');return false;">
-					<img src="__DOMAIN__/images/icon/google_plus.png" alt="Share on Google+"/>
-				</a>
-				<a rel="nofollow" href="https://twitter.com/intent/tweet?text=__TITLE__&url=__URL__">
-					<img src="__DOMAIN__/images/icon/twitter.png" alt="Tweet" />
-				</a>
-				<a target="_blank" onclick="printpage('print')">
-					<img alt="print" src="__DOMAIN__/images/icon/print32.png" style="cursor: pointer;" border="0" align="bottom"></img>
-				</a>
-				<div class="socialize-containter" style="background-color:#DDE8F4; border: 2px #327539;border-style:solid; padding: 7px 0 10px 0; width:99.5%; display:inline-block; font-size:14px; margin-left: 0px;">
-					<div style="width:210px;border-right:1px solid #336699;float: left;padding-right:10px;margin-right:10px">								
+				
+				<div class="socialize-containter" style="background-color:#FFF; border: 1px #327539;border-style:solid; padding: 7px 0 10px 0; width:99.5%; display:inline-block; font-size:14px; margin-left: 0px; margin-top: 20px;">
+					<div style="width:300px;border-right:1px solid #336699;float: left;padding-right:10px;margin-right:10px">								
 						<div style="padding:5px 0px 10px; font-weight: bold; color: rgb(15, 73, 114);"> Ủng hộ chủ đề trên FB, G+</div>
-						<div class="fb-like" data-href="__URL__" data-width="60" data-height="20" data-colorscheme="light" data-layout="button_count" data-action="like" data-show-faces="false" data-send="false"></div>
-						<div class="g-plusone" data-size="medium" data-href="__URL__"></div>
+					
+					<div class="fb-like" style="margin-right: 5px;" data-href="__URL__" data-layout="box_count" data-action="like" data-show-faces="true" data-share="false"></div>
+					<div style="margin-right:10px" class="fb-share-button" data-href="__URL__" data-type="box_count"></div>
+					<div  class="g-plus" data-action="share" data-annotation="vertical-bubble" data-height="60" data-href="__URL__"></div>
+					<div class="g-plusone" data-size="tall" data-href="__URL__"></div>
+
+					
 					</div>
-					<div style="width:430px;float:left;">					
+					<div style="width:380px;float:left;">					
 						<div style="padding:5px 0px 10px; font-weight: bold; color: rgb(15, 73, 114);">Theo dõi Y Học Cộng Đồng trên mạng xã hội</div>
-						<div class="fb-like" data-href="https://www.facebook.com/yhoccongdong" data-layout="button_count" data-action="like" data-show-faces="false" data-share="false"></div>
-						<div class="fb-follow" data-href="http://www.facebook.com/yhoccongdong.quanly" data-colorscheme="light" data-layout="button" data-show-faces="false"></div>
-						<div class="g-follow" data-annotation="none" data-height="20" data-href="https://plus.google.com/+yhoccongdong" data-rel="publisher"></div>
-						<div class="g-plusone" data-size="medium" data-href="https://plus.google.com/+yhoccongdong"></div>
+					
+					 <div style="margin-right:5px" class="fb-like" data-href="https://www.facebook.com/yhoccongdong" data-layout="box_count" data-action="like" data-show-faces="true" data-share="false"></div>
+					<div style="margin-right:10px" class="fb-follow" data-href="http://www.facebook.com/yhoccongdong.quanly" data-colorscheme="light" data-layout="box_count" data-show-faces="true">
+					</div>
+					<div style="margin-right:0px; display:inline-block;">
+						<div class="g-follow" data-annotation="vertical-bubble" data-height="20" data-href="https://plus.google.com/+yhoccongdong" data-rel="publisher"></div></div>
+						<div class="g-plusone" data-size="tall" data-href="https://plus.google.com/+yhoccongdong"></div>
 					</div>
 				</div>
 			</div>
@@ -148,10 +146,11 @@
 			<div style="width: 98%; display: inline-block; margin-left: 10px;">		
 				<?php include("__AUTHORBOX__")?>
 			</div>
-			
+		
 			</br>			
 			</br>
-			<header class="secondary-header">
+			<header class="secondary-header" style="margin-left: 10px;margin-left:10px">
+				 <img style="float:left" src="http://yhoccongdong.com/images/bullet-header.png"/>
 				<strong style="padding-left: 10px;">Thành viên tham gia</strong>
 			</header>
 			<div class="boxChuyentrang">
@@ -163,7 +162,8 @@
 			</div>
 			<div class="social_block">
 				<header class="secondary-header">
-					<strong style="padding-left: 10px;">Trao đổi bình luận</strong>
+					 <img style="float:left" src="http://yhoccongdong.com/images/bullet-header.png"/>
+					<strong style="padding-left: 10px;">Hãy bình luận và chia sẻ kinh nghiệm của bạn</strong>
 				</header>
 				</br>
 				<div id="con_comment">
