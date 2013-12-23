@@ -129,6 +129,7 @@ class yhoc_trangchu(osv.osv):
                 'thungo': fields.text('Thư ngỏ'),
                 'duanhoanthanh': fields.function(_get_duannoibac, type='many2many', relation='yhoc_duan', string='Dự án hoàn thành'),
                 'baivietbanner':fields.function(_get_baivietbanner, type='many2many', relation='yhoc_thongtin', string='Banner'),
+                'tukhoa_dinhhuong': fields.many2many('yhoc_keyword', 'trangchu_keyword_rel', 'trangchu_id', 'keyword_id', 'Từ khóa định hướng'),
                 }
     _defaults={
               
@@ -899,8 +900,48 @@ class yhoc_trangchu(osv.osv):
             #Cap nhat nha tai tro
             self.capnhat_nhataitro(cr, uid, duongdan, domain, kieufile, context)
             #Cap nhât danh sach các từ khóa         
-            all_tag = self.pool.get('yhoc_keyword').search(cr, uid, [('soluongxem','>',0)], limit=15, order='soluongxem desc', context=context)
-            all_tag = self.pool.get('yhoc_keyword').browse(cr, uid, all_tag, context=context)
+#            tag_do = self.pool.get('yhoc_keyword').search(cr, uid, [('color','=','maudo')], limit=4, context=context)
+#            tag_xanhla = self.pool.get('yhoc_keyword').search(cr, uid, [('color','=','mauxanhla')], limit=4, context=context)
+#            tag_xanhduong = self.pool.get('yhoc_keyword').search(cr, uid, [('color','=','mauxanhduong')], limit=4, context=context)
+#            tag_xam = self.pool.get('yhoc_keyword').search(cr, uid, [('color','=','mauxam')], limit=8, context=context)
+#            all_tag = tag_do+tag_xanhla+tag_xanhduong+tag_xam
+#            
+            
+            
+            
+            
+            import random 
+            kw_obj = self.pool.get('yhoc_keyword')
+            all = kw_obj.search(cr, uid, [], context=context)
+            sql = '''select distinct keyword_id
+                    from (select keyword_id,count(thongtin_id)
+                        from thongtin_keyword_rel
+                        group by keyword_id                    
+                        order by count(thongtin_id) desc
+                        ) as temp_                    
+                    '''
+            cr.execute(sql)
+            all_xanhduong = [r[0] for r in cr.fetchall()]
+            xanhduong = random.sample(all_xanhduong, 5)
+            all_maudo = kw_obj.search(cr, uid, [('soluongxem','>',0),('link','!=', False)], order="soluongxem desc", limit=len(all)*0.3, context=context)
+            maudo = random.sample(all_maudo, 5)
+            all_xam = kw_obj.search(cr, uid, [('id','not in', all_maudo),('id','not in', all_xanhduong),('link','!=', False)], context=context)
+            mauxam = random.sample(all_xam, 5)
+            
+            all_tag = xanhduong+maudo+mauxam
+            all_tag = kw_obj.browse(cr, uid, all_tag, context=context)
+            xanhla = trangchu.tukhoa_dinhhuong
+            if len(xanhla) > 4:
+                xanhla = random.sample(xanhla, 4)
+            all_tag+=xanhla
+            
+            
+            
+            
+            
+            
+            
+            
             list_tag = self.pool.get('yhoc_keyword').capnhat_listtag_ophiacuoi(cr, uid, all_tag, context=context)
             template = template.replace('__LIST_TAGS__', list_tag)
         else:

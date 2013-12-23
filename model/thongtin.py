@@ -428,15 +428,16 @@ class yhoc_thongtin(osv.osv):
 #Cap nhat tag        
         self.pool.get('yhoc_keyword').chenbaimoivaotag(cr, uid, thongtin.keyword_ids, thongtin.id, context=context)
         tags = thongtin.keyword_ids
-        list_tag = ''
-        temp_ = '''<a href="__LINKTAG__" class="HeaderTagCloud">__NAMETAG__</a>
-		'''
-        for t in tags:
-            temp = ''
-            name = self.pool.get('yhoc_trangchu').parser_url(t.name)
-            temp = temp_.replace('__LINKTAG__',domain+'/tags/'+name)
-            temp = temp.replace('__NAMETAG__',t.name)
-            list_tag += temp
+        
+        list_tag = capnhat_listtag_ophiacuoi(cr, uid, tags, context=context)
+#        temp_ = '''<a href="__LINKTAG__" class="HeaderTagCloud">__NAMETAG__</a>
+#		'''
+#        for t in tags:
+#            temp = ''
+#            name = self.pool.get('yhoc_trangchu').parser_url(t.name)
+#            temp = temp_.replace('__LINKTAG__',domain+'/tags/'+name)
+#            temp = temp.replace('__NAMETAG__',t.name)
+#            list_tag += temp
         template = template.replace('__LIST_TAGS__', list_tag)
         template = template.replace('__DUONGDAN__', duongdan)
         template = template.replace('__ID__', str(thongtin.id))

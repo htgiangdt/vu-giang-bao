@@ -71,6 +71,34 @@ class yhoc_keyword(osv.osv):
                 result[record.id].append(da.id)
         return result
     
+    def _get_color(self, cr, uid, ids, name, arg, context=None):
+        kw_obj = self.pool.get('yhoc_keyword')
+        all_tag = kw_obj.search(cr, uid, [], context=context)
+        res = {}
+        sql = '''select distinct keyword_id
+                from (select keyword_id,count(thongtin_id)
+                    from thongtin_keyword_rel
+                    group by keyword_id                    
+                    order by count(thongtin_id) desc
+                    limit 150) as temp_                    
+                '''
+        cr.execute(sql)
+        xanhduong = [r[0] for r in cr.fetchall()]
+        
+        trangchu = self.pool.get('yhoc_trangchu').search(cr, uid, [('id','=',1)], context=context)
+        trangchu = self.pool.get('yhoc_trangchu').browse(cr, uid, trangchu[0], context=context)
+        xanhla = trangchu.tukhoa_dinhhuong
+        maudo = kw_obj.search(cr, uid, [('soluongxem','>',0),('link','!=', False)], order="soluongxem desc", limit=len(all_tag)*0.3, context=context)
+        for record in self.browse(cr, uid, ids, context=context):
+            if record.id in xanhduong:
+                res[record.id] = 'mauxanhduong'
+            elif record.id in maudo:
+                res[record.id] = 'maudo'
+            elif record in xanhla:
+                res[record.id] = 'mauxanhla'
+            else:
+                res[record.id] = 'mauxam'
+        return res
     
     _columns = {
         'name': fields.char('Keyword', size=500, required=1),
@@ -89,6 +117,7 @@ class yhoc_keyword(osv.osv):
         'bacsilienquan':fields.function(_get_bacsilienquan, type='many2many', relation='hr.employee', string='Bác sĩ liên quan'),
         'duanlienquan':fields.function(_get_duanlienquan, type='many2many', relation='yhoc_duan', string='Bác sĩ liên quan'),
         'link':fields.char('Link',size=500),
+        'color': fields.function(_get_color, type='selection', selection=[('maudo', 'Màu đỏ'), ('mauxam', 'Màu xám'),('mauxanhla', 'Màu xanh lá'),('mauxanhduong', 'Màu xanh dương')], string='Color'),
     }
 
     _defaults = {
@@ -423,13 +452,23 @@ class yhoc_keyword(osv.osv):
     def capnhat_listtag_ophiacuoi(self, cr, uid, tags, context=None):
         domain = self.pool.get('hlv.property')._get_value_project_property_by_name(cr, uid, 'Domain') or '../..'
         list_tag = ''
-        temp_ = '''<a href="__LINKTAG__" class="HeaderTagCloud">__NAMETAG__</a>
+        temp_ = '''<a href="__LINKTAG__" class="__COLOR__">__NAMETAG__</a>
         '''
         for t in tags:
             temp = ''
+            
             name = self.pool.get('yhoc_trangchu').parser_url(t.name)
             temp = temp_.replace('__LINKTAG__',domain+'/tags/'+name)
             temp = temp.replace('__NAMETAG__',t.name)
+            if t.color=='maudo':
+                color = 'HeaderTagCloudRed'
+            elif t.color == 'mauxanhduong':
+                color = 'HeaderTagCloudGray'
+            elif t.color == 'mauxanhla':
+                color = 'HeaderTagCloudGreen'
+            else:
+                color = 'HeaderTagCloud'
+            temp = temp.replace('__COLOR__',color)
             list_tag += temp
         return list_tag
     
