@@ -90,12 +90,12 @@ class yhoc_keyword(osv.osv):
         xanhla = trangchu.tukhoa_dinhhuong
         maudo = kw_obj.search(cr, uid, [('soluongxem','>',0),('link','!=', False)], order="soluongxem desc", limit=len(all_tag)*0.3, context=context)
         for record in self.browse(cr, uid, ids, context=context):
-            if record.id in xanhduong:
+            if record in xanhla:
+                res[record.id] = 'mauxanhla'
+            elif record.id in xanhduong:
                 res[record.id] = 'mauxanhduong'
             elif record.id in maudo:
                 res[record.id] = 'maudo'
-            elif record in xanhla:
-                res[record.id] = 'mauxanhla'
             else:
                 res[record.id] = 'mauxam'
         return res
@@ -455,21 +455,22 @@ class yhoc_keyword(osv.osv):
         temp_ = '''<a href="__LINKTAG__" class="__COLOR__">__NAMETAG__</a>
         '''
         for t in tags:
-            temp = ''
-            
-            name = self.pool.get('yhoc_trangchu').parser_url(t.name)
-            temp = temp_.replace('__LINKTAG__',domain+'/tags/'+name)
-            temp = temp.replace('__NAMETAG__',t.name)
-            if t.color=='maudo':
-                color = 'HeaderTagCloudRed'
-            elif t.color == 'mauxanhduong':
-                color = 'HeaderTagCloudGray'
-            elif t.color == 'mauxanhla':
-                color = 'HeaderTagCloudGreen'
-            else:
-                color = 'HeaderTagCloud'
-            temp = temp.replace('__COLOR__',color)
-            list_tag += temp
+            if t.link:
+                temp = ''
+                
+                name = self.pool.get('yhoc_trangchu').parser_url(t.name)
+                temp = temp_.replace('__LINKTAG__',domain+'/tags/'+name)
+                temp = temp.replace('__NAMETAG__',t.name)
+                if t.color=='maudo':
+                    color = 'HeaderTagCloudRed'
+                elif t.color == 'mauxanhduong':
+                    color = 'HeaderTagCloudGray'
+                elif t.color == 'mauxanhla':
+                    color = 'HeaderTagCloudGreen'
+                else:
+                    color = 'HeaderTagCloud'
+                temp = temp.replace('__COLOR__',color)
+                list_tag += temp
         return list_tag
     
 yhoc_keyword()

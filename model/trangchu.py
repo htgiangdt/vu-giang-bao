@@ -45,7 +45,15 @@ class yhoc_trangchu(osv.osv):
         result = {}
         for record in self.browse(cr, uid, ids, context=context):
             if record.id == 1:
-                dsbaiviet = self.pool.get('yhoc_chude').search(cr, uid, [('parent_id','!=',False),('link','!=',False)], limit=10, order='soluongxem desc', context=context)
+#                dsbaiviet = self.pool.get('yhoc_chude').search(cr, uid, [('parent_id','!=',False),('link','!=',False)], limit=10, order='soluongxem desc', context=context)
+                sql = '''select cd.id
+                        from yhoc_chude cd
+                        where cd.link is not null                            
+                        and cd.soluongxem>0
+                        order by cd.soluongxem desc
+                        limit 10'''
+                cr.execute(sql)
+                dsbaiviet = [r[0] for r in cr.fetchall()]
             else:
                 sql = '''select temp.id
                         from(
@@ -54,6 +62,7 @@ class yhoc_trangchu(osv.osv):
                             where chude_id = cd.id
                             and cd.link is not null
                             and da.truongduan=%s
+                            and cd.soluongxem>0
                             order by cd.soluongxem desc
                             limit 10
                         ) as temp'''
@@ -87,6 +96,7 @@ class yhoc_trangchu(osv.osv):
                 where duan_done.duan = duan_all.duan
                 and duan_done.sobaiviet > duan_all.tongsobaiviet/2
                 and duan_all.tongsobaiviet > %s 
+                and duan_done.soluongxem > 0
                 order by duan_done.soluongxem desc
                 limit 20
                 '''
@@ -624,7 +634,7 @@ class yhoc_trangchu(osv.osv):
             bv = list_baiviet_rc[i]
             baivietmoi_tab = ''
             photo = ''
-            if bv.hinhdaidien or thongtin.duan.photo:
+            if bv.hinhdaidien or bv.duan.photo:
                 name_url = self.parser_url(bv.name)
                 filename = str(bv.id) + '-thongtin-' + name_url
                 if not os.path.exists(duongdan+'/images/thongtin/%s-thongtin-%s.jpg'%(str(bv.id),name_url)):

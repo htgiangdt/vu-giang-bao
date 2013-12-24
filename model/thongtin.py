@@ -429,7 +429,7 @@ class yhoc_thongtin(osv.osv):
         self.pool.get('yhoc_keyword').chenbaimoivaotag(cr, uid, thongtin.keyword_ids, thongtin.id, context=context)
         tags = thongtin.keyword_ids
         
-        list_tag = capnhat_listtag_ophiacuoi(cr, uid, tags, context=context)
+        list_tag = self.pool.get('yhoc_keyword').capnhat_listtag_ophiacuoi(cr, uid, tags, context=context)
 #        temp_ = '''<a href="__LINKTAG__" class="HeaderTagCloud">__NAMETAG__</a>
 #		'''
 #        for t in tags:
