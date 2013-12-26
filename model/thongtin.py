@@ -456,6 +456,8 @@ class yhoc_thongtin(osv.osv):
                 tentrang_url = 'vi'
             else:
                 tentrang_url = self.pool.get('yhoc_trangchu').parser_url(str(trangchu_rc.name))
+                #Post bài viết lên wordpress của tác giả
+                self.pool.get('yhoc_trangchu').post_to_wordpress(cr, uid, [trangchu_rc.id], [thongtin.id], context=context)
             path = duongdan + '/trangchu/%s/baivietmoi.html'%tentrang_url
             self.pool.get('yhoc_trangchu').capnhat_baivietmoi(cr, uid, trangchu_rc.baivietmoi,path, context)
             
@@ -467,7 +469,7 @@ class yhoc_thongtin(osv.osv):
         self.capnhat_sharebutton(cr, uid, thongtin.id, context=context)
 #Tao trang Blog
         self.taotrangblog(cr, uid, context)
-        
+
 #cap nhat tong hieu dinh va tong dong gop
 #        self.capnhat_tonghieudinh_donggop(cr, uid, [tv.id], context)
 
@@ -731,12 +733,33 @@ class yhoc_thongtin(osv.osv):
         domain = self.pool.get('hlv.property')._get_value_project_property_by_name(cr, uid, 'Domain') or '../..'
         kieufile = self.pool.get('hlv.property')._get_value_project_property_by_name(cr, uid, 'Kiểu lưu file') or 'html'
         thongtin = self.browse(cr,uid,ids[0],context)
+        list_kw_for_bv = []
         
+        name_url_tt = name_url_thongtin = self.pool.get('yhoc_trangchu').parser_url(str(thongtin.name))
         if thongtin.url_thongtin:
             name_url_thongtin = thongtin.url_thongtin
+            
+        kw = self.pool.get('yhoc_keyword').search(cr, uid, ['|',('name','=',thongtin.name),('khongdau','=',name_url_tt)],context=context)
+        if not kw:
+            vals = {
+                    'name':thongtin.name,
+                    'khongdau':name_url_tt,
+                    'loai_tukhoa':'theh1',
+                    'link': domain+'/thongtin/%s'%(name_url_thongtin)
+                    }
+            kw = self.pool.get('yhoc_keyword').create(cr, uid, vals, context=context)
         else:
-            name_url_thongtin = self.pool.get('yhoc_trangchu').parser_url(str(thongtin.name))
+            kw = kw[0]
+            vals = {
+                    'link': domain+'/thongtin/%s'%(name_url_thongtin)
+                    }
+            self.pool.get('yhoc_keyword').write(cr, uid, [kw], vals, context=context) 
+            
+        list_kw_for_bv.append(kw)
         noidung = thongtin.noidung
+        list_kw_in_bv = thongtin.keyword_ids
+        for i in list_kw_in_bv:
+            list_kw_for_bv.append(i.id)
         
         if os.path.exists(duongdan+'/template/thongtin/menu.html'):
             fr = open(duongdan+'/template/thongtin/menu.html', 'r')
@@ -755,6 +778,7 @@ class yhoc_thongtin(osv.osv):
         menu = ''
         STT = 1
         link = domain + '/thongtin/'+name_url_thongtin
+        
         for tag in all_h2:
             temp = ''
             name_url = ''
@@ -787,8 +811,17 @@ class yhoc_thongtin(osv.osv):
                         'name':name,
                         'khongdau':name_url,
                         'loai_tukhoa':'theh2',
+                        'link': domain + '/thongtin/' + name_url_thongtin + '#' + name_url
                         }
-                self.pool.get('yhoc_keyword').create(cr, uid, vals, context=context)
+                kw = self.pool.get('yhoc_keyword').create(cr, uid, vals, context=context)
+            else:
+                kw = kw[0]
+                vals = {
+                    'link': domain + '/thongtin/' + name_url_thongtin + '#' + name_url
+                    }
+                self.pool.get('yhoc_keyword').write(cr, uid, [kw], vals, context=context)
+                 
+            list_kw_for_bv.append(kw)
             tag['id'] = name_url
         template_ = template_.replace('__MENU_ITEM__', menu)
         
@@ -801,10 +834,11 @@ class yhoc_thongtin(osv.osv):
         fw.close()
 #        print(soup.prettify())
 #        menu += soup.prettify()
-        vals = {'noidung':soup.prettify()}
-        self.write(cr, uid, ids, vals, context=context)
+        vals = {'noidung':soup.prettify(),
+                'keyword_ids': [[6, False, list(set(list_kw_for_bv))]]}
+#        super(yhoc_thongtin,self).write(cr, uid, ids, vals, context=context)
 #        self.xuatban_thongtin(cr, uid, ids, context=context)
-        return True
+        return super(yhoc_thongtin,self).write(cr, uid, ids, vals, context=context)
     
     def replace_tukhoa(self, cr, uid, ids, context=None):
         '''Hàm này dùng để thay thế các từ trong bài viết thành các đường link trỏ tới trang tags (giống wikipedia)'''

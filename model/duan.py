@@ -47,6 +47,7 @@ class yhoc_duan(osv.osv):
     _columns = {
                 'name':fields.char('Tên dự án',size=500,required='1'),
                 'description':fields.text('Giới thiệu'),
+                'noidung':fields.text('Nội dung'),
                 'link':fields.char('Link dự án',size=1000),
                 'chude_id': fields.many2one('yhoc_chude','Chủ đề'),
                 'photo': fields.binary('Hình',filters='*.png,*.gif,*.jpg'),
@@ -520,9 +521,6 @@ class yhoc_duan(osv.osv):
         self.pool.get('yhoc_chude').capnhat_chudetrongtrangduan(cr, uid, duan.chude_id, context)
         template = template.replace('__CHUDETRONGTRANGDUAN__',duongdan+'/%s/data/chudetrongtrangduan.html'%str(duan.chude_id.link_url))
         
-#Cập nhật bài viết cùng dự án
-        self.capnhat_baivietcungduan(cr, uid, duan, folder_duan, context)
-            
 #Cập nhật thanhf vien tham gia
         #self.capnhat_thanhvien(cr, uid, duan, folder_duan, context)
         self.capnhat_thanhvienthamgia_trongduan(cr, uid, ids, context)
@@ -550,6 +548,9 @@ class yhoc_duan(osv.osv):
         super(yhoc_duan,self).write(cr,uid,[duan.id],{'link':domain + '/%s/'%link_url,
                                                       'link_url': link_url}, context=context)
         
+        #Cập nhật bài viết cùng dự án
+        self.capnhat_baivietcungduan(cr, uid, duan, folder_duan, context)
+        
         #Giang_0112# Cập nhật link tree trong dự án
         self.capnhat_linktree_trongduan(cr, uid, duan, duongdan, domain, folder_duan_data, context)
         
@@ -558,7 +559,16 @@ class yhoc_duan(osv.osv):
         write_date = cr.fetchone()[0]
         write_date = write_date.split('.')
         template = template.replace('__TUADEDUAN__', duan.name)
-        template = template.replace('__MOTA__', str(duan.description) or '')
+        template = template.replace('__MOTA__', str(duan.description) or '(Chưa cập nhật)')
+        #Thêm nội dung vào dự án
+        if duan.noidung:
+            noidung_template_ ='''<div id="noidungthongtin" style="padding-top:15px; line-height: 25px; max-width:700px; display;block; clear: both; text-align:justify;" itemprop="articleBody">    
+                    __NOIDUNG_DUAN__
+                    <p>&nbsp;</p>
+                </div>'''
+            noidung_template = noidung_template_.replace('__NOIDUNG_DUAN__', str(duan.noidung))
+            template = template.replace('<!--__NOIDUNG__-->', noidung_template)
+            
         template = template.replace('__DANHXUNG__', duan.truongduan.danhxung or '')
         template = template.replace('__TRUONGDUAN__', duan.truongduan.name or '')
         template = template.replace('__LINKTRUONGDA__', duan.truongduan.link or '')

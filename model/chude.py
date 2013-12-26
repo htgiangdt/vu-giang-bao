@@ -51,6 +51,7 @@ class yhoc_chude(osv.osv):
                 'name':fields.char("Tên chủ đề",size=500, required='1'),
                 'photo': fields.binary('Hình',filters='*.png,*.gif,*.jpg'),
                 'description':fields.text('Giới thiệu'),
+                'noidung':fields.text('Nội dung'),
                 'parent_id': fields.many2one('yhoc_chude', 'Chủ đề cha'),
                 'link':fields.char('Link chủ đề',size=1000),
                 'link_tree':fields.char('Link tree',size=1000),
@@ -192,6 +193,13 @@ class yhoc_chude(osv.osv):
             template = template.replace('__MOTACHUDE__', str(chude.description))
         else:
             template = template.replace('__MOTACHUDE__', 'Đang cập nhật')
+        if chude.noidung:
+            noidung_template_ ='''<div id="noidungthongtin" style="padding-top:15px; line-height: 25px; max-width:700px; display;block; clear: both; text-align:justify;" itemprop="articleBody">    
+                    __NOIDUNG_CHUDE__
+                    <p>&nbsp;</p>
+                </div>'''
+            noidung_template = noidung_template_.replace('__NOIDUNG_CHUDE__', str(chude.noidung))
+            template = template.replace('<!--__NOIDUNG__-->', noidung_template)
         template = template.replace('__HINHCHUDE__', photo)
         #date = datetime.strptime(chude.create_date, '%Y-%m-%d %H:%M:%S')
         date = datetime.now().strftime('%d-%m-%Y %H:%M')
@@ -359,8 +367,8 @@ class yhoc_chude(osv.osv):
             if not os.path.exists(folder_chude_data):
                 os.makedirs(folder_chude_data)
             #Cập nhật RSS
-            self.capnhat_rsschude(cr,uid,chude.id,context)
-            self.taotrangrss(cr, uid,duongdan, domain, context)
+#            self.capnhat_rsschude(cr,uid,chude.id,context)
+#            self.taotrangrss(cr, uid,duongdan, domain, context)
             
             
             import codecs

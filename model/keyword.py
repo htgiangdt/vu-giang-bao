@@ -100,6 +100,10 @@ class yhoc_keyword(osv.osv):
                 res[record.id] = 'mauxam'
         return res
     
+    def _get_loai_tukhoa(self,cr, uid, context=None):
+        loaitukhoa = self.pool.get('hlv.property')._get_value_project_property_by_name(cr, uid, 'Các loại từ khóa') or '[]'
+        return eval(loaitukhoa)
+    
     _columns = {
         'name': fields.char('Keyword', size=500, required=1),
         'khongdau': fields.char('Keyword', size=500, required=1),
@@ -113,7 +117,8 @@ class yhoc_keyword(osv.osv):
         'baivietmoi':fields.function(_get_baivietmoi, type='many2many', relation='yhoc_thongtin', string='Bài viết mới'),
         'baivietbanner':fields.function(_get_baivietbanner, type='many2many', relation='yhoc_thongtin', string='Banner'),
         'baiviet_ids': fields.many2many('yhoc_thongtin', 'thongtin_keyword_rel', 'keyword_id','thongtin_id', 'Bài viết chứa từ khóa'),
-        'loai_tukhoa':fields.selection([('bacsi','Bác sĩ'),('tukhoa','Từ khóa'),('theh2','Thẻ H2')],'Loại từ khóa'), 
+#        'loai_tukhoa':fields.selection([('bacsi','Bác sĩ'),('tukhoa','Từ khóa'),('theh2','Thẻ H2'),('theh1','Thẻ H1')],'Loại từ khóa'),
+        'loai_tukhoa': fields.selection(_get_loai_tukhoa, 'Loại từ khóa'), 
         'bacsilienquan':fields.function(_get_bacsilienquan, type='many2many', relation='hr.employee', string='Bác sĩ liên quan'),
         'duanlienquan':fields.function(_get_duanlienquan, type='many2many', relation='yhoc_duan', string='Bác sĩ liên quan'),
         'link':fields.char('Link',size=500),
@@ -121,6 +126,7 @@ class yhoc_keyword(osv.osv):
     }
 
     _defaults = {
+        'loai_tukhoa': 'tukhoa',
     }
     
     def capnhat_kwlienquan(self, cr, uid, ids, context=None):
@@ -442,7 +448,8 @@ class yhoc_keyword(osv.osv):
                 template = template.replace('__TITLE__', t.name)
                 template = template.replace('__URL__', '%s/tags/%s'%(domain,name_tags))
                 
-                vals = {'link':domain+'/tags/%s'%name_tags}
+                if not t.loai_tukhoa == 'theh1' or not t.loai_tukhoa == 'theh2':
+                    vals = {'link':domain+'/tags/%s'%name_tags}
                 self.write(cr, uid, [t.id], vals, context=context)
                 fw = codecs.open(folder_tags +'/index.%s'%kieufile,'w','utf-8')
                 fw.write(template)
@@ -527,12 +534,12 @@ class yhoc_search_kw(osv.osv):
         
         noidungkeyword = ''
         if kqsearch:
+            kqsearch_r = self.pool.get('yhoc_keyword').browse(cr, uid, kqsearch[0], context=context)
+        if kqsearch and kqsearch_r.link and kqsearch_r.loai_tukhoa != 'theh1' and kqsearch_r.loai_tukhoa != 'theh2':
             kqsearch = self.pool.get('yhoc_keyword').browse(cr, uid, kqsearch[0],context=context)
             name = self.pool.get('yhoc_trangchu').parser_url(kqsearch.name)
-            redirect = '''<script language="javascript" type="text/javascript">window.location.href="../../tags/%s/index.php";</script>'''%name
+            redirect = '''<script language="javà ascript" type="text/javascript">window.location.href="../../tags/%s";</script>'''%name
             template = template.replace('__TAGNAME__', redirect)
-            
-            
         else:
             template = template.replace('__TAGNAME__', keyword.name)
             kqsearch = self.pool.get('yhoc_keyword').search(cr, uid, [('khongdau','ilike','%'+chuoi+'%')])
@@ -540,14 +547,20 @@ class yhoc_search_kw(osv.osv):
                 temp_ = '''<a href="__LINK__" class="HeaderTagCloud">__NAME__</a>
                 '''
                 for kq in kqsearch:
-                    tt = self.pool.get('yhoc_thongtin').search(cr, uid, [('keyword_ids','=',[kq])], context=context)
-                    if tt:
-                        kq = self.pool.get('yhoc_keyword').browse(cr,uid,kq,context=context)
+                    kq = self.pool.get('yhoc_keyword').browse(cr,uid,kq,context=context)
+                    if kq.link:
                         temp = ''
-                        name = self.pool.get('yhoc_trangchu').parser_url(kq.name)
-                        temp = temp_.replace('__LINK__',domain+'/tags/'+name)
+                        temp = temp_.replace('__LINK__',kq.link)
                         temp = temp.replace('__NAME__', kq.name)
                         noidungkeyword += temp
+                    else:
+                        tt = self.pool.get('yhoc_thongtin').search(cr, uid, [('keyword_ids','in',[kq.id])], context=context)
+                        if tt:
+                            temp = ''
+                            name = self.pool.get('yhoc_trangchu').parser_url(kq.name)
+                            temp = temp_.replace('__LINK__',domain+'/tags/'+name)
+                            temp = temp.replace('__NAME__', kq.name)
+                            noidungkeyword += temp
             else:
                 noidungkeyword = 'Không tìm thấy kết quả'
                 

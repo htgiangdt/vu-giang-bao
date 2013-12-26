@@ -140,6 +140,7 @@ class yhoc_trangchu(osv.osv):
                 'duanhoanthanh': fields.function(_get_duannoibac, type='many2many', relation='yhoc_duan', string='Dự án hoàn thành'),
                 'baivietbanner':fields.function(_get_baivietbanner, type='many2many', relation='yhoc_thongtin', string='Banner'),
                 'tukhoa_dinhhuong': fields.many2many('yhoc_keyword', 'trangchu_keyword_rel', 'trangchu_id', 'keyword_id', 'Từ khóa định hướng'),
+                'wordpress_info':fields.char("Wordpress",size=500),
                 }
     _defaults={
               
@@ -208,6 +209,19 @@ class yhoc_trangchu(osv.osv):
         tintuc = self.pool.get('yhoc_thongtin').search(cr, uid, [('state','=','done')])
         for tt in tintuc:
             self.pool.get('yhoc_thongtin').capnhattukhoachinhchobaiviet(cr,uid,[tt],context=context)
+        return True
+    
+    def capnhat_allmenu(self, cr, uid, ids=None, context=None):
+        tintuc = self.pool.get('yhoc_thongtin').search(cr, uid, [('state','=','done')])
+        for tt in tintuc:
+            self.pool.get('yhoc_thongtin').tao_mucluc(cr,uid,[tt],context=context)
+        return True
+    
+    def capnhat_lenwp_cacchuyentrang(self, cr, uid, ids, context=None):
+        chuyentrang = self.browse(cr, uid, ids[0], context=context)
+        thanhvien_id = self.pool.get('hr.employee').search(cr, uid, [('name','=',chuyentrang.name)], context=context)
+        dsbaiviet = self.pool.get('yhoc_thongtin').search(cr, uid, ['&',('state','=','done'),('nguoidich.id','=',thanhvien_id)], order='date asc', context=context)
+        self.post_to_wordpress(cr, uid, ids, dsbaiviet, context=context)
         return True
     
     
@@ -1031,4 +1045,56 @@ class yhoc_trangchu(osv.osv):
             kq = kq.replace(char,'')
         return kq
     
+    def post_to_wordpress(self, cr, uid, chuyentrang_ids, dsbaiviet, context=None):
+        duongdan = self.pool.get('hlv.property')._get_value_project_property_by_name(cr, uid, 'path of template')
+        domain = self.pool.get('hlv.property')._get_value_project_property_by_name(cr, uid, 'Domain') or '../..'
+        from wordpress_xmlrpc import Client, WordPressPost
+        from wordpress_xmlrpc.methods.posts import NewPost        
+        from wordpress_xmlrpc.methods.taxonomies import GetTerms
+        chuyentrang = self.browse(cr, uid, chuyentrang_ids[0], context=context)
+#        content_ = '''<table cellspacing="1" cellpadding="1">
+#                        <tbody>
+#                        <tr>
+#                        <td><img class="alignnone" style="margin: 10px;" alt="" src="__PHOTO__"/></td>
+#                        <td><strong style="font-size: 18px;">Tóm tắt: </strong><em style="font-size: 14px;">__MOTA__</em></td>
+#                        </tr>
+#                        </tbody>
+#                        </table>'''
+        content_ = '''<strong style="font-size: 18px;">Tóm tắt: </strong><em style="font-size: 14px;">__MOTA__</em>'''
+        if chuyentrang.id == 1:
+            return False
+        else:
+            if chuyentrang.wordpress_info:
+                wordpress = eval(chuyentrang.wordpress_info)
+                wp = Client('http://%s.wordpress.com/xmlrpc.php'%wordpress[0], wordpress[1], wordpress[2])
+                for bv in dsbaiviet:
+                    post = WordPressPost()
+                    bv = self.pool.get('yhoc_thongtin').browse(cr, uid, bv, context=context)
+                    if bv.url_thongtin:
+                        name_url = bv.url_thongtin
+                    else:
+                        name_url = self.pool.get('yhoc_trangchu').parser_url(str(bv.name))
+                    list_tag = []
+                    for tag in bv.keyword_ids:
+                        if tag.name:
+                            list_tag.append(tag.name)
+                    post.terms_names = {'post_tag': list_tag,
+                                        'category': [bv.duan.name]}
+                    post.title = bv.name
+                    menu = ''
+                    if os.path.exists(duongdan+'/thongtin/%s/menu.html'%name_url):
+                        fr = open(duongdan+'/thongtin/%s/menu.html'%name_url, 'r')
+                        menu = fr.read()
+                        fr.close()
+                    
+                    content = content_.replace('__MOTA__', bv.motangan or '(Chưa cập nhật)')
+                    content = content.replace('__PHOTO__', domain + '/images/thongtin/%s-thongtin-%s.jpg'%(str(bv.id),name_url))
+                    content += menu
+                    link = domain + '/thongtin/%s'%name_url
+                    content += '''
+                    <strong style="font-size: 18px;">Xem thêm tại: </strong><a href="%s">%s</a>'''%(link,link)
+                    post.content = content
+                    post.post_status = 'publish'
+                    kq = wp.call(NewPost(post))
+                return True
 yhoc_trangchu()
