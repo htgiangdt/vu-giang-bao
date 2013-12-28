@@ -367,8 +367,8 @@ class yhoc_chude(osv.osv):
             if not os.path.exists(folder_chude_data):
                 os.makedirs(folder_chude_data)
             #Cập nhật RSS
-#            self.capnhat_rsschude(cr,uid,chude.id,context)
-#            self.taotrangrss(cr, uid,duongdan, domain, context)
+            #self.capnhat_rsschude(cr,uid,chude.id,context)
+            #self.taotrangrss(cr, uid,duongdan, domain, context)
             
             
             import codecs

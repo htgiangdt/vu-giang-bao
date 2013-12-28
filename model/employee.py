@@ -286,7 +286,7 @@ class yhoc_employee(osv.osv):
             template = template.replace('__LINK__',tv.link or '#')
             
                         
-            link_item_ = '<a href="__LINK__" title="__TIITLELINK__"><img src="__IMAGELINK__"></a>'
+            link_item_ = '<a href="__LINK__" title="__TIITLELINK__"><img src="__IMAGELINK__" alt="__TIITLELINK__"/></a>'
             
             alllink_item_ = ''
             if tv.work_email:
@@ -410,11 +410,11 @@ class yhoc_employee(osv.osv):
             if chuyenmon:
                 description += chuyenmon
             if tv.nganh:
-                description += '''</br>Ngành: ''' + tv.nganh.name
+                description += '''<br/>Ngành: ''' + tv.nganh.name
             if tv.chuyennganh:
-                description += '''</br>Chuyên: ''' + tv.chuyennganh
+                description += '''<br/>Chuyên: ''' + tv.chuyennganh
             if tv.noilamviec_id.name:
-                description += '''</br>Công tác tại: ''' + tv.noilamviec_id.name
+                description += '''<br/>Công tác tại: ''' + tv.noilamviec_id.name
             
             template = template.replace('__DESCRIPTION__',description)
             
@@ -781,7 +781,8 @@ class yhoc_employee(osv.osv):
             item = item.replace('__LINK__',dsbs[i].link or '#')
             
                         
-            link_item_ = '<a href="__LINK__" target="_blank" title="__TIITLELINK__"><img src="__IMAGELINK__"></a>'
+            link_item_ = '''<a href="__LINK__" target="_blank" title="__TIITLELINK__"><img src="__IMAGELINK__"/></a>
+            '''
             
             alllink_item_ = ''
             if dsbs[i].work_email:
@@ -817,6 +818,7 @@ class yhoc_employee(osv.osv):
         fw.write(template_)
         fw.close()
         return True
+
 yhoc_employee()
 
 

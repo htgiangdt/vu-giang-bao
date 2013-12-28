@@ -205,6 +205,15 @@ class yhoc_trangchu(osv.osv):
             self.pool.get('yhoc_thongtin').xuatban_thongtin(cr,uid,[tt])
         return True
     
+    def capnhat_allthuoc(self, cr, uid, ids=None, context=None):
+        sql = '''select id from yhoc_thongtin
+                where nguoidich = 141               
+                '''
+        cr.execute(sql)
+        thuoc = [r[0] for r in cr.fetchall()]
+        for t in thuoc:
+            self.pool.get('yhoc_thongtin').xuatban_thongtin(cr,uid,[t])
+        return True
     def capnhat_tukhoachinhvaodstukhoa(self, cr, uid, ids=None, context=None):
         tintuc = self.pool.get('yhoc_thongtin').search(cr, uid, [('state','=','done')])
         for tt in tintuc:
@@ -293,7 +302,8 @@ class yhoc_trangchu(osv.osv):
                 chude = self.pool.get('yhoc_chude').browse(cr, uid, chude, context=context)
                 
                 if chude.link:
-                    root_menu_tab = '''<li><a href="__LINK__" rel="__REL__" __TRIGGER__>__TENMENU__</a></li>'''
+                    root_menu_tab = '''<li><a href="__LINK__" rel="__REL__" __TRIGGER__>__TENMENU__</a></li>
+                    '''
                     #Giang_0511#root_menu_tab = root_menu_tab.replace('__LINK__', '../../../../../../%s/'%(chude.link_url))
                     root_menu_tab = root_menu_tab.replace('__LINK__', domain + '/%s/'%(chude.link_url))
                     root_menu_tab = root_menu_tab.replace('__REL__', 'item'+str(chude.id))
@@ -323,7 +333,8 @@ class yhoc_trangchu(osv.osv):
                         for cd in chudecon_da:
                             cd = self.pool.get('yhoc_duan').browse(cr, uid, cd, context=context)
                             if cd.link:
-                                item_sub_menu_tab = '''<li><a href="__LINK__" >__NAME__</a></li>'''
+                                item_sub_menu_tab = '''<li><a href="__LINK__" >__NAME__</a></li>
+                                '''
                                 #Giang_0511#item_sub_menu_tab = item_sub_menu_tab.replace('__LINK__', '../../../../../../%s/'%(cd.link_url))
                                 item_sub_menu_tab = item_sub_menu_tab.replace('__LINK__', domain + '/%s/'%(cd.link_url))
                                 item_sub_menu_tab = item_sub_menu_tab.replace('__NAME__', cd.name)

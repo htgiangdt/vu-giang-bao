@@ -134,7 +134,7 @@ class yhoc_duan(osv.osv):
         cungchude = self.pool.get('yhoc_thongtin').search(cr, uid, [('duan.id', '=',duan.id),('state','=','done')], order='sequence', context=context)
         #Giang_0112#
 #        cungchude_tab_ = '''<li><a href="__LINKBAIVIET__">__TENBAIVIET__</a></li>'''
-        cungchude_tab_ = '''<li> <img class="thongtinleftimg" src="__HINHDUAN__"/><a href="__LINKBAIVIET__">__TENBAIVIET__</a></li>
+        cungchude_tab_ = '''<li><a href="__LINKBAIVIET__"><img class="thongtinleftimg" src="__HINHDUAN__" alt="__TENBAIVIET__"/>__TENBAIVIET__</a></li>
         '''
         all_cungchude = '' 
         for ccd in cungchude:
@@ -520,7 +520,7 @@ class yhoc_duan(osv.osv):
 #Lấy du an cùng chủ đề:
         self.pool.get('yhoc_chude').capnhat_chudetrongtrangduan(cr, uid, duan.chude_id, context)
         template = template.replace('__CHUDETRONGTRANGDUAN__',duongdan+'/%s/data/chudetrongtrangduan.html'%str(duan.chude_id.link_url))
-        
+            
 #Cập nhật thanhf vien tham gia
         #self.capnhat_thanhvien(cr, uid, duan, folder_duan, context)
         self.capnhat_thanhvienthamgia_trongduan(cr, uid, ids, context)
@@ -559,7 +559,11 @@ class yhoc_duan(osv.osv):
         write_date = cr.fetchone()[0]
         write_date = write_date.split('.')
         template = template.replace('__TUADEDUAN__', duan.name)
-        template = template.replace('__MOTA__', str(duan.description) or '(Chưa cập nhật)')
+        if duan.description:
+            template = template.replace('__MOTA__', str(duan.description))
+        else:
+            template = template.replace('__MOTA__', 'Đang cập nhật')
+        
         #Thêm nội dung vào dự án
         if duan.noidung:
             noidung_template_ ='''<div id="noidungthongtin" style="padding-top:15px; line-height: 25px; max-width:700px; display;block; clear: both; text-align:justify;" itemprop="articleBody">    
@@ -568,7 +572,6 @@ class yhoc_duan(osv.osv):
                 </div>'''
             noidung_template = noidung_template_.replace('__NOIDUNG_DUAN__', str(duan.noidung))
             template = template.replace('<!--__NOIDUNG__-->', noidung_template)
-            
         template = template.replace('__DANHXUNG__', duan.truongduan.danhxung or '')
         template = template.replace('__TRUONGDUAN__', duan.truongduan.name or '')
         template = template.replace('__LINKTRUONGDA__', duan.truongduan.link or '')

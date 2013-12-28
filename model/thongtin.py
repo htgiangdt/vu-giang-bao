@@ -630,7 +630,9 @@ class yhoc_thongtin(osv.osv):
             template_ = ''
         template = template_.replace('__DOMAIN__', domain)
         template = template.replace('__URL__', domain + '/%s/'%bv.link_url)
-        template = template.replace('__TITTLE__', bv.name)
+        name = str(bv.name)
+        name = name.replace(' ', '%20')
+        template = template.replace('__TITTLE__', str(name))
         import codecs  
         fw = codecs.open(duongdan + '/%s/share_button16.html'%bv.link_url,'w','utf-8')
         fw.write(template)
@@ -644,7 +646,9 @@ class yhoc_thongtin(osv.osv):
             template_ = ''
         template = template_.replace('__DOMAIN__', domain)
         template = template.replace('__URL__', domain + '/%s/'%bv.link_url)
-        template = template.replace('__TITTLE__', bv.name)
+        name = str(bv.name)
+        name = name.replace(' ', '%20')
+        template = template.replace('__TITTLE__', str(name))
         fw = codecs.open(duongdan + '/%s/share_button32.html'%bv.link_url,'w','utf-8')
         fw.write(template)
         fw.close()     
@@ -834,7 +838,12 @@ class yhoc_thongtin(osv.osv):
         fw.close()
 #        print(soup.prettify())
 #        menu += soup.prettify()
-        vals = {'noidung':soup.prettify(),
+        noidung_mucluc = soup.prettify()
+        noidung_remove_html_body = noidung_mucluc.replace('<html>','')
+        noidung_remove_html_body = noidung_remove_html_body.replace('</html>','')
+        noidung_remove_html_body = noidung_remove_html_body.replace('<body>','')
+        noidung_remove_html_body = noidung_remove_html_body.replace('</body>','')
+        vals = {'noidung':noidung_remove_html_body,
                 'keyword_ids': [[6, False, list(set(list_kw_for_bv))]]}
 #        super(yhoc_thongtin,self).write(cr, uid, ids, vals, context=context)
 #        self.xuatban_thongtin(cr, uid, ids, context=context)
