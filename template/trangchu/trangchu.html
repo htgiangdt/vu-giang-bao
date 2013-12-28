@@ -1,6 +1,6 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml" itemscope itemtype="http://schema.org/__ITEMTYPE__">
+<html xmlns="http://www.w3.org/1999/xhtml" prefix="og: http://ogp.me/ns#">
 
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
@@ -10,34 +10,18 @@
 	<meta name="google-site-verification" content="hOscgIY8rgaYMJfzp5AbEjPBimZ2uKazVOj721vELc4" />
 	<meta name="robots" content="index,follow,noodp" />
 	<link rel="canonical" href="__URL__"/>
-	<meta name="copyright" content="Copyright © 2012 by YHocCongDong.com" />
-	<meta name="distribution" content="Global" />	
-	<meta property="fb:admins" content="100005119690063" />
-	<meta property="og:title" itemprop="headline" content="__TITLE__"/>
-	<meta property="og:url" itemprop="url"  content="__URL__"/>
-	<meta property="og:description" itemprop="description" content="__DESCRIPTION__"/>
-    <meta property="og:locale" itemprop="inLanguage" content="vi_VN" />
-	<meta property="og:site_name" content="YHocCongDong.com"/>
-	<meta property="twitter:creator" content="@yhoccongdong">
-	<meta property="twitter:site" content="@yhoccongdong">
-	<meta property="twitter:url" content="__URL__">
+	<meta content="100005119690063" property="fb:admins"/>
+	<meta content="__TITLE__" property="og:title"/>
+	<meta content="__URL__" property="og:url"/>
+	<meta content="__DESCRIPTION__" property="og:description"/>
+    <meta content="vi_VN" property="og:locale"/>
+	<meta content="yhoccongdong.com" property="og:site_name"/>
+	<meta content="@yhoccongdong" property="twitter:creator"/>
+	<meta content="@yhoccongdong" property="twitter:site"/>
+	<meta content="__URL__" property="twitter:url"/>
 	
 <?php include("__DUONGDAN__/trangchu/vi/header1.html")?>
 
-<?php
-	function curPageURL() {
-	 $pageURL = 'http';
-	 #Giang#if ($_SERVER["HTTPS"] == "on") {$pageURL .= "s";}
-	 if (!empty($_SERVER['HTTPS'])) {$pageURL .= "s";}  
-	 $pageURL .= "://";
-	 if ($_SERVER["SERVER_PORT"] != "80") {
-	  $pageURL .= $_SERVER["SERVER_NAME"].":".$_SERVER["SERVER_PORT"].$_SERVER["REQUEST_URI"];
-	 } else {
-	  $pageURL .= $_SERVER["SERVER_NAME"].$_SERVER["REQUEST_URI"];
-	 }
-	 return $pageURL;
-	}
-?>
 <!-- MENU END-->	
 
 	<article>
@@ -51,7 +35,7 @@
 					
 				</div>				
 			</section>
-			</br>
+			<br/>
 			
 			<section id="content_center">
 				<div class="center_left">
