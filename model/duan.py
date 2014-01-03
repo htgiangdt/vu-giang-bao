@@ -253,7 +253,7 @@ class yhoc_duan(osv.osv):
                 item = item.replace('__CHUYENNGANH__',tv.chuyennganh or '')
                 item = item.replace('__TRINHDOCHUYENMON__',chuyenmon)
                 
-                link_item_ = '''<a href="__LINK__" title="__TITLELINK__" target="_blank"><img src="__IMAGELINK__"></a>
+                link_item_ = '''<a href="__LINK__" title="__TITLELINK__" target="_blank"><img src="__IMAGELINK__" alt="__TITLELINK__"/></a>
                 '''
                 alllink_item_ = ''
                 if tv.work_email:
@@ -707,7 +707,9 @@ class yhoc_duan(osv.osv):
             template_ = ''
         template = template_.replace('__DOMAIN__', domain)
         template = template.replace('__URL__', domain + '/%s/'%duan.link_url)
-        template = template.replace('__TITLE__', duan.name)
+        name = str(duan.name)
+        name = name.replace(' ', '%20')
+        template = template.replace('__TITLE__', str(name))
         if not os.path.exists(folder_duan_data):
             os.makedirs(folder_duan_data)
         import codecs  

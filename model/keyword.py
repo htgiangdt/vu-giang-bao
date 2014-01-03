@@ -100,6 +100,10 @@ class yhoc_keyword(osv.osv):
                 res[record.id] = 'mauxam'
         return res
     
+    def _get_loai_tukhoa(self,cr, uid, context=None):
+        loaitukhoa = self.pool.get('hlv.property')._get_value_project_property_by_name(cr, uid, 'Các loại từ khóa') or '[]'
+        return eval(loaitukhoa)
+    
     _columns = {
         'name': fields.char('Keyword', size=500, required=1),
         'khongdau': fields.char('Keyword', size=500, required=1),
@@ -113,7 +117,8 @@ class yhoc_keyword(osv.osv):
         'baivietmoi':fields.function(_get_baivietmoi, type='many2many', relation='yhoc_thongtin', string='Bài viết mới'),
         'baivietbanner':fields.function(_get_baivietbanner, type='many2many', relation='yhoc_thongtin', string='Banner'),
         'baiviet_ids': fields.many2many('yhoc_thongtin', 'thongtin_keyword_rel', 'keyword_id','thongtin_id', 'Bài viết chứa từ khóa'),
-        'loai_tukhoa':fields.selection([('bacsi','Bác sĩ'),('tukhoa','Từ khóa'),('theh2','Thẻ H2'),('theh1','Thẻ H1')],'Loại từ khóa'), 
+#        'loai_tukhoa':fields.selection([('bacsi','Bác sĩ'),('tukhoa','Từ khóa'),('theh2','Thẻ H2'),('theh1','Thẻ H1')],'Loại từ khóa'),
+        'loai_tukhoa': fields.selection(_get_loai_tukhoa, 'Loại từ khóa'), 
         'bacsilienquan':fields.function(_get_bacsilienquan, type='many2many', relation='hr.employee', string='Bác sĩ liên quan'),
         'duanlienquan':fields.function(_get_duanlienquan, type='many2many', relation='yhoc_duan', string='Bác sĩ liên quan'),
         'link':fields.char('Link',size=500),
@@ -121,6 +126,7 @@ class yhoc_keyword(osv.osv):
     }
 
     _defaults = {
+        'loai_tukhoa': 'tukhoa',
     }
     
     def capnhat_kwlienquan(self, cr, uid, ids, context=None):
@@ -460,8 +466,7 @@ class yhoc_keyword(osv.osv):
                 temp = ''
                 
                 name = self.pool.get('yhoc_trangchu').parser_url(t.name)
-                name = name.replace(' ','')
-                temp = temp_.replace('__LINKTAG__',domain+'/tags/'+str(name))
+                temp = temp_.replace('__LINKTAG__',domain+'/tags/'+name)
                 temp = temp.replace('__NAMETAG__',t.name)
                 if t.color=='maudo':
                     color = 'HeaderTagCloudRed'

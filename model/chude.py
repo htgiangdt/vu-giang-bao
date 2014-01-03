@@ -114,7 +114,7 @@ class yhoc_chude(osv.osv):
         chudecon = chudecon_cd + chudecon_da
         
         #cungchude_tab_ = '''<li><a href="__LINKBAIVIET__">__TENBAIVIET__</a></li>'''
-        cungchude_tab_ = '''<li> <img class="thongtinleftimg" src="__PHOTO__"/><a href="__LINKBAIVIET__">__TENBAIVIET__</a></li>'''
+        cungchude_tab_ = '''<li> <img class="thongtinleftimg" src="__PHOTO__" alt="__TENBAIVIET__"/><a href="__LINKBAIVIET__">__TENBAIVIET__</a></li>'''
         all_cungchude = '' 
         for ccdr in chudecon:
             name_url_ccdr = self.pool.get('yhoc_trangchu').parser_url(str(ccdr.name))
@@ -315,7 +315,7 @@ class yhoc_chude(osv.osv):
                 chudecon_cuacha_cd = self.pool.get('yhoc_chude').search(cr, uid, [('parent_id','=',chude.parent_id.id),('link','!=',False)])
                 chudecon_cuacha = chudecon_cuacha_da + chudecon_cuacha_cd
                 all_cungchude = '' 
-                cungchude_tab_='''<li><img class="thongtinleftimg" src="__HINHCHUDE__"/><a href="__LINKCHUDE__">__TENCHUDE__</a></li>
+                cungchude_tab_='''<li><img class="thongtinleftimg" src="__HINHCHUDE__" alt="__TENCHUDE__"/><a href="__LINKCHUDE__">__TENCHUDE__</a></li>
                 '''
                 if chudecon_cuacha:
                     for cd in chudecon_cuacha_cd:
@@ -524,7 +524,9 @@ class yhoc_chude(osv.osv):
             template_ = ''
         template = template_.replace('__DOMAIN__', domain)
         template = template.replace('__URL__', domain + '/%s/'%chude.link_url)
-        template = template.replace('__TITLE__', chude.name)
+        name = str(chude.name)
+        name = name.replace(' ', '%20')
+        template = template.replace('__TITLE__', str(name))
         if not os.path.exists(folder_chude_data):
             os.makedirs(folder_chude_data)
         import codecs  

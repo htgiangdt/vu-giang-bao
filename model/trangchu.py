@@ -214,6 +214,17 @@ class yhoc_trangchu(osv.osv):
         for t in thuoc:
             self.pool.get('yhoc_thongtin').xuatban_thongtin(cr,uid,[t])
         return True
+    
+    def tagging_allthuoc(self, cr, uid, ids=None, context=None):
+        sql = '''select id from yhoc_thongtin
+                where nguoidich = 141               
+                '''
+        cr.execute(sql)
+        thuoc = [r[0] for r in cr.fetchall()]
+        for t in thuoc:
+            self.pool.get('yhoc_thongtin').auto_tags(cr,uid,[t])
+        return True
+		
     def capnhat_tukhoachinhvaodstukhoa(self, cr, uid, ids=None, context=None):
         tintuc = self.pool.get('yhoc_thongtin').search(cr, uid, [('state','=','done')])
         for tt in tintuc:

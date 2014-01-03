@@ -29,12 +29,12 @@ class yhoc_sach(osv.osv):
         import pyslideshare
         
         # Have all the secure keys in a file called localsettings.py
-        try:
-            from localsettings import username, password, api_key, secret_key, proxy
-        except:
-            pass
+        #try:
+        #    from localsettings import username, password, api_key, secret_key, proxy
+        #except:
+        #    pass
         
-#         Use proxy if available
+        # Use proxy if available
         vals = {
         'api_key':'bQFCVV7X',
         'secret_key':'SCmYTgrI'
