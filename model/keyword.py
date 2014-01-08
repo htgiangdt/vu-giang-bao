@@ -421,7 +421,7 @@ class yhoc_keyword(osv.osv):
                     tt = self.pool.get('yhoc_thongtin').search(cr, uid, [('keyword_ids','in',[lq.id])], context=context)
                     if tt:
                         name = self.pool.get('yhoc_trangchu').parser_url(lq.name)
-                        item = item_.replace('__LINK__','%s/tags/%s'%(domain,name))
+                        item = item_.replace('__LINK__','%s/tags/%s/'%(domain,name))
                         item = item.replace('__NAME__',lq.name)
                         tukhoalienquan += item
                         
@@ -446,10 +446,10 @@ class yhoc_keyword(osv.osv):
                 template = template.replace('__ITEMTYPE__', 'WebPage')
                 template = template.replace('__DESCRIPTION__', t.description or '')
                 template = template.replace('__TITLE__', t.name)
-                template = template.replace('__URL__', '%s/tags/%s'%(domain,name_tags))
+                template = template.replace('__URL__', '%s/tags/%s/'%(domain,name_tags))
                 
                 if not t.loai_tukhoa == 'theh1' or not t.loai_tukhoa == 'theh2':
-                    vals = {'link':domain+'/tags/%s'%name_tags}
+                    vals = {'link':domain+'/tags/%s/'%name_tags}
                 self.write(cr, uid, [t.id], vals, context=context)
                 fw = codecs.open(folder_tags +'/index.%s'%kieufile,'w','utf-8')
                 fw.write(template)
@@ -466,7 +466,8 @@ class yhoc_keyword(osv.osv):
                 temp = ''
                 
                 name = self.pool.get('yhoc_trangchu').parser_url(t.name)
-                temp = temp_.replace('__LINKTAG__',domain+'/tags/'+name)
+                name = name.replace(' ','')
+                temp = temp_.replace('__LINKTAG__',domain+'/tags/%s/'%(str(name)))
                 temp = temp.replace('__NAMETAG__',t.name)
                 if t.color=='maudo':
                     color = 'HeaderTagCloudRed'
