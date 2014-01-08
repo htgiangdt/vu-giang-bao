@@ -214,17 +214,6 @@ class yhoc_trangchu(osv.osv):
         for t in thuoc:
             self.pool.get('yhoc_thongtin').xuatban_thongtin(cr,uid,[t])
         return True
-    
-    def tagging_allthuoc(self, cr, uid, ids=None, context=None):
-        sql = '''select id from yhoc_thongtin
-                where nguoidich = 141               
-                '''
-        cr.execute(sql)
-        thuoc = [r[0] for r in cr.fetchall()]
-        for t in thuoc:
-            self.pool.get('yhoc_thongtin').auto_tags(cr,uid,[t])
-        return True
-		
     def capnhat_tukhoachinhvaodstukhoa(self, cr, uid, ids=None, context=None):
         tintuc = self.pool.get('yhoc_thongtin').search(cr, uid, [('state','=','done')])
         for tt in tintuc:
@@ -961,9 +950,9 @@ class yhoc_trangchu(osv.osv):
             all = kw_obj.search(cr, uid, [], context=context)
             sql = '''select distinct keyword_id
                     from (select keyword_id,count(thongtin_id)
-                        from thongtin_keyword_rel
+                        from thongtin_keyword_rel                        
                         group by keyword_id                    
-                        order by count(thongtin_id) desc
+                        having count(thongtin_id)>10
                         ) as temp_                    
                     '''
             cr.execute(sql)
@@ -971,23 +960,29 @@ class yhoc_trangchu(osv.osv):
             xanhduong = random.sample(all_xanhduong, 5)
             all_maudo = kw_obj.search(cr, uid, [('soluongxem','>',0),('link','!=', False)], order="soluongxem desc", limit=len(all)*0.3, context=context)
             maudo = random.sample(all_maudo, 5)
-            all_xam = kw_obj.search(cr, uid, [('id','not in', all_maudo),('id','not in', all_xanhduong),('link','!=', False)], context=context)
+            
+#            all_xam = kw_obj.search(cr, uid, [('id','not in', all_maudo),('id','not in', all_xanhduong),('link','!=', False),('loai_tukhoa','not in',['theh1','theh2','thuoc'])], context=context)
+            sql_xam = '''select id 
+                        from yhoc_keyword 
+                        where loai_tukhoa is null 
+                            and LENGTH(name)< 20 
+                            and link is not null
+                            and id not in %s'''%(tuple(all_maudo+all_xanhduong),)
+            cr.execute(sql_xam)
+            all_xam = [r[0] for r in cr.fetchall()]
             mauxam = random.sample(all_xam, 5)
             
-            all_tag = xanhduong+maudo+mauxam
-            all_tag = kw_obj.browse(cr, uid, all_tag, context=context)
+            xanhduong = kw_obj.browse(cr, uid, xanhduong, context=context)
+            maudo = kw_obj.browse(cr, uid, maudo, context=context)
+            mauxam = kw_obj.browse(cr, uid, mauxam, context=context)
+            all_tag = mauxam+maudo+xanhduong
+#            all_tag = kw_obj.browse(cr, uid, all_tag, context=context)
             xanhla = trangchu.tukhoa_dinhhuong
             if len(xanhla) > 4:
                 xanhla = random.sample(xanhla, 4)
             all_tag+=xanhla
             
-            
-            
-            
-            
-            
-            
-            
+            random.shuffle(all_tag)
             list_tag = self.pool.get('yhoc_keyword').capnhat_listtag_ophiacuoi(cr, uid, all_tag, context=context)
             template = template.replace('__LIST_TAGS__', list_tag)
         else:
@@ -1065,6 +1060,11 @@ class yhoc_trangchu(osv.osv):
         kq = '-'.join(list)
         for char in '?/:*<>|':  
             kq = kq.replace(char,'')
+        kq = kq.replace('---', '-')
+        kq = kq.replace('--', '-')
+        kq = kq.replace(' ','')
+        kq = kq.replace('"','')
+        kq = kq.replace("'",'')
         return kq
     
     def post_to_wordpress(self, cr, uid, chuyentrang_ids, dsbaiviet, context=None):
@@ -1082,7 +1082,10 @@ class yhoc_trangchu(osv.osv):
 #                        </tr>
 #                        </tbody>
 #                        </table>'''
-        content_ = '''<strong style="font-size: 18px;">Tóm tắt: </strong><em style="font-size: 14px;">__MOTA__</em>'''
+        content_ = '''Người dịch: <a href="__LINK_NGUOIDICH__">__NGUOIDICH__</a>
+Người hiệu đính: <a href="__LINK_NGUOIHIEUDINH__">__NGUOIHIEUDINH__</a>
+
+<strong style="font-size: 18px;">Tóm tắt: </strong><em style="font-size: 14px;">__MOTA__</em>'''
         if chuyentrang.id == 1:
             return False
         else:
@@ -1110,6 +1113,10 @@ class yhoc_trangchu(osv.osv):
                         fr.close()
                     
                     content = content_.replace('__MOTA__', bv.motangan or '(Chưa cập nhật)')
+                    content = content.replace('__LINK_NGUOIDICH__', bv.nguoidich.link or '#')
+                    content = content.replace('__NGUOIDICH__', bv.nguoidich.name)
+                    content = content.replace('__LINK_NGUOIHIEUDINH__', bv.nguoihieudinh.link or '#')
+                    content = content.replace('__NGUOIHIEUDINH__', bv.nguoihieudinh.name)
                     content = content.replace('__PHOTO__', domain + '/images/thongtin/%s-thongtin-%s.jpg'%(str(bv.id),name_url))
                     content += menu
                     link = domain + '/thongtin/%s'%name_url
